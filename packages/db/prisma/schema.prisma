@@ -1,0 +1,917 @@
+// BiletFlow data model. See docs/data-model.md for the invariants that are enforced
+// by hand-written SQL in migrations rather than by Prisma.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  ATTENDEE
+  ORGANIZER
+  PLATFORM_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum VerificationStatus {
+  NOT_STARTED
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+enum EventVisibility {
+  PUBLIC
+  UNLISTED
+  PRIVATE
+}
+
+enum SeatingMode {
+  GENERAL_ADMISSION
+  ASSIGNED
+}
+
+enum RefundPolicy {
+  NO_REFUNDS
+  UNTIL_48H_BEFORE
+  UNTIL_24H_BEFORE
+}
+
+enum SeatStatus {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+enum SeatHoldStatus {
+  ACTIVE
+  CONVERTED
+  RELEASED
+}
+
+enum OrderStatus {
+  PENDING
+  AWAITING_PAYMENT
+  PAID
+  CANCELLED
+  REFUNDED
+  EXPIRED
+}
+
+enum TicketStatus {
+  VALID
+  CHECKED_IN
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentPurpose {
+  TICKET_ORDER
+  ACTIVATION_FEE
+}
+
+enum PaymentStatus {
+  CREATED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  ABANDONED
+  REFUNDED
+}
+
+enum RefundStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+enum PayoutStatus {
+  PENDING
+  SCHEDULED
+  PAID
+}
+
+enum StaffRole {
+  CO_ORGANIZER
+  EVENT_ADMIN
+  SUPPORT_AGENT
+}
+
+enum NotificationType {
+  ACCOUNT_VERIFICATION
+  ORDER_CONFIRMATION
+  TICKET_DELIVERY
+  PAYMENT_FAILED
+  EVENT_UPDATED
+  EVENT_CANCELLED
+  REFUND_COMPLETED
+  PAYOUT_STATUS
+  SUPPORT_MESSAGE
+  SUPPORT_ASSIGNED
+  SUPPORT_STATUS_CHANGED
+}
+
+enum NotificationChannel {
+  EMAIL
+  IN_APP
+}
+
+enum SupportAudience {
+  ATTENDEE_TO_ORGANIZER
+  ORGANIZER_TO_PLATFORM
+}
+
+enum SupportCategory {
+  TICKET_DELIVERY
+  PAYMENT
+  REFUND
+  SEATING
+  EVENT_INFORMATION
+  CHECK_IN
+  ACCOUNT
+  TECHNICAL
+}
+
+enum SupportStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_FOR_CUSTOMER
+  RESOLVED
+}
+
+enum DiscountType {
+  PERCENT
+  FIXED_KZT
+}
+
+enum CampaignStatus {
+  ACTIVE
+  DISABLED
+}
+
+// ---------------------------------------------------------------------------
+// Auth. Field names follow better-auth's expected Prisma schema.
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String     @id @default(cuid())
+  name          String
+  email         String     @unique
+  emailVerified Boolean    @default(false)
+  image         String?
+  role          UserRole   @default(ATTENDEE)
+  status        UserStatus @default(ACTIVE)
+  locale        String     @default("ru")
+  phone         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  sessions          Session[]
+  accounts          Account[]
+  organizerProfile  OrganizerProfile?
+  events            Event[]              @relation("EventOrganizer")
+  orders            Order[]
+  seatHolds         SeatHold[]
+  staffAssignments  StaffAssignment[]
+  notifications     Notification[]
+  supportCases      SupportCase[]        @relation("SupportRequester")
+  assignedCases     SupportCase[]        @relation("SupportAssignee")
+  supportMessages   SupportMessage[]
+  checkInsPerformed CheckInRecord[]      @relation("CheckedInBy")
+  checkInsReversed  CheckInRecord[]      @relation("ReversedBy")
+  promoRedemptions  PromoRedemption[]
+  auditEntries      AuditLog[]
+  refundsInitiated  Refund[]             @relation("RefundInitiator")
+  activationsPaid   PaidSalesActivation[] @relation("ActivationOrganizer")
+  activationsReviewed PaidSalesActivation[] @relation("ActivationReviewer")
+
+  @@index([role])
+  @@index([status])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+// ---------------------------------------------------------------------------
+// Organizer
+// ---------------------------------------------------------------------------
+
+model OrganizerProfile {
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  displayName        String
+  description        String?
+  logoUrl            String?
+  contactEmail       String
+  contactPhone       String?
+  websiteUrl         String?
+  verificationStatus VerificationStatus @default(NOT_STARTED)
+  // Simulated KYC: a single uploaded document, reviewed manually by a Platform Admin.
+  identityDocUrl     String?
+  verifiedAt         DateTime?
+  reviewNote         String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payoutAccounts PayoutAccount[]
+
+  @@index([verificationStatus])
+}
+
+model PayoutAccount {
+  id                 String   @id @default(cuid())
+  organizerProfileId String
+  holderName         String
+  bankName           String
+  // Store only the last four digits. Full account numbers are out of scope.
+  ibanLast4          String   @map("iban_last4")
+  currency           String   @default("KZT")
+  isDefault          Boolean  @default(false)
+  simulated          Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  organizerProfile OrganizerProfile @relation(fields: [organizerProfileId], references: [id], onDelete: Cascade)
+  payouts          Payout[]
+
+  @@index([organizerProfileId])
+}
+
+model Payout {
+  id              String       @id @default(cuid())
+  payoutAccountId String
+  eventId         String
+  grossKzt        Int
+  feeKzt          Int
+  refundedKzt     Int
+  netKzt          Int
+  status          PayoutStatus @default(PENDING)
+  scheduledFor    DateTime?
+  paidAt          DateTime?
+  simulated       Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  payoutAccount PayoutAccount @relation(fields: [payoutAccountId], references: [id])
+  event         Event         @relation(fields: [eventId], references: [id])
+
+  @@index([eventId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Venue and seating. Assigned seating is bonus scope (docs/PLAN.md section 1);
+// the tables exist so the feature can be added without a migration rewrite.
+// ---------------------------------------------------------------------------
+
+model Venue {
+  id        String   @id @default(cuid())
+  name      String
+  address   String
+  city      String
+  country   String   @default("KZ")
+  timezone  String   @default("Asia/Almaty")
+  latitude  Float?
+  longitude Float?
+  capacity  Int?
+  isPredefinedLayout Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sections VenueSection[]
+  events   Event[]
+}
+
+model VenueSection {
+  id            String   @id @default(cuid())
+  venueId       String
+  name          String
+  displayOrder  Int      @default(0)
+  priceCategory String?
+  createdAt     DateTime @default(now())
+
+  venue Venue     @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  rows  SeatRow[]
+
+  @@unique([venueId, name])
+}
+
+model SeatRow {
+  id             String   @id @default(cuid())
+  venueSectionId String
+  label          String
+  displayOrder   Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  section VenueSection @relation(fields: [venueSectionId], references: [id], onDelete: Cascade)
+  seats   Seat[]
+
+  @@unique([venueSectionId, label])
+}
+
+model Seat {
+  id           String     @id @default(cuid())
+  seatRowId    String
+  number       String
+  isAccessible Boolean    @default(false)
+  status       SeatStatus @default(AVAILABLE)
+  priceCategory String?
+  createdAt    DateTime   @default(now())
+
+  row        SeatRow     @relation(fields: [seatRowId], references: [id], onDelete: Cascade)
+  holds      SeatHold[]
+  orderItems OrderItem[]
+  tickets    Ticket[]
+
+  @@unique([seatRowId, number])
+}
+
+model SeatHold {
+  id        String         @id @default(cuid())
+  seatId    String
+  eventId   String
+  userId    String?
+  orderId   String?
+  status    SeatHoldStatus @default(ACTIVE)
+  expiresAt DateTime
+  createdAt DateTime       @default(now())
+
+  seat  Seat   @relation(fields: [seatId], references: [id], onDelete: Cascade)
+  event Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User?  @relation(fields: [userId], references: [id])
+  order Order? @relation(fields: [orderId], references: [id])
+
+  @@index([eventId, status])
+  @@index([expiresAt])
+}
+
+// ---------------------------------------------------------------------------
+// Events and tickets
+// ---------------------------------------------------------------------------
+
+model Event {
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  organizerId String
+  venueId     String?
+  title       String
+  description String?
+  category    String?
+  coverImageUrl String?
+  status      EventStatus     @default(DRAFT)
+  visibility  EventVisibility @default(PUBLIC)
+  seatingMode SeatingMode     @default(GENERAL_ADMISSION)
+
+  startsAt DateTime
+  endsAt   DateTime
+  timezone String   @default("Asia/Almaty")
+
+  registrationOpensAt  DateTime?
+  registrationClosesAt DateTime?
+  capacity             Int?
+
+  paidSalesActive    Boolean      @default(false)
+  paidSalesSuspended Boolean      @default(false)
+  refundPolicy       RefundPolicy @default(NO_REFUNDS)
+
+  publishedAt DateTime?
+  cancelledAt DateTime?
+  cancellationReason String?
+  // Bumped on every change so calendar clients replace the earlier .ics entry.
+  calendarSequence Int @default(0)
+
+  reportCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  organizer   User                  @relation("EventOrganizer", fields: [organizerId], references: [id])
+  venue       Venue?                @relation(fields: [venueId], references: [id])
+  ticketTypes TicketType[]
+  orders      Order[]
+  tickets     Ticket[]
+  seatHolds   SeatHold[]
+  staff       StaffAssignment[]
+  campaigns   PromotionalCampaign[]
+  supportCases SupportCase[]
+  auditEntries AuditLog[]
+  activation  PaidSalesActivation?
+  payouts     Payout[]
+  checkIns    CheckInRecord[]
+
+  @@index([status, startsAt])
+  @@index([organizerId])
+  @@index([visibility, status])
+}
+
+model TicketType {
+  id          String   @id @default(cuid())
+  eventId     String
+  name        String
+  description String?
+  priceKzt    Int      @default(0)
+  quantity    Int
+  // Counters are mutated only by the atomic statements in docs/data-model.md.
+  sold        Int      @default(0)
+  reserved    Int      @default(0)
+  refunded    Int      @default(0)
+  maxPerOrder Int      @default(10)
+  salesStartAt DateTime?
+  salesEndAt   DateTime?
+  isHidden     Boolean  @default(false)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  event      Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+  tickets    Ticket[]
+  campaignTicketTypes CampaignTicketType[]
+
+  @@index([eventId])
+}
+
+model PaidSalesActivation {
+  id           String   @id @default(cuid())
+  eventId      String   @unique
+  organizerId  String
+  feeKzt       Int
+  feePaid      Boolean  @default(false)
+  identityVerified Boolean @default(false)
+  payoutAccountConnected Boolean @default(false)
+  termsAcceptedAt DateTime?
+  activatedAt  DateTime?
+  reviewedById String?
+  reviewNote   String?
+  simulated    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  event      Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  organizer  User      @relation("ActivationOrganizer", fields: [organizerId], references: [id])
+  reviewedBy User?     @relation("ActivationReviewer", fields: [reviewedById], references: [id])
+  payments   Payment[]
+}
+
+// ---------------------------------------------------------------------------
+// Orders, tickets, attendees
+// ---------------------------------------------------------------------------
+
+model Order {
+  id       String      @id @default(cuid())
+  // Short human-readable reference shown to attendees and support staff.
+  reference String     @unique
+  eventId  String
+  userId   String
+  status   OrderStatus @default(PENDING)
+
+  subtotalKzt Int @default(0)
+  discountKzt Int @default(0)
+  feeKzt      Int @default(0)
+  totalKzt    Int @default(0)
+  currency    String @default("KZT")
+
+  campaignId  String?
+  promoCodeId String?
+
+  // Guards duplicate submissions of the same checkout attempt.
+  clientIdempotencyKey String? @unique
+  // Inventory reservation deadline; the sweeper releases the order after this.
+  expiresAt   DateTime?
+  paidAt      DateTime?
+  cancelledAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  event      Event                @relation(fields: [eventId], references: [id])
+  user       User                 @relation(fields: [userId], references: [id])
+  campaign   PromotionalCampaign? @relation(fields: [campaignId], references: [id])
+  promoCode  PromoCode?           @relation(fields: [promoCodeId], references: [id])
+  items      OrderItem[]
+  tickets    Ticket[]
+  payments   Payment[]
+  refunds    Refund[]
+  seatHolds  SeatHold[]
+  redemption PromoRedemption?
+  supportCases SupportCase[]
+
+  @@index([eventId, status])
+  @@index([userId])
+  @@index([status, expiresAt])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id           String @id @default(cuid())
+  orderId      String
+  ticketTypeId String
+  quantity     Int
+  unitPriceKzt Int
+  discountKzt  Int    @default(0)
+  totalKzt     Int
+
+  // Populated only for assigned-seating events.
+  seatId      String?
+  sectionName String?
+  rowLabel    String?
+  seatNumber  String?
+
+  createdAt DateTime @default(now())
+
+  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id])
+  seat       Seat?      @relation(fields: [seatId], references: [id])
+  tickets    Ticket[]
+
+  @@index([orderId])
+  @@index([ticketTypeId])
+}
+
+model Attendee {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String
+  phone     String?
+  createdAt DateTime @default(now())
+
+  tickets Ticket[]
+
+  @@index([email])
+}
+
+model Ticket {
+  id           String       @id @default(cuid())
+  // Value encoded in the admission QR payload; see packages/shared/src/qr.ts.
+  code         String       @unique
+  eventId      String
+  orderId      String
+  orderItemId  String
+  ticketTypeId String
+  attendeeId   String
+  status       TicketStatus @default(VALID)
+
+  seatId      String?
+  sectionName String?
+  rowLabel    String?
+  seatNumber  String?
+
+  issuedAt    DateTime  @default(now())
+  invalidatedAt DateTime?
+  pdfUrl      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  event      Event           @relation(fields: [eventId], references: [id])
+  order      Order           @relation(fields: [orderId], references: [id])
+  orderItem  OrderItem       @relation(fields: [orderItemId], references: [id])
+  ticketType TicketType      @relation(fields: [ticketTypeId], references: [id])
+  attendee   Attendee        @relation(fields: [attendeeId], references: [id])
+  seat       Seat?           @relation(fields: [seatId], references: [id])
+  checkIns   CheckInRecord[]
+  supportCases SupportCase[]
+
+  @@index([eventId, status])
+  @@index([orderId])
+  @@index([attendeeId])
+}
+
+model CheckInRecord {
+  id           String    @id @default(cuid())
+  ticketId     String
+  eventId      String
+  checkedInById String
+  checkedInAt  DateTime  @default(now())
+  reversedById String?
+  reversedAt   DateTime?
+  reversalReason String?
+  deviceLabel  String?
+
+  ticket      Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  event       Event  @relation(fields: [eventId], references: [id])
+  checkedInBy User   @relation("CheckedInBy", fields: [checkedInById], references: [id])
+  reversedBy  User?  @relation("ReversedBy", fields: [reversedById], references: [id])
+
+  // A ticket may have many historical records but only one un-reversed one. That
+  // is a partial unique index, added by hand in the migration; see docs/data-model.md.
+  @@index([ticketId])
+  @@index([eventId, checkedInAt])
+}
+
+model StaffAssignment {
+  id        String    @id @default(cuid())
+  eventId   String
+  userId    String
+  role      StaffRole
+  createdAt DateTime  @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId, role])
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Money. Every record here is simulated for the academic build.
+// ---------------------------------------------------------------------------
+
+model Payment {
+  id           String         @id @default(cuid())
+  purpose      PaymentPurpose
+  orderId      String?
+  activationId String?
+  provider     String         @default("simulated")
+  providerIntentId String     @unique
+  status       PaymentStatus  @default(CREATED)
+  amountKzt    Int
+  feeKzt       Int            @default(0)
+  currency     String         @default("KZT")
+  failureReason String?
+  simulated    Boolean        @default(true)
+  succeededAt  DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  order      Order?               @relation(fields: [orderId], references: [id])
+  activation PaidSalesActivation? @relation(fields: [activationId], references: [id])
+  refunds    Refund[]
+
+  @@index([orderId])
+  @@index([status])
+}
+
+model Refund {
+  id            String       @id @default(cuid())
+  orderId       String
+  paymentId     String
+  initiatedById String
+  amountKzt     Int
+  reason        String?
+  status        RefundStatus @default(PENDING)
+  simulated     Boolean      @default(true)
+  processedAt   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  order       Order   @relation(fields: [orderId], references: [id])
+  payment     Payment @relation(fields: [paymentId], references: [id])
+  initiatedBy User    @relation("RefundInitiator", fields: [initiatedById], references: [id])
+
+  @@index([orderId])
+  @@index([status])
+}
+
+// Guards the payment webhook against duplicate delivery.
+model ProcessedWebhookEvent {
+  id          String   @id @default(cuid())
+  provider    String
+  eventKey    String
+  processedAt DateTime @default(now())
+
+  @@unique([provider, eventKey])
+}
+
+// ---------------------------------------------------------------------------
+// Promotions
+// ---------------------------------------------------------------------------
+
+model PromotionalCampaign {
+  id             String         @id @default(cuid())
+  eventId        String
+  name           String
+  discountType   DiscountType
+  discountValue  Int
+  status         CampaignStatus @default(ACTIVE)
+  startsAt       DateTime?
+  endsAt         DateTime?
+  maxRedemptions Int?
+  // Incremented only by the conditional UPDATE in docs/data-model.md.
+  redeemed       Int            @default(0)
+  perUserLimit   Int            @default(1)
+  qrImageUrl     String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  event       Event                @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  promoCode   PromoCode?
+  redemptions PromoRedemption[]
+  orders      Order[]
+  ticketTypes CampaignTicketType[]
+
+  @@index([eventId, status])
+}
+
+model CampaignTicketType {
+  campaignId   String
+  ticketTypeId String
+
+  campaign   PromotionalCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  ticketType TicketType          @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+
+  @@id([campaignId, ticketTypeId])
+}
+
+model PromoCode {
+  id         String   @id @default(cuid())
+  campaignId String   @unique
+  code       String   @unique
+  // Opaque HMAC token embedded in the campaign QR link. Never encodes a discount.
+  qrToken    String   @unique
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  campaign    PromotionalCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  redemptions PromoRedemption[]
+  orders      Order[]
+}
+
+model PromoRedemption {
+  id          String   @id @default(cuid())
+  campaignId  String
+  promoCodeId String
+  orderId     String   @unique
+  userId      String
+  discountKzt Int
+  createdAt   DateTime @default(now())
+
+  campaign  PromotionalCampaign @relation(fields: [campaignId], references: [id])
+  promoCode PromoCode           @relation(fields: [promoCodeId], references: [id])
+  order     Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user      User                @relation(fields: [userId], references: [id])
+
+  @@unique([campaignId, userId])
+  @@index([campaignId])
+}
+
+// ---------------------------------------------------------------------------
+// Support
+// ---------------------------------------------------------------------------
+
+model SupportCase {
+  id          String          @id @default(cuid())
+  reference   String          @unique
+  audience    SupportAudience
+  category    SupportCategory
+  status      SupportStatus   @default(OPEN)
+  subject     String
+  requesterId String
+  assigneeId  String?
+  eventId     String?
+  orderId     String?
+  ticketId    String?
+  lastMessageAt DateTime      @default(now())
+  resolvedAt  DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  requester User             @relation("SupportRequester", fields: [requesterId], references: [id])
+  assignee  User?            @relation("SupportAssignee", fields: [assigneeId], references: [id])
+  event     Event?           @relation(fields: [eventId], references: [id])
+  order     Order?           @relation(fields: [orderId], references: [id])
+  ticket    Ticket?          @relation(fields: [ticketId], references: [id])
+  messages  SupportMessage[]
+
+  @@index([requesterId, status])
+  @@index([assigneeId, status])
+  @@index([eventId])
+}
+
+model SupportMessage {
+  id        String   @id @default(cuid())
+  caseId    String
+  authorId  String
+  body      String
+  // Status changes and assignments are rendered inline in the thread.
+  isSystem  Boolean  @default(false)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  case   SupportCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  author User        @relation(fields: [authorId], references: [id])
+
+  @@index([caseId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Platform
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  type      NotificationType
+  channel   NotificationChannel
+  subject   String
+  body      String
+  payload   Json?
+  sentAt    DateTime?
+  readAt    DateTime?
+  error     String?
+  createdAt DateTime            @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+// Append-only. Never updated or deleted through application code.
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  eventId     String?
+  action      String
+  entityType  String
+  entityId    String
+  description String
+  metadata    Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  actor User?  @relation(fields: [actorUserId], references: [id])
+  event Event? @relation(fields: [eventId], references: [id])
+
+  @@index([eventId, createdAt])
+  @@index([entityType, entityId])
+  @@index([actorUserId])
+}
+
+model PlatformSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model EventReport {
+  id         String   @id @default(cuid())
+  eventId    String
+  reporterId String?
+  reason     String
+  details    String?
+  resolvedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([eventId])
+}

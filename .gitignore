@@ -1,3 +1,19 @@
+# --- BiletFlow -------------------------------------------------------------
+.env
+.env.*
+!.env.example
+.next/
+out/
+.expo/
+.turbo/
+dist/
+coverage/
+playwright-report/
+test-results/
+packages/db/generated/
+*.pem
+.DS_Store
+
 # Logs
 logs
 *.log
