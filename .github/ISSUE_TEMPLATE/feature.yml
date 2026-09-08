@@ -1,0 +1,49 @@
+name: Feature
+description: A unit of work from the delivery plan
+labels: ["P1"]
+body:
+  - type: input
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What can a user do after this ships that they could not before?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - web-attendee
+        - web-organizer
+        - admin
+        - api
+        - mobile
+        - infra
+        - docs
+    validations:
+      required: true
+
+  - type: dropdown
+    id: week
+    attributes:
+      label: Planned week
+      options: ["4", "5", "6", "7", "8", "9", "10", "11", "12", "stretch"]
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Dependencies and notes

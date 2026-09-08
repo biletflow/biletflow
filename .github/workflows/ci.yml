@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: lint, typecheck, test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: biletflow
+          POSTGRES_PASSWORD: biletflow
+          POSTGRES_DB: biletflow_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://biletflow:biletflow@localhost:5432/biletflow_test?schema=public
+      BETTER_AUTH_SECRET: ci-secret-not-used-anywhere-else
+      BETTER_AUTH_URL: http://localhost:3000
+      TICKET_SIGNING_KEY: ci-ticket-signing-key
+      CAMPAIGN_SIGNING_KEY: ci-campaign-signing-key
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # `pnpm -r run` skips workspace packages that do not define the script, so this
+      # stays green while apps/web and apps/scanner are still being scaffolded.
+      - run: pnpm -r run lint
+      - run: pnpm -r run typecheck
+      - run: pnpm --filter @biletflow/db run deploy
+      - run: pnpm -r run test
