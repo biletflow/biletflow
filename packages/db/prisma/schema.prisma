@@ -399,11 +399,15 @@ model SeatHold {
   expiresAt DateTime
   createdAt DateTime       @default(now())
 
+  // Same trick as CheckInRecord.activeKey: only one live hold per seat.
+  activeKey String @default("active")
+
   seat  Seat   @relation(fields: [seatId], references: [id], onDelete: Cascade)
   event Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user  User?  @relation(fields: [userId], references: [id])
   order Order? @relation(fields: [orderId], references: [id])
 
+  @@unique([seatId, activeKey])
   @@index([eventId, status])
   @@index([expiresAt])
 }
@@ -648,14 +652,17 @@ model CheckInRecord {
   reversalReason String?
   deviceLabel  String?
 
+  // A ticket may have many historical check-ins but only one un-reversed one.
+  // Holds the literal "active" while live; on reversal the app sets it to this row's
+  // id, which frees the slot for a new check-in and keeps the history row.
+  activeKey String @default("active")
+
   ticket      Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   event       Event  @relation(fields: [eventId], references: [id])
   checkedInBy User   @relation("CheckedInBy", fields: [checkedInById], references: [id])
   reversedBy  User?  @relation("ReversedBy", fields: [reversedById], references: [id])
 
-  // A ticket may have many historical records but only one un-reversed one. That
-  // is a partial unique index, added by hand in the migration; see docs/data-model.md.
-  @@index([ticketId])
+  @@unique([ticketId, activeKey])
   @@index([eventId, checkedInAt])
 }
 

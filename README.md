@@ -23,7 +23,7 @@ All payments in this build are **simulated**. No real money moves.
 corepack enable && corepack use pnpm@latest
 cp .env.example .env      # fill BETTER_AUTH_SECRET + 2 signing keys
 pnpm install
-pnpm infra:up             # Postgres :5432, Mailpit :8025, MinIO :9001
+pnpm infra:up             # Postgres :5433, Mailpit :8025, MinIO :9001
 pnpm db:migrate && pnpm db:seed
 pnpm dev
 ```
