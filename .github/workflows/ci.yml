@@ -49,6 +49,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Types come from the generated client, so this must precede typecheck.
+      - run: pnpm --filter @biletflow/db run generate
+
       # `pnpm -r run` skips workspace packages that do not define the script, so this
       # stays green while apps/web and apps/scanner are still being scaffolded.
       - run: pnpm -r run lint

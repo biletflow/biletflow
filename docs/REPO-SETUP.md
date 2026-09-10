@@ -1,7 +1,5 @@
 # Setup
 
-Owner: D. Checked items are already committed.
-
 ## Already done
 
 - [x] Org `biletflow`, public repo, MIT.
@@ -11,6 +9,9 @@ Owner: D. Checked items are already committed.
 - [x] `infra/` — Compose (Postgres, Mailpit, MinIO) + Dockerfile.
 - [x] `.github/` — CI, PR template, issue forms, CODEOWNERS.
 - [x] `docs/`, `.env.example`, `scripts/bootstrap-github.sh`.
+- [x] `apps/web` — Next.js 16, React 19, Tailwind 4, shadcn/ui, standalone output.
+- [x] `apps/scanner` — Expo SDK 57, expo-camera, monorepo Metro config, working scan screen.
+- [x] Initial migration applied, seed script written and run.
 
 ## 1. Local (everyone, once)
 
@@ -27,39 +28,35 @@ pnpm db:migrate && pnpm db:seed
 
 Mailpit inbox: <http://localhost:8025>. MinIO console: <http://localhost:9001> (`biletflow`/`biletflow`).
 
-## 2. Scaffold apps/web — D
+## 2. apps/web — D
 
-`apps/web` is empty on purpose so `create-next-app` hits no conflicts.
+Scaffolded and building: Next.js 16, React 19, Tailwind 4, shadcn/ui, standalone output.
+Installed: better-auth, next-intl, `@react-pdf/renderer`, qrcode, recharts,
+react-hook-form, zod, nodemailer, `@aws-sdk/client-s3`, vitest.
 
-```bash
-pnpm create next-app@latest apps/web --ts --tailwind --app --eslint --src-dir --use-pnpm
-cd apps/web
-pnpm add @biletflow/db@workspace:* @biletflow/shared@workspace:*
-pnpm add better-auth next-intl @react-pdf/renderer qrcode recharts \
-         react-hook-form @hookform/resolvers zod nodemailer @aws-sdk/client-s3
-pnpm add -D vitest @vitejs/plugin-react
-pnpm dlx shadcn@latest init
-```
+Remaining for D:
 
-Then: add `"typecheck": "tsc --noEmit"` and `"test": "vitest run --passWithNoTests"` to
-`apps/web/package.json`, and set `output: "standalone"` in `next.config.ts` so the
-Dockerfile works.
+- [ ] Wire next-intl (`kk`/`ru`/`en`) before any feature screens land.
+- [ ] Configure better-auth to use `hashPassword`/`verifyPassword` from
+      `@biletflow/shared/password.server`, so seeded logins work.
 
-## 3. Scaffold apps/scanner — K
+## 3. apps/scanner — K
 
-```bash
-pnpm create expo-app apps/scanner --template blank-typescript
-cd apps/scanner
-pnpm add expo-camera expo-router expo-secure-store nativewind
-pnpm add @biletflow/shared@workspace:*
-```
+Scaffolded on Expo SDK 57 with expo-camera and expo-secure-store. `metro.config.js` is
+configured for the monorepo, and `App.tsx` scans a QR and classifies it with the shared
+parser — including rejecting a campaign QR as "not a ticket".
 
-Then configure `metro.config.js` per Expo's monorepo guide: `watchFolders` at the repo
-root, extended `nodeModulesPaths`. Import `@biletflow/shared` only — never
-`qr.server.ts`, which needs `node:crypto` and will not bundle.
+Import `@biletflow/shared` only — never `qr.server.ts` or `password.server.ts`, which
+need `node:crypto` and will not bundle.
 
-If Metro costs more than a day, move the scanner to its own repo and copy the types. Do
-not block week 5 on it.
+Remaining for K:
+
+- [ ] Run on a physical device: `pnpm --filter scanner start`, then scan with Expo Go.
+- [ ] expo-router and NativeWind, deliberately not installed — both need entry-point and
+      Babel changes better made once the screen structure exists.
+
+If Metro resolution costs more than a day, move the scanner to its own repo and copy the
+types. Do not block week 5 on it.
 
 ## 4. GitHub
 
@@ -96,5 +93,3 @@ Settings → Rules → Rulesets → new branch ruleset targeting `main`:
 gh project create --owner biletflow --title "BiletFlow Delivery"
 ```
 
-Fields: `Owner`, `Area`, `Priority`, `Week`. Columns: Backlog / This Week / In Progress /
-In Review / Done. Bulk-add the issues from step 4.
