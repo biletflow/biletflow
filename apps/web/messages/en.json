@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "title": "BiletFlow — Event ticketing for Kazakhstan",
+    "description": "Create an event and issue QR-code tickets. Free events cost nothing; activate paid sales when you are ready."
+  },
+  "nav": {
+    "home": "BiletFlow home",
+    "browse": "Browse Events",
+    "categories": "Categories",
+    "signIn": "Sign In",
+    "getStarted": "Get Started"
+  },
+  "home": {
+    "eyebrow": "Self-service event ticketing in Kazakhstan",
+    "headline": "Your Next Great Event",
+    "headlineAccent": "Starts Here",
+    "subhead": "Discover, book, and manage events across Kazakhstan. The smarter way to experience live entertainment.",
+    "searchPlaceholder": "Search events, concerts, sports…",
+    "findEvents": "Find Events",
+    "allCities": "All Cities",
+    "featuredEyebrow": "Happening soon",
+    "featured": "Featured Events",
+    "viewAll": "View All Events",
+    "categoriesHeading": "Browse by Category",
+    "organizerHeading": "Ready to host your event?",
+    "organizerBody": "Create an event and issue free tickets at no cost. Activate paid sales when you are ready to sell.",
+    "organizerCta": "Start Selling Tickets",
+    "features": {
+      "bookingTitle": "Instant booking",
+      "bookingBody": "Reserve a ticket in under a minute. No queues.",
+      "qrTitle": "QR-code tickets",
+      "qrBody": "Your ticket lives on your phone, or print it for the door.",
+      "organizerTitle": "Built for organizers",
+      "organizerBody": "Sales analytics, attendee lists, promo campaigns, and check-in.",
+      "supportTitle": "Contextual support",
+      "supportBody": "Open a support case from any order or ticket and get a reply in the thread."
+    }
+  },
+  "events": {
+    "searchPlaceholder": "Search events, venues…",
+    "allCities": "All Cities",
+    "allCategories": "All",
+    "resultCount": "{count, plural, =0 {No events found} one {# event found} other {# events found}}",
+    "filters": "Filters",
+    "priceRange": "Price",
+    "allPrices": "All prices",
+    "free": "Free",
+    "under": "Under {amount}",
+    "over": "{amount} and up",
+    "date": "Date",
+    "anyDate": "Any date",
+    "today": "Today",
+    "thisWeekend": "This weekend",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "status": "Availability",
+    "anyAvailability": "Any",
+    "available": "Available",
+    "almostFull": "Almost full",
+    "sortBy": "Sort by",
+    "sortDate": "Date",
+    "sortPrice": "Price",
+    "sortPopular": "Popularity",
+    "clearFilters": "Clear filters",
+    "emptyTitle": "No events match these filters",
+    "emptyBody": "Try widening your date range or clearing a filter."
+  },
+  "event": {
+    "about": "About this event",
+    "venue": "Venue",
+    "organizer": "Organizer",
+    "verifiedOrganizer": "Verified organizer",
+    "selectTickets": "Select tickets",
+    "quantity": "Quantity",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
+    "soldOut": "Sold out",
+    "salesEnded": "Sales ended",
+    "salesNotOpen": "Sales not open yet",
+    "remaining": "{count} remaining",
+    "salesEnd": "Sales end {date}",
+    "register": "Register",
+    "buyTickets": "Buy tickets",
+    "freeTicket": "Free",
+    "capacity": "{count} capacity",
+    "relatedHeading": "You might also like",
+    "cancelled": "This event has been cancelled",
+    "cancelledBody": "Ticket holders have been notified and refunded where applicable.",
+    "paidSalesInactive": "Paid sales are not active for this event yet",
+    "checkoutSoon": "Checkout is not connected yet. Ticket selection is for display only.",
+    "total": "Total",
+    "refundPolicy": "Refund policy",
+    "refund": {
+      "NO_REFUNDS": "Tickets are non-refundable.",
+      "UNTIL_48H_BEFORE": "Refundable up to 48 hours before the event starts.",
+      "UNTIL_24H_BEFORE": "Refundable up to 24 hours before the event starts."
+    }
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signUpTitle": "Create an account",
+    "notReady": "Accounts are not connected yet. You can still browse events without signing in.",
+    "back": "Back to events"
+  },
+  "common": {
+    "percentSold": "{percent}% sold",
+    "language": "Language",
+    "simulatedPayments": "Demonstration build — all payments are simulated and no real money moves."
+  },
+  "cities": {
+    "Almaty": "Almaty",
+    "Astana": "Astana",
+    "Shymkent": "Shymkent"
+  },
+  "categories": {
+    "Music": "Music",
+    "Community": "Community",
+    "Technology": "Technology",
+    "Film": "Film"
+  },
+  "ticketTypes": {
+    "General Admission": "General Admission",
+    "VIP": "VIP",
+    "Free Entry": "Free Entry",
+    "Standard": "Standard",
+    "Student": "Student",
+    "Seat": "Seat",
+    "Early Bird": "Early Bird"
+  },
+  "countries": {
+    "KZ": "Kazakhstan"
+  },
+  "footer": {
+    "tagline": "Kazakhstan-focused self-service event ticketing. Create an event, issue tickets, check people in.",
+    "rights": "© {year} BiletFlow. Almaty, Kazakhstan."
+  }
+}

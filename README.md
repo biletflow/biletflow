@@ -28,8 +28,6 @@ pnpm db:migrate && pnpm db:seed
 pnpm dev
 ```
 
-`apps/web` and `apps/scanner` are not scaffolded yet — see [docs/REPO-SETUP.md](docs/REPO-SETUP.md).
-
 ## Layout
 
 ```
@@ -38,19 +36,14 @@ apps/scanner     Expo app for event admins
 packages/db      Prisma schema, client, seed
 packages/shared  Zod schemas, KZT money, QR parsing/signing
 infra            docker-compose, Dockerfile
-docs             plan, decisions, data model, API contract
 ```
 
 ## Docs
 
 | | |
 | --- | --- |
-| [PLAN.md](docs/PLAN.md) | Scope, owners, weekly schedule, gates |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Branching, PRs, definition of done |
-| [REPO-SETUP.md](docs/REPO-SETUP.md) | Setup checklist |
-| [data-model.md](docs/data-model.md) | Entities + the SQL that prevents double-selling |
 | [api.md](docs/api.md) | Endpoint contract |
-| [ADR-0001](docs/decisions/ADR-0001-stack.md) | Stack rationale + closed decisions |
 
 ## Team
 

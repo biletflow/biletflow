@@ -2,10 +2,6 @@
 
 <!-- One or two sentences. What does this change do for a user? -->
 
-## Linked issue
-
-Closes #
-
 ## Checklist
 
 - [ ] CI is green

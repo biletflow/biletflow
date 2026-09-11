@@ -1,14 +1,13 @@
-# Replace the placeholders with real GitHub handles before enabling the branch ruleset.
-# Owners are auto-requested as reviewers; see docs/PLAN.md section 2.
+# Reviewers auto-requested on PRs that touch these paths.
+# D = daridokki, A = kymbatovaa, Z = zhansayasyzdykova, K = utegenkamila
 
-/apps/web/src/app/(attendee)/    @D-handle
-/apps/web/src/app/(organizer)/   @A-handle
-/apps/web/src/app/(admin)/       @A-handle
-/apps/web/src/app/api/checkin/   @K-handle
-/apps/web/src/server/            @Z-handle
-/apps/scanner/                   @K-handle
-/packages/db/                    @Z-handle
-/packages/shared/                @Z-handle
-/infra/                          @D-handle
-/.github/                        @D-handle
-/docs/                           @A-handle
+/apps/web/          @daridokki
+/infra/             @daridokki
+/.github/           @daridokki
+
+/docs/              @kymbatovaa
+
+/packages/db/       @zhansayasyzdykova
+/packages/shared/   @zhansayasyzdykova
+
+/apps/scanner/      @utegenkamila
