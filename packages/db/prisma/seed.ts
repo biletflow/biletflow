@@ -84,21 +84,19 @@ async function createUser(
   role: "ATTENDEE" | "ORGANIZER" | "PLATFORM_ADMIN",
   passwordHash: string,
 ) {
-  return prisma.user.create({
-    data: {
-      email,
-      name,
-      role,
-      emailVerified: true,
-      locale: "ru",
-      accounts: {
-        create: {
-          providerId: "credential",
-          accountId: email,
-          password: passwordHash,
-        },
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: { email, name, role, emailVerified: true, locale: "ru" },
+    });
+    await tx.account.create({
+      data: {
+        userId: user.id,
+        providerId: "credential",
+        accountId: user.id,
+        password: passwordHash,
       },
-    },
+    });
+    return user;
   });
 }
 

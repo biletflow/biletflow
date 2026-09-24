@@ -8,6 +8,10 @@ Bodies are validated by [`packages/shared/src/schemas`](../packages/shared/src/s
 | Idempotency | Anything creating money or tickets requires `clientIdempotencyKey` |
 
 ## Auth
+
+Implemented auth response shapes, role checks, migration notes and audit usage:
+[backend-auth.md](backend-auth.md). Better Auth routes retain their native error format.
+
 | `POST` | `/api/auth/[...all]` | better-auth handler: sign-up, sign-in, sign-out, verify email, reset password |
 | `GET` | `/api/me` | Current user, role, organizer profile summary |
 | `POST` | `/api/mobile/auth/login` | Returns a bearer token for the scanner app |
