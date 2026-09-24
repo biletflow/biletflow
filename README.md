@@ -28,6 +28,12 @@ pnpm db:migrate && pnpm db:seed
 pnpm dev
 ```
 
+For the scanner app, set `EXPO_PUBLIC_API_URL` to the web server's reachable URL
+(for example `http://192.168.1.10:3000` on a phone on the same Wi-Fi), then run
+`pnpm --filter scanner start`. Sign in as `scanner@biletflow.kz` using the
+development password from the local seed configuration. The app stores its bearer token in secure
+device storage and validates it when reopened.
+
 ## Layout
 
 ```
