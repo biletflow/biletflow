@@ -1,14 +1,19 @@
+import { headers } from "next/headers";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 
 import { BrandMark } from "@/components/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { SignedInNav } from "@/components/signed-in-nav";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 export async function SiteHeader() {
   const t = await getTranslations("nav");
+  const session = await auth.api.getSession({ headers: await headers() });
+  const displayName = session?.user.name?.trim() || session?.user.email || "";
 
   return (
     <header className="border-ink-300 bg-background/95 sticky top-0 z-40 border-b backdrop-blur">
@@ -36,18 +41,24 @@ export async function SiteHeader() {
           <Suspense>
             <LocaleSwitcher />
           </Suspense>
-          <Link
-            href="/sign-in"
-            className="text-ink-800 hover:text-brand hidden text-sm font-semibold transition-colors sm:block"
-          >
-            {t("signIn")}
-          </Link>
-          <Link
-            href="/sign-up"
-            className={cn(buttonVariants(), "h-9 px-4 text-sm font-semibold")}
-          >
-            {t("getStarted")}
-          </Link>
+          {session?.user ? (
+            <SignedInNav name={displayName} />
+          ) : (
+            <>
+              <Link
+                href="/sign-in"
+                className="text-ink-800 hover:text-brand hidden text-sm font-semibold transition-colors sm:block"
+              >
+                {t("signIn")}
+              </Link>
+              <Link
+                href="/sign-up"
+                className={cn(buttonVariants(), "h-9 px-4 text-sm font-semibold")}
+              >
+                {t("getStarted")}
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

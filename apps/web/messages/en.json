@@ -8,7 +8,9 @@
     "browse": "Browse Events",
     "categories": "Categories",
     "signIn": "Sign In",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "signOut": "Sign out",
+    "signingOut": "Signing out…"
   },
   "home": {
     "eyebrow": "Self-service event ticketing in Kazakhstan",
@@ -99,7 +101,25 @@
   "auth": {
     "signInTitle": "Sign in",
     "signUpTitle": "Create an account",
-    "notReady": "Accounts are not connected yet. You can still browse events without signing in.",
+    "signInLead": "Use your BiletFlow email and password.",
+    "signUpLead": "Public accounts are created as attendees.",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least 10 characters.",
+    "submitSignIn": "Sign in",
+    "submitSignUp": "Create account",
+    "signingIn": "Signing in…",
+    "signingUp": "Creating account…",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "signInLink": "Sign in",
+    "signUpLink": "Create one",
+    "errorValidation": "Check the name, email, and password and try again.",
+    "errorInvalid": "Email or password is incorrect.",
+    "errorForbidden": "This account is suspended.",
+    "errorExists": "An account with this email already exists.",
+    "errorGeneric": "Could not complete that request. Try again.",
     "back": "Back to events"
   },
   "common": {
