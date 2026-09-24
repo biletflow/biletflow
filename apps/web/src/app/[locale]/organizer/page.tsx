@@ -73,7 +73,7 @@ export default async function OrganizerPage({
                   <div className="border-ink-200 mt-5 flex justify-between border-t pt-4 text-xs">
                     <span className="text-ink-500">{event.visibility}</span>
                     <span className="text-ink-700 font-semibold">
-                      Capacity: {event.capacity ?? quantity || "—"}
+                      Capacity: {event.capacity ?? (quantity || "—")}
                     </span>
                   </div>
                 </article>
