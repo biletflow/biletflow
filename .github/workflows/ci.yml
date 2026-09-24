@@ -36,6 +36,7 @@ jobs:
       TICKET_SIGNING_KEY: ci-ticket-signing-key
       CAMPAIGN_SIGNING_KEY: ci-campaign-signing-key
       NEXT_PUBLIC_APP_URL: http://localhost:3000
+      RUN_AUTH_INTEGRATION: "1"
 
     steps:
       - uses: actions/checkout@v4
