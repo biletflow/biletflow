@@ -8,7 +8,9 @@
     "browse": "Іс-шаралар",
     "categories": "Санаттар",
     "signIn": "Кіру",
-    "getStarted": "Бастау"
+    "getStarted": "Бастау",
+    "signOut": "Шығу",
+    "signingOut": "Шығып жатыр…"
   },
   "home": {
     "eyebrow": "Қазақстандағы билет сату платформасы",
@@ -99,7 +101,25 @@
   "auth": {
     "signInTitle": "Кіру",
     "signUpTitle": "Тіркелу",
-    "notReady": "Аккаунттар әлі қосылмаған. Іс-шараларды кірмей-ақ көруге болады.",
+    "signInLead": "BiletFlow email мен құпиясөзін енгізіңіз.",
+    "signUpLead": "Ашық тіркелу келуші аккаунтын жасайды.",
+    "name": "Аты",
+    "email": "Email",
+    "password": "Құпиясөз",
+    "passwordHint": "Кемінде 10 таңба.",
+    "submitSignIn": "Кіру",
+    "submitSignUp": "Тіркелу",
+    "signingIn": "Кіріп жатыр…",
+    "signingUp": "Тіркеліп жатыр…",
+    "noAccount": "Аккаунтыңыз жоқ па?",
+    "haveAccount": "Аккаунтыңыз бар ма?",
+    "signInLink": "Кіру",
+    "signUpLink": "Тіркелу",
+    "errorValidation": "Аты, email және құпиясөзді тексеріп, қайта көріңіз.",
+    "errorInvalid": "Email немесе құпиясөз қате.",
+    "errorForbidden": "Бұл аккаунт бұғатталған.",
+    "errorExists": "Бұл email тіркелген.",
+    "errorGeneric": "Сұранысты орындау мүмкін болмады. Қайта көріңіз.",
     "back": "Іс-шараларға"
   },
   "common": {

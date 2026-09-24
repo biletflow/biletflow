@@ -1,6 +1,10 @@
+import { headers } from "next/headers";
 import { setRequestLocale } from "next-intl/server";
 
-import { AuthPlaceholder } from "@/components/auth-placeholder";
+import { AuthForm } from "@/components/auth-form";
+import { redirect } from "@/i18n/navigation";
+import { auth } from "@/lib/auth";
+import { homePathForRole } from "@/lib/auth-home";
 
 export default async function SignUpPage({
   params,
@@ -9,5 +13,16 @@ export default async function SignUpPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <AuthPlaceholder mode="sign-up" />;
+
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (session?.user) {
+    redirect({
+      href: homePathForRole(
+        "role" in session.user ? String(session.user.role) : undefined,
+      ),
+      locale,
+    });
+  }
+
+  return <AuthForm mode="sign-up" />;
 }

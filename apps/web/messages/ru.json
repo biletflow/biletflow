@@ -8,7 +8,9 @@
     "browse": "Мероприятия",
     "categories": "Категории",
     "signIn": "Войти",
-    "getStarted": "Начать"
+    "getStarted": "Начать",
+    "signOut": "Выйти",
+    "signingOut": "Выходим…"
   },
   "home": {
     "eyebrow": "Онлайн-платформа продажи билетов в Казахстане",
@@ -99,7 +101,25 @@
   "auth": {
     "signInTitle": "Вход",
     "signUpTitle": "Регистрация",
-    "notReady": "Аккаунты пока не подключены. Мероприятия можно смотреть без входа.",
+    "signInLead": "Введите email и пароль BiletFlow.",
+    "signUpLead": "Публичная регистрация создаёт аккаунт посетителя.",
+    "name": "Имя",
+    "email": "Email",
+    "password": "Пароль",
+    "passwordHint": "Не меньше 10 символов.",
+    "submitSignIn": "Войти",
+    "submitSignUp": "Создать аккаунт",
+    "signingIn": "Входим…",
+    "signingUp": "Создаём аккаунт…",
+    "noAccount": "Ещё нет аккаунта?",
+    "haveAccount": "Уже есть аккаунт?",
+    "signInLink": "Войти",
+    "signUpLink": "Зарегистрироваться",
+    "errorValidation": "Проверьте имя, email и пароль и попробуйте снова.",
+    "errorInvalid": "Неверный email или пароль.",
+    "errorForbidden": "Этот аккаунт заблокирован.",
+    "errorExists": "Аккаунт с таким email уже существует.",
+    "errorGeneric": "Не получилось выполнить запрос. Попробуйте снова.",
     "back": "К мероприятиям"
   },
   "common": {
