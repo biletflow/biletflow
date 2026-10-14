@@ -1,30 +1,37 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as SecureStore from "expo-secure-store";
-import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import {
+  ActivityIndicator,
+  AppState,
+  Linking,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
-import { parseScannedPayload, signInSchema, type ScannedPayload } from "@biletflow/shared";
+import {
+  parseScannedPayload,
+  signInSchema,
+  type ScannedPayload,
+} from "@biletflow/shared";
 
-const TOKEN_KEY = "biletflow.scanner.token";
-const SCANNER_EMAIL = "scanner@biletflow.kz";
-// A physical device needs the computer's LAN address, not localhost.
-const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000").replace(/\/$/, "");
+import { createScannerAuth } from "./src/auth";
+import { messages, type Locale } from "./src/messages";
 
-type ScannerUser = { email: string; name: string; staffAssignments: { eventId: string }[] };
-
-function isScanner(user: ScannerUser) {
-  return user.email.toLowerCase() === SCANNER_EMAIL && user.staffAssignments.length > 0;
-}
-
-async function getScanner(token: string): Promise<ScannerUser | null> {
-  const response = await fetch(`${API_URL}/api/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (response.status === 401 || response.status === 403) return null;
-  if (!response.ok) throw new Error("Unable to verify session. Check your connection.");
-  const data = await response.json();
-  return data.user && isScanner(data.user) ? data.user : null;
-}
+const auth = createScannerAuth(
+  SecureStore,
+  process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000",
+);
 
 /**
  * Week 4 scaffold: proves the camera works and that the shared payload classifier
@@ -32,89 +39,121 @@ async function getScanner(token: string): Promise<ScannerUser | null> {
  * screen must never decide admission on its own.
  */
 export default function App() {
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<ScannerUser | null>(null);
-  const [restoring, setRestoring] = useState(true);
-  const [email, setEmail] = useState(SCANNER_EMAIL);
+  const [locale, setLocale] = useState<Locale>("ru");
+  const t = messages[locale];
+  const session = useSyncExternalStore(auth.subscribe, auth.getSnapshot);
+  const [email, setEmail] = useState("scanner@biletflow.kz");
   const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [permission, requestPermission] = useCameraPermissions();
   const [result, setResult] = useState<ScannedPayload | null>(null);
+  const scanned = useRef(false);
 
   useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const saved = await SecureStore.getItemAsync(TOKEN_KEY);
-        if (saved) {
-          const current = await getScanner(saved);
-          if (!active) return;
-          if (current) { setToken(saved); setUser(current); }
-          else await SecureStore.deleteItemAsync(TOKEN_KEY);
-        }
-      } catch (cause) {
-        if (active) setError(cause instanceof Error ? cause.message : "Unable to restore session.");
-      } finally {
-        if (active) setRestoring(false);
-      }
-    })();
-    return () => { active = false; };
+    void auth.restore();
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        setResult(null);
+        scanned.current = false;
+        void auth.resume();
+      } else auth.suspend();
+    });
+    return () => subscription.remove();
   }, []);
 
   async function signIn() {
     const parsed = signInSchema.safeParse({ email, password });
-    if (!parsed.success) { setError("Enter a valid email and password."); return; }
-    if (parsed.data.email !== SCANNER_EMAIL) { setError("Use the scanner account to sign in."); return; }
-    setBusy(true);
+    if (!parsed.success) {
+      setError(t.input);
+      return;
+    }
     setError("");
-    try {
-      const response = await fetch(`${API_URL}/api/mobile/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed.data),
-      });
-      if (!response.ok) throw new Error(response.status === 401 ? "Incorrect email or password." : "Sign-in failed. Please try again.");
-      const data = await response.json();
-      if (typeof data.token !== "string" || !data.user || !isScanner(data.user)) {
-        throw new Error("This account does not have scanner access.");
-      }
-      await SecureStore.setItemAsync(TOKEN_KEY, data.token);
-      setToken(data.token);
-      setUser(data.user);
-      setPassword("");
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Sign-in failed.");
-    } finally { setBusy(false); }
+    await auth.login(parsed.data.email, parsed.data.password);
+    if (auth.getSnapshot().phase === "ready") setPassword("");
   }
 
-  async function signOut() {
-    setToken(null);
-    setUser(null);
+  function signOut() {
     setResult(null);
-    await SecureStore.deleteItemAsync(TOKEN_KEY);
+    scanned.current = false;
+    setPassword("");
+    setError("");
+    void auth.logout();
   }
 
-  const onBarcodeScanned = useCallback(
-    ({ data }: { data: string }) => {
-      if (result) return;
-      setResult(parseScannedPayload(data));
-    },
-    [result],
-  );
+  const onBarcodeScanned = useCallback(({ data }: { data: string }) => {
+    if (scanned.current || auth.getSnapshot().phase !== "ready") return;
+    scanned.current = true;
+    setResult(parseScannedPayload(data));
+  }, []);
 
-  if (restoring) return <Centered text="Checking your session…"><ActivityIndicator color="#fff" /></Centered>;
+  if (session.phase === "checking")
+    return (
+      <Centered text={t.checking}>
+        <ActivityIndicator color="#fff" />
+      </Centered>
+    );
+  if (session.phase === "retry")
+    return (
+      <Centered text={session.error ? t[session.error] : t.verify}>
+        <Pressable
+          style={styles.button}
+          onPress={() => {
+            void auth.retry();
+          }}
+        >
+          <Text style={styles.buttonText}>{t.retry}</Text>
+        </Pressable>
+        <Pressable onPress={signOut}>
+          <Text style={styles.detail}>{t.signOut}</Text>
+        </Pressable>
+      </Centered>
+    );
 
-  if (!token || !user) {
+  if (session.phase !== "ready") {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.center}>
-          <Text style={styles.heading}>Scanner sign in</Text>
-          <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email" placeholderTextColor="#888" autoCapitalize="none" keyboardType="email-address" autoComplete="email" editable={!busy} />
-          <TextInput style={styles.input} value={password} onChangeText={setPassword} placeholder="Password" placeholderTextColor="#888" secureTextEntry autoComplete="password" editable={!busy} onSubmitEditing={signIn} />
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-          <Pressable style={styles.button} onPress={signIn} disabled={busy}>
-            <Text style={styles.buttonText}>{busy ? "Signing in…" : "Sign in"}</Text>
+          <View style={{ flexDirection: "row", gap: 16 }}>
+            {(["ru", "kk", "en"] as const).map((value) => (
+              <Pressable
+                key={value}
+                onPress={() => {
+                  setError("");
+                  setLocale(value);
+                }}
+              >
+                <Text style={styles.detail}>{value.toUpperCase()}</Text>
+              </Pressable>
+            ))}
+          </View>
+          <Text style={styles.heading}>{t.title}</Text>
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            placeholder={t.email}
+            placeholderTextColor="#888"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+          />
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            placeholder={t.password}
+            placeholderTextColor="#888"
+            secureTextEntry
+            autoComplete="password"
+            onSubmitEditing={signIn}
+          />
+          {error || session.error ? (
+            <Text style={styles.error}>
+              {error || (session.error && t[session.error])}
+            </Text>
+          ) : null}
+          <Pressable style={styles.button} onPress={signIn}>
+            <Text style={styles.buttonText}>{t.signIn}</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -122,16 +161,27 @@ export default function App() {
   }
 
   if (!permission) {
-    return <Centered text="Checking camera permission…" />;
+    return <Centered text={t.cameraChecking} />;
   }
 
   if (!permission.granted) {
     return (
-      <Centered text="BiletFlow needs the camera to scan tickets.">
-        <Pressable style={styles.button} onPress={requestPermission}>
-          <Text style={styles.buttonText}>Grant permission</Text>
+      <Centered text={t.cameraNeeded}>
+        <Pressable
+          style={styles.button}
+          onPress={() => {
+            void (permission.canAskAgain
+              ? requestPermission()
+              : Linking.openSettings());
+          }}
+        >
+          <Text style={styles.buttonText}>
+            {permission.canAskAgain ? t.grant : t.settings}
+          </Text>
         </Pressable>
-        <Pressable onPress={signOut}><Text style={styles.detail}>Sign out</Text></Pressable>
+        <Pressable onPress={signOut}>
+          <Text style={styles.detail}>{t.signOut}</Text>
+        </Pressable>
       </Centered>
     );
   }
@@ -140,12 +190,20 @@ export default function App() {
     return (
       <SafeAreaView style={[styles.container, styles[resultStyle(result)]]}>
         <View style={styles.center}>
-          <Text style={styles.heading}>{resultHeading(result)}</Text>
-          <Text style={styles.detail}>{resultDetail(result)}</Text>
-          <Pressable style={styles.button} onPress={() => setResult(null)}>
-            <Text style={styles.buttonText}>Scan again</Text>
+          <Text style={styles.heading}>{resultHeading(result, t)}</Text>
+          <Text style={styles.detail}>{resultDetail(result, t)}</Text>
+          <Pressable
+            style={styles.button}
+            onPress={() => {
+              scanned.current = false;
+              setResult(null);
+            }}
+          >
+            <Text style={styles.buttonText}>{t.again}</Text>
           </Pressable>
-          <Pressable onPress={signOut}><Text style={styles.detail}>Sign out</Text></Pressable>
+          <Pressable onPress={signOut}>
+            <Text style={styles.detail}>{t.signOut}</Text>
+          </Pressable>
         </View>
       </SafeAreaView>
     );
@@ -159,14 +217,24 @@ export default function App() {
         onBarcodeScanned={onBarcodeScanned}
       />
       <SafeAreaView style={styles.overlay}>
-        <Text style={styles.overlayText}>Point the camera at a ticket QR code</Text>
-        <Pressable onPress={signOut} style={styles.signOut}><Text style={styles.overlayText}>Sign out · {user.name}</Text></Pressable>
+        <Text style={styles.overlayText}>{t.point}</Text>
+        <Pressable onPress={signOut} style={styles.signOut}>
+          <Text style={styles.overlayText}>
+            {t.signOut} · {session.user?.name}
+          </Text>
+        </Pressable>
       </SafeAreaView>
     </View>
   );
 }
 
-function Centered({ text, children }: { text: string; children?: React.ReactNode }) {
+function Centered({
+  text,
+  children,
+}: {
+  text: string;
+  children?: React.ReactNode;
+}) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.center}>
@@ -178,26 +246,28 @@ function Centered({ text, children }: { text: string; children?: React.ReactNode
 }
 
 function resultStyle(result: ScannedPayload) {
-  return result.kind === "ADMISSION_TICKET" ? ("ok" as const) : ("reject" as const);
+  return result.kind === "ADMISSION_TICKET"
+    ? ("ok" as const)
+    : ("reject" as const);
 }
 
-function resultHeading(result: ScannedPayload) {
+function resultHeading(result: ScannedPayload, t: typeof messages.en) {
   switch (result.kind) {
     case "ADMISSION_TICKET":
-      return "Ticket recognised";
+      return t.recognised;
     case "CAMPAIGN_QR":
-      return "Not a ticket";
+      return t.notTicket;
     default:
-      return "Unrecognised code";
+      return t.unknown;
   }
 }
 
-function resultDetail(result: ScannedPayload) {
+function resultDetail(result: ScannedPayload, t: typeof messages.en) {
   switch (result.kind) {
     case "ADMISSION_TICKET":
-      return `Ticket ${result.ticketId}\nAwaiting server verification.`;
+      return `${t.ticket} ${result.ticketId}\n${t.awaiting}`;
     case "CAMPAIGN_QR":
-      return "This is a promotional code, not a ticket. It cannot be used for entry.";
+      return t.promotional;
     default:
       return result.raw.slice(0, 120);
   }
@@ -205,13 +275,37 @@ function resultDetail(result: ScannedPayload) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0b0b0c" },
-  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 16 },
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+    gap: 16,
+  },
   overlay: { flex: 1, justifyContent: "flex-end", padding: 32 },
   overlayText: { color: "#fff", fontSize: 16, textAlign: "center" },
-  heading: { color: "#fff", fontSize: 28, fontWeight: "700", textAlign: "center" },
-  detail: { color: "#e5e5e5", fontSize: 16, textAlign: "center", lineHeight: 22 },
+  heading: {
+    color: "#fff",
+    fontSize: 28,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  detail: {
+    color: "#e5e5e5",
+    fontSize: 16,
+    textAlign: "center",
+    lineHeight: 22,
+  },
   error: { color: "#fca5a5", fontSize: 14, textAlign: "center" },
-  input: { width: "100%", borderWidth: 1, borderColor: "#777", borderRadius: 8, padding: 12, color: "#fff", fontSize: 16 },
+  input: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#777",
+    borderRadius: 8,
+    padding: 12,
+    color: "#fff",
+    fontSize: 16,
+  },
   signOut: { alignSelf: "center", marginTop: 16, padding: 8 },
   ok: { backgroundColor: "#14532d" },
   reject: { backgroundColor: "#7f1d1d" },
