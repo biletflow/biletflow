@@ -5,7 +5,11 @@
 
 export function formatKzt(amountKzt: number, locale: string): string {
   if (amountKzt === 0) return "₸0";
-  return `₸${new Intl.NumberFormat(locale).format(amountKzt)}`;
+  // Chromium may lack Kazakh number-format data and fall back to English,
+  // while Node uses Kazakh grouping. Use the equivalent Russian grouping for
+  // kk so server-rendered prices hydrate identically in browsers.
+  const numberLocale = locale.toLowerCase().startsWith("kk") ? "ru-KZ" : locale;
+  return `₸${new Intl.NumberFormat(numberLocale).format(amountKzt)}`;
 }
 
 export function formatEventDate(
