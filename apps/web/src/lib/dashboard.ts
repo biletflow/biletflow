@@ -1,7 +1,8 @@
 import { prisma } from "@biletflow/db";
 
-export async function listOrganizerEvents() {
+export async function listOrganizerEvents(organizerId: string) {
   return prisma.event.findMany({
+    where: { organizerId },
     orderBy: { startsAt: "asc" },
     select: {
       id: true,

@@ -10,7 +10,9 @@
     "signIn": "Sign In",
     "getStarted": "Get Started",
     "signOut": "Sign out",
-    "signingOut": "Signing out…"
+    "signingOut": "Signing out…",
+    "organizer": "Organizer",
+    "admin": "Admin"
   },
   "home": {
     "eyebrow": "Self-service event ticketing in Kazakhstan",

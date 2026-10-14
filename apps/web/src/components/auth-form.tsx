@@ -6,16 +6,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
-import { homePathForRole } from "@/lib/auth-home";
+import { homePathForRole, roleOf } from "@/lib/auth-home";
 import { signInSchema, signUpSchema } from "@biletflow/shared";
 
 type Mode = "sign-in" | "sign-up";
-
-function roleOf(user: unknown) {
-  if (user && typeof user === "object" && "role" in user) {
-    return String((user as { role?: unknown }).role);
-  }
-}
 
 function messageKey(error: { code?: string; message?: string; status?: number } | null) {
   const code = error?.code ?? error?.message ?? "";

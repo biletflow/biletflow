@@ -1,6 +1,7 @@
 import { CalendarDays, MapPin, Ticket } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
 
+import { requirePageRole } from "@/lib/auth-guard";
 import { listOrganizerEvents } from "@/lib/dashboard";
 
 export default async function OrganizerPage({
@@ -10,10 +11,11 @@ export default async function OrganizerPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const events = await listOrganizerEvents();
+  const { user } = await requirePageRole(locale, ["ORGANIZER"]);
+  const events = await listOrganizerEvents(user.id);
 
   return (
-    <main className="bg-ink-100 min-h-[70vh]">
+    <div className="bg-ink-100 min-h-[70vh]">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div>
           <p className="text-brand text-xs font-bold tracking-wider uppercase">Organizer</p>
@@ -82,6 +84,6 @@ export default async function OrganizerPage({
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }
