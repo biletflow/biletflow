@@ -60,8 +60,11 @@ jobs:
       - run: pnpm --filter @biletflow/db run deploy
       - run: pnpm -r run test
 
+      - name: Install Chromium for browser integration tests
+        run: pnpm --filter web exec playwright install --with-deps chromium
+
       - name: Test web and scanner authentication over HTTP
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
           pnpm --filter @biletflow/db run seed
           pnpm --filter web exec next dev --webpack --hostname 127.0.0.1 > /tmp/biletflow-web.log 2>&1 &
@@ -77,3 +80,14 @@ jobs:
           done
           test "$ready" = 1
           RUN_HTTP_INTEGRATION=1 pnpm --filter web exec vitest run src/lib/auth.http.test.ts
+          E2E_REUSE_SERVER=1 pnpm --filter web exec playwright test
+
+      - name: Upload browser integration report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: team-integration-report
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+          if-no-files-found: ignore

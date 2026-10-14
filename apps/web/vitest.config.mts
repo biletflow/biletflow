@@ -1,7 +1,12 @@
 import { fileURLToPath } from "node:url";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
-  test: { environment: "node", testTimeout: 15000, hookTimeout: 30000 },
+  test: {
+    exclude: [...configDefaults.exclude, "e2e/**"],
+    environment: "node",
+    testTimeout: 15000,
+    hookTimeout: 30000,
+  },
 });
