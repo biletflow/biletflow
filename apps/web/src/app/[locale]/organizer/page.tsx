@@ -1,6 +1,7 @@
 import { CalendarDays, MapPin, Ticket } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
 
+import { requireDashboardAccess } from "@/lib/dashboard-access";
 import { listOrganizerEvents } from "@/lib/dashboard";
 
 export default async function OrganizerPage({
@@ -10,6 +11,7 @@ export default async function OrganizerPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await requireDashboardAccess(locale, "ORGANIZER");
   const events = await listOrganizerEvents();
 
   return (
