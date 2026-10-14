@@ -59,3 +59,21 @@ jobs:
       - run: pnpm -r run typecheck
       - run: pnpm --filter @biletflow/db run deploy
       - run: pnpm -r run test
+
+      - name: Test web and scanner authentication over HTTP
+        timeout-minutes: 5
+        run: |
+          pnpm --filter @biletflow/db run seed
+          pnpm --filter web exec next dev --webpack --hostname 127.0.0.1 > /tmp/biletflow-web.log 2>&1 &
+          web_pid=$!
+          trap 'kill "$web_pid" 2>/dev/null || true; cat /tmp/biletflow-web.log' EXIT
+          ready=0
+          for attempt in $(seq 1 60); do
+            if [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/api/me)" = 401 ]; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" = 1
+          RUN_HTTP_INTEGRATION=1 pnpm --filter web exec vitest run src/lib/auth.http.test.ts
