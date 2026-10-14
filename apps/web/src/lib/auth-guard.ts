@@ -1,21 +1,31 @@
 import { headers } from "next/headers";
 
 import { redirect } from "@/i18n/navigation";
-import { auth } from "./auth";
-import {
-  homePathForRole,
-  roleOf,
-  type SessionRole,
-} from "./auth-home";
+import { ApiError } from "./api-error";
+import { requireUser } from "./session";
+import { homePathForRole, roleOf, type SessionRole } from "./auth-home";
 
 export { roleOf, type SessionRole } from "./auth-home";
 
 export async function getSessionUser() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  return session?.user ?? null;
+  try {
+    // Pages and API routes must enforce the same current account status.
+    return await requireUser(await headers());
+  } catch (error) {
+    if (
+      error instanceof ApiError &&
+      (error.status === 401 || error.status === 403)
+    ) {
+      return null;
+    }
+    throw error;
+  }
 }
 
-export async function requirePageRole(locale: string, roles: readonly SessionRole[]) {
+export async function requirePageRole(
+  locale: string,
+  roles: readonly SessionRole[],
+) {
   const user = await getSessionUser();
   const role = roleOf(user);
   if (!user || !role) {
