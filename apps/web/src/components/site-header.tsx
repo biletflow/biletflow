@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 
@@ -7,13 +6,16 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { SignedInNav } from "@/components/signed-in-nav";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { auth } from "@/lib/auth";
+import { getSessionUser, roleOf } from "@/lib/auth-guard";
+import { dashboardPathForRole } from "@/lib/auth-home";
 import { cn } from "@/lib/utils";
 
 export async function SiteHeader() {
   const t = await getTranslations("nav");
-  const session = await auth.api.getSession({ headers: await headers() });
-  const displayName = session?.user.name?.trim() || session?.user.email || "";
+  const user = await getSessionUser();
+  const role = roleOf(user);
+  const dashboardHref = dashboardPathForRole(role);
+  const displayName = user?.name?.trim() || user?.email || "";
 
   return (
     <header className="border-ink-300 bg-background/95 sticky top-0 z-40 border-b backdrop-blur">
@@ -41,13 +43,23 @@ export async function SiteHeader() {
           <Suspense>
             <LocaleSwitcher />
           </Suspense>
-          {session?.user ? (
-            <SignedInNav name={displayName} />
+          {user ? (
+            <SignedInNav
+              name={displayName}
+              dashboardHref={dashboardHref}
+              dashboardLabel={
+                role === "PLATFORM_ADMIN"
+                  ? t("admin")
+                  : role === "ORGANIZER"
+                    ? t("organizer")
+                    : undefined
+              }
+            />
           ) : (
             <>
               <Link
                 href="/sign-in"
-                className="text-ink-800 hover:text-brand hidden text-sm font-semibold transition-colors sm:block"
+                className="text-ink-800 hover:text-brand text-sm font-semibold transition-colors"
               >
                 {t("signIn")}
               </Link>

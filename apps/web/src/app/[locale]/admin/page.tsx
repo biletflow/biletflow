@@ -1,6 +1,7 @@
 import { ShieldCheck, UserRound } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
 
+import { requirePageRole } from "@/lib/auth-guard";
 import { listAdminUsers } from "@/lib/dashboard";
 
 export default async function AdminPage({
@@ -10,10 +11,11 @@ export default async function AdminPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await requirePageRole(locale, ["PLATFORM_ADMIN"]);
   const users = await listAdminUsers();
 
   return (
-    <main className="bg-ink-100 min-h-[70vh]">
+    <div className="bg-ink-100 min-h-[70vh]">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div>
           <p className="text-brand text-xs font-bold tracking-wider uppercase">Platform admin</p>
@@ -79,6 +81,6 @@ export default async function AdminPage({
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }
