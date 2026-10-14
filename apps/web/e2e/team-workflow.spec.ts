@@ -58,6 +58,8 @@ for (const locale of ["en", "ru", "kk"]) {
   test(`public events and authentication forms render in ${locale}`, async ({
     page,
   }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
     await page.goto(`/${locale}/events`);
     await expect(
       page.getByRole("heading", { name: "Almaty Jazz Night" }),
@@ -66,6 +68,15 @@ for (const locale of ["en", "ru", "kk"]) {
     await expect(
       page.getByRole("heading", { name: "Almaty Jazz Night", exact: true }),
     ).toBeVisible();
+    await page
+      .getByRole("button", {
+        name: messages[locale].event.increaseQuantity,
+        exact: true,
+      })
+      .click();
+    const total = locale === "en" ? "₸16,000" : "₸16\u00a0000";
+    await expect(page.getByText(total, { exact: true }).first()).toBeVisible();
+    expect(errors).toEqual([]);
     await page.goto(`/${locale}/sign-in`);
     await expect(
       page.getByRole("heading", {
@@ -87,7 +98,7 @@ test("incorrect web password shows an error without a session", async ({
   page,
 }) => {
   await login(page, "organizer@biletflow.kz", "incorrect-test-input");
-  await expect(page.getByRole("alert")).toContainText(
+  await expect(page.locator("form").getByRole("alert")).toContainText(
     messages.en.auth.errorInvalid,
   );
   expect((await page.request.get("/api/me")).status()).toBe(401);
@@ -114,7 +125,7 @@ test("browser signup, cookie persistence, attendee access and logout work togeth
   }
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(
-    page.getByRole("link", { name: "Sign in", exact: true }),
+    page.getByRole("link", { name: messages.en.nav.signIn, exact: true }),
   ).toBeVisible();
   expect((await page.request.get("/api/me")).status()).toBe(401);
 });
@@ -186,7 +197,25 @@ test("expiring a session returns the browser to anonymous access", async ({
   await expect(page).toHaveURL(/\/en\/sign-in$/);
 });
 
-test("both seeded scanner accounts work through the running Next.js API", async () => {
+test("both seeded scanner accounts work through the running Next.js API", async ({
+  request,
+}) => {
+  // Node fetch adds browser metadata without an Origin. Expo's native transport
+  // does not. Use the API transport to preserve native requests and CSRF checks.
+  const nativeFetch: typeof fetch = async (input, init) => {
+    const response = await request.fetch(
+      input instanceof Request ? input.url : String(input),
+      {
+        method: init?.method,
+        headers: Object.fromEntries(new Headers(init?.headers).entries()),
+        data: init?.body ? String(init.body) : undefined,
+      },
+    );
+    return new Response(await response.text(), {
+      status: response.status(),
+      headers: response.headers(),
+    });
+  };
   for (const email of ["scanner@biletflow.kz", "scanner2@biletflow.kz"]) {
     const device = {
       token: null as string | null,
@@ -200,7 +229,11 @@ test("both seeded scanner accounts work through the running Next.js API", async 
         this.token = null;
       },
     };
-    const scanner = createScannerAuth(device, "http://localhost:3000");
+    const scanner = createScannerAuth(
+      device,
+      "http://localhost:3000",
+      nativeFetch,
+    );
     await scanner.login(email, password!);
     expect(scanner.getSnapshot()).toMatchObject({
       phase: "ready",
