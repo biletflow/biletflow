@@ -41,7 +41,7 @@ async function signup(page: Page) {
     .getByLabel("Name", { exact: true })
     .fill("Team integration attendee");
   await page.getByLabel("Email", { exact: true }).fill(email);
-  await page.getByLabel("Password", { exact: true }).fill(password!);
+  await page.locator('input[name="password"]').fill(password!);
   await page
     .getByRole("button", { name: "Create account", exact: true })
     .click();
