@@ -1,6 +1,7 @@
 import { ShieldCheck, UserRound } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
 
+import { requireDashboardAccess } from "@/lib/dashboard-access";
 import { listAdminUsers } from "@/lib/dashboard";
 
 export default async function AdminPage({
@@ -10,6 +11,7 @@ export default async function AdminPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await requireDashboardAccess(locale, "PLATFORM_ADMIN");
   const users = await listAdminUsers();
 
   return (
