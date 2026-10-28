@@ -102,9 +102,13 @@ export async function POST(request: Request, context: { params: Promise<{ intent
       return Response.json(result, { headers: { "Cache-Control": "no-store" } });
     }
     const label = outcome === "APPROVED" ? "approved" : outcome === "DECLINED" ? "declined" : "abandoned";
+    const ticketsNote =
+      result.tickets > 0
+        ? `<p>Tickets were issued.</p><p><a href="/tickets">View tickets</a></p>`
+        : `<p>No ticket was issued.</p>`;
     return page(
       "Simulated payment",
-      `<h1>Payment ${label}</h1><p>${result.tickets > 0 ? "Tickets were issued." : "No ticket was issued."}</p>`,
+      `<h1>Payment ${label}</h1>${ticketsNote}`,
     );
   } catch (error) {
     return errorResponse(error);

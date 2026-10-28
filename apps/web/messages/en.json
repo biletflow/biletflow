@@ -11,6 +11,7 @@
     "getStarted": "Get Started",
     "signOut": "Sign out",
     "signingOut": "Signing out…",
+    "tickets": "My tickets",
     "organizer": "Organizer",
     "admin": "Admin"
   },
@@ -92,12 +93,38 @@
     "cancelledBody": "Ticket holders have been notified and refunded where applicable.",
     "paidSalesInactive": "Paid sales are not active for this event yet",
     "checkoutSoon": "Checkout is not connected yet. Ticket selection is for display only.",
+    "signInToContinue": "Sign in to continue",
     "total": "Total",
     "refundPolicy": "Refund policy",
     "refund": {
       "NO_REFUNDS": "Tickets are non-refundable.",
       "UNTIL_48H_BEFORE": "Refundable up to 48 hours before the event starts.",
       "UNTIL_24H_BEFORE": "Refundable up to 24 hours before the event starts."
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "lead": "Confirm the quantity and ticket holder. Totals are whole tenge.",
+    "submitFree": "Complete registration",
+    "submitPaid": "Continue to payment",
+    "submitting": "Working…",
+    "back": "Back to event",
+    "errorGeneric": "Could not complete checkout. Try again.",
+    "errorConflict": "Those tickets are no longer available.",
+    "errorValidation": "Check the name, email, and quantity and try again."
+  },
+  "tickets": {
+    "title": "My tickets",
+    "empty": "You have no tickets yet.",
+    "emptyBody": "Browse events to register or buy a ticket.",
+    "browse": "Browse events",
+    "qrAlt": "Admission QR for {event}",
+    "holder": "Holder",
+    "status": {
+      "VALID": "Valid",
+      "CHECKED_IN": "Checked in",
+      "CANCELLED": "Cancelled",
+      "REFUNDED": "Refunded"
     }
   },
   "auth": {

@@ -28,6 +28,12 @@ export function SignedInNav({
 
   return (
     <div className="flex items-center gap-3">
+      <Link
+        href="/tickets"
+        className="text-ink-800 hover:text-brand hidden text-sm font-semibold transition-colors sm:block"
+      >
+        {t("tickets")}
+      </Link>
       {dashboardHref && dashboardLabel ? (
         <Link
           href={dashboardHref}

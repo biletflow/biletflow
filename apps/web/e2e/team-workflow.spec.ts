@@ -50,7 +50,30 @@ async function signup(page: Page) {
 }
 
 test.afterAll(async () => {
-  await prisma.user.deleteMany({ where: { email: { in: createdEmails } } });
+  const users = await prisma.user.findMany({
+    where: { email: { in: createdEmails } },
+    select: { id: true },
+  });
+  const userIds = users.map((user) => user.id);
+  const orders = await prisma.order.findMany({
+    where: { userId: { in: userIds } },
+    select: { id: true },
+  });
+  const orderIds = orders.map((order) => order.id);
+  const tickets = await prisma.ticket.findMany({
+    where: { orderId: { in: orderIds } },
+    select: { attendeeId: true },
+  });
+  await prisma.ticket.deleteMany({ where: { orderId: { in: orderIds } } });
+  await prisma.attendee.deleteMany({
+    where: { id: { in: tickets.map((ticket) => ticket.attendeeId) } },
+  });
+  await prisma.orderItem.deleteMany({ where: { orderId: { in: orderIds } } });
+  await prisma.payment.deleteMany({ where: { orderId: { in: orderIds } } });
+  await prisma.promoRedemption.deleteMany({ where: { orderId: { in: orderIds } } });
+  await prisma.auditLog.deleteMany({ where: { actorUserId: { in: userIds } } });
+  await prisma.order.deleteMany({ where: { id: { in: orderIds } } });
+  await prisma.user.deleteMany({ where: { id: { in: userIds } } });
   await prisma.$disconnect();
 });
 
@@ -244,4 +267,62 @@ test("both seeded scanner accounts work through the running Next.js API", async 
     await scanner.logout();
     expect(device.token).toBeNull();
   }
+});
+
+test("anonymous checkout sends the attendee to sign-in", async ({ page }) => {
+  await page.goto("/en/events/kbtu-freshers-welcome");
+  await page
+    .getByRole("link", { name: messages.en.event.signInToContinue, exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/en\/sign-in/);
+});
+
+test("signed-in attendee completes free checkout and sees an admission QR", async ({
+  page,
+}) => {
+  await signup(page);
+  await page.goto("/en/events/kbtu-freshers-welcome");
+  await page
+    .getByRole("link", { name: messages.en.event.register, exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/en\/events\/kbtu-freshers-welcome\/checkout/);
+  await expect(
+    page.getByText(messages.en.event.freeTicket, { exact: true }).first(),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: messages.en.checkout.submitFree, exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/en\/tickets/);
+  const qr = page.getByRole("img", {
+    name: messages.en.tickets.qrAlt.replace("{event}", "KBTU Freshers Welcome"),
+  });
+  await expect(qr).toBeVisible();
+  const src = await qr.getAttribute("src");
+  expect(src).toMatch(/\/api\/tickets\/.+\/qr\.png$/);
+  const image = await page.request.get(src!);
+  expect(image.status()).toBe(200);
+  expect(image.headers()["content-type"]).toContain("image/png");
+});
+
+test("paid checkout issues a ticket after simulated approval", async ({
+  page,
+}) => {
+  await signup(page);
+  await page.goto("/en/events/almaty-jazz-night");
+  await page
+    .getByRole("link", { name: messages.en.event.buyTickets, exact: true })
+    .click();
+  await expect(page.getByText("₸8,000", { exact: true }).first()).toBeVisible();
+  await page
+    .getByRole("button", { name: messages.en.checkout.submitPaid, exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/sandbox\/pay\//);
+  await page.getByRole("button", { name: "Approve" }).click();
+  await expect(page.getByText("Tickets were issued.")).toBeVisible();
+  await page.goto("/en/tickets");
+  await expect(
+    page.getByRole("img", {
+      name: messages.en.tickets.qrAlt.replace("{event}", "Almaty Jazz Night"),
+    }),
+  ).toBeVisible();
 });
