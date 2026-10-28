@@ -1,3 +1,4 @@
+import { checkInResultSchema, type CheckInResult } from "@biletflow/shared";
 import type { MessageKey } from "./messages";
 export const TOKEN_KEY = "biletflow.scanner.token";
 export type ScannerEvent = { id: string; title: string; startsAt: string; endsAt: string; status: string };
@@ -191,7 +192,19 @@ export function createScannerAuth(
     if (!Array.isArray(data?.events)) throw new Error("Invalid response");
     return data.events as ScannerEvent[];
   }
+  async function submitScan(eventId: string, payload: string): Promise<CheckInResult> {
+    if (!token || state.phase !== "ready") throw new Error("Not authenticated");
+    const response = await api("/api/checkin", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ eventId, payload }),
+    });
+    if (!response.ok) throw new Error("Server verification failed");
+    const body: unknown = await response.json();
+    return checkInResultSchema.parse(body);
+  }
   return {
+    submitScan,
     getEvents,
     resume,
     getSnapshot: () => state,
