@@ -1,5 +1,6 @@
 import type { MessageKey } from "./messages";
 export const TOKEN_KEY = "biletflow.scanner.token";
+export type ScannerEvent = { id: string; title: string; startsAt: string; endsAt: string; status: string };
 export type ScannerUser = {
   email: string;
   name: string;
@@ -182,7 +183,16 @@ export function createScannerAuth(
     await pending;
     return restore();
   }
+  async function getEvents(): Promise<ScannerEvent[]> {
+    if (!token || state.phase !== "ready") throw new Error("Not authenticated");
+    const response = await api("/api/mobile/events", { headers: { Authorization: `Bearer ${token}` } });
+    if (!response.ok) throw new Error("Unable to load events");
+    const data = await response.json();
+    if (!Array.isArray(data?.events)) throw new Error("Invalid response");
+    return data.events as ScannerEvent[];
+  }
   return {
+    getEvents,
     resume,
     getSnapshot: () => state,
     subscribe: (listener: () => void) => {
