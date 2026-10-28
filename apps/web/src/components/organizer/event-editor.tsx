@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import PaidSalesActivation from "./paid-sales-activation";
 
 type EventData = {
   id: string; title: string; description: string | null; category: string | null;
@@ -152,6 +153,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
           </form>
           {event.status === "DRAFT" && <button type="button" disabled={busy || event.ticketTypes.length === 0} onClick={publish} className="bg-brand rounded-lg px-5 py-3 font-bold text-white disabled:opacity-50">{t.publish}</button>}
         </section>}
+        {event && <PaidSalesActivation eventId={event.id} locale={locale} />}
       </div>
     </div>
   );
