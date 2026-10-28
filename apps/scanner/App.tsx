@@ -9,6 +9,7 @@ import {
 } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   AppState,
   Linking,
   Pressable,
@@ -25,7 +26,7 @@ import {
   type ScannedPayload,
 } from "@biletflow/shared";
 
-import { createScannerAuth } from "./src/auth";
+import { createScannerAuth, type ScannerEvent } from "./src/auth";
 import { messages, type Locale } from "./src/messages";
 
 const auth = createScannerAuth(
@@ -48,6 +49,24 @@ export default function App() {
   const [permission, requestPermission] = useCameraPermissions();
   const [result, setResult] = useState<ScannedPayload | null>(null);
   const scanned = useRef(false);
+  const [events, setEvents] = useState<ScannerEvent[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+  const [eventsError, setEventsError] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [eventsReload, setEventsReload] = useState(0);
+  useEffect(() => {
+    if (session.phase !== "ready") { setSelectedEventId(null); setEvents([]); return; }
+    let active = true;
+    setEventsLoading(true);
+    setEventsError(false);
+    void auth.getEvents().then((list) => {
+      if (!active) return;
+      setEvents(list);
+      setSelectedEventId((previous) => previous && list.some((event) => event.id === previous) ? previous : null);
+    }).catch(() => { if (active) setEventsError(true); })
+      .finally(() => { if (active) setEventsLoading(false); });
+    return () => { active = false; };
+  }, [session.phase, eventsReload]);
 
   useEffect(() => {
     void auth.restore();
@@ -73,6 +92,8 @@ export default function App() {
   }
 
   function signOut() {
+    setSelectedEventId(null);
+    setEvents([]);
     setResult(null);
     scanned.current = false;
     setPassword("");
@@ -160,6 +181,30 @@ export default function App() {
     );
   }
 
+  if (eventsLoading) return <Centered text={t.checking}><ActivityIndicator color="#fff" /></Centered>;
+  if (!selectedEventId || eventsError || !events.some((event) => event.id === selectedEventId)) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.eventList}>
+          <Text style={styles.heading}>{t.chooseEvent}</Text>
+          {eventsError ? <Text style={styles.error}>{t.eventsError}</Text> :
+            events.length === 0 ? <Text style={styles.detail}>{t.noEvents}</Text> :
+            events.map((event) => (
+              <Pressable key={event.id} style={styles.eventButton} onPress={() => {
+                setSelectedEventId(event.id); setResult(null); scanned.current = false;
+              }}>
+                <Text style={styles.eventTitle}>{event.title}</Text>
+                <Text style={styles.detail}>{new Date(event.startsAt).toLocaleString(locale)}</Text>
+              </Pressable>
+            ))}
+          <Pressable style={styles.button} onPress={() => setEventsReload((value) => value + 1)}>
+            <Text style={styles.buttonText}>{t.retry}</Text>
+          </Pressable>
+          <Pressable onPress={signOut}><Text style={styles.detail}>{t.signOut}</Text></Pressable>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
   if (!permission) {
     return <Centered text={t.cameraChecking} />;
   }
@@ -217,7 +262,11 @@ export default function App() {
         onBarcodeScanned={onBarcodeScanned}
       />
       <SafeAreaView style={styles.overlay}>
+        <Text style={styles.overlayText}>{events.find((event) => event.id === selectedEventId)?.title}</Text>
         <Text style={styles.overlayText}>{t.point}</Text>
+        <Pressable onPress={() => { setSelectedEventId(null); setResult(null); scanned.current = false; }} style={styles.signOut}>
+          <Text style={styles.overlayText}>{t.changeEvent}</Text>
+        </Pressable>
         <Pressable onPress={signOut} style={styles.signOut}>
           <Text style={styles.overlayText}>
             {t.signOut} · {session.user?.name}
@@ -283,6 +332,9 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   overlay: { flex: 1, justifyContent: "flex-end", padding: 32 },
+  eventList: { flexGrow: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 16 },
+  eventButton: { width: "100%", borderWidth: 1, borderColor: "#777", borderRadius: 8, padding: 16, gap: 8 },
+  eventTitle: { color: "#fff", fontSize: 20, fontWeight: "600", textAlign: "center" },
   overlayText: { color: "#fff", fontSize: 16, textAlign: "center" },
   heading: {
     color: "#fff",
