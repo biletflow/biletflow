@@ -542,6 +542,8 @@ model Order {
 
   // Guards duplicate submissions of the same checkout attempt.
   clientIdempotencyKey String? @unique
+  // Names collected at checkout. Paid tickets are created later, only by the webhook.
+  attendees   Json?
   // Inventory reservation deadline; the sweeper releases the order after this.
   expiresAt   DateTime?
   paidAt      DateTime?

@@ -50,6 +50,7 @@ infra            docker-compose, Dockerfile
 | --- | --- |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Branching, PRs, definition of done |
 | [api.md](docs/api.md) | Endpoint contract |
+| [backend-commerce.md](docs/backend-commerce.md) | Orders, simulated payments, check-in |
 
 ## Team
 
