@@ -1,4 +1,4 @@
-import { checkInResultSchema, type CheckInResult } from "@biletflow/shared";
+import type { CheckInResult } from "@biletflow/shared";
 import type { MessageKey } from "./messages";
 export const TOKEN_KEY = "biletflow.scanner.token";
 export type ScannerEvent = { id: string; title: string; startsAt: string; endsAt: string; status: string };
@@ -201,7 +201,12 @@ export function createScannerAuth(
     });
     if (!response.ok) throw new Error("Server verification failed");
     const body: unknown = await response.json();
-    return checkInResultSchema.parse(body);
+    if (!body || typeof body !== "object" || !("result" in body) ||
+      !("message" in body) || typeof body.message !== "string" ||
+      !["VALID", "ALREADY_CHECKED_IN", "CANCELLED", "REFUNDED", "WRONG_EVENT", "NOT_A_TICKET", "INVALID"].includes(String(body.result))) {
+      throw new Error("Invalid check-in response");
+    }
+    return body as CheckInResult;
   }
   return {
     submitScan,
