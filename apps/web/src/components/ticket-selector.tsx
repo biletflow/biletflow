@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { formatEventDate, formatKzt } from "@/lib/format";
 import { labelOf } from "@/lib/labels";
 import { cn } from "@/lib/utils";
@@ -32,10 +33,14 @@ function blockedReason(
 }
 
 export function TicketSelector({
+  eventSlug,
+  signedIn,
   ticketTypes,
   disabled = false,
   disabledReason,
 }: {
+  eventSlug: string;
+  signedIn: boolean;
   ticketTypes: SelectableTicketType[];
   disabled?: boolean;
   disabledReason?: string;
@@ -178,18 +183,22 @@ export function TicketSelector({
         <p className="bg-warning-bg text-warning mt-5 rounded-lg px-3 py-2.5 text-xs font-medium">
           {disabledReason}
         </p>
-      ) : (
-        <>
-          <button
-            type="button"
-            disabled
-            className={cn(buttonVariants(), "mt-5 h-11 w-full text-sm font-bold")}
-          >
-            {isFree ? t("register") : t("buyTickets")}
-          </button>
-          <p className="text-ink-500 mt-2 text-center text-xs">{t("checkoutSoon")}</p>
-        </>
-      )}
+      ) : selected ? (
+        <Link
+          href={
+            signedIn
+              ? `/events/${eventSlug}/checkout?ticketTypeId=${selected.id}&quantity=${quantity}`
+              : `/sign-in?next=${encodeURIComponent(`/events/${eventSlug}/checkout?ticketTypeId=${selected.id}&quantity=${quantity}`)}`
+          }
+          className={cn(buttonVariants(), "mt-5 h-11 w-full text-sm font-bold")}
+        >
+          {signedIn
+            ? isFree
+              ? t("register")
+              : t("buyTickets")
+            : t("signInToContinue")}
+        </Link>
+      ) : null}
     </div>
   );
 }

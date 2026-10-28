@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 
-import type { Prisma } from "@biletflow/db";
+import { prisma, type Prisma } from "@biletflow/db";
 import { buildTicketCode } from "@biletflow/shared/qr.server";
+import QRCode from "qrcode";
 
 import { ApiError } from "./api-error";
 
@@ -65,4 +66,35 @@ export function ticketSigningKey() {
   const key = process.env.TICKET_SIGNING_KEY;
   if (!key) throw new Error("TICKET_SIGNING_KEY is not set");
   return key;
+}
+
+export async function listTicketsForUser(userId: string) {
+  return prisma.ticket.findMany({
+    where: { order: { userId } },
+    orderBy: { issuedAt: "desc" },
+    select: {
+      id: true,
+      status: true,
+      issuedAt: true,
+      attendee: { select: { fullName: true, email: true } },
+      ticketType: { select: { name: true } },
+      event: {
+        select: { title: true, slug: true, startsAt: true, timezone: true },
+      },
+    },
+  });
+}
+
+export async function qrPngForOwnedTicket(userId: string, ticketId: string) {
+  const ticket = await prisma.ticket.findFirst({
+    where: { id: ticketId, order: { userId } },
+    select: { code: true },
+  });
+  if (!ticket) throw new ApiError(404, "NOT_FOUND");
+  return QRCode.toBuffer(ticket.code, {
+    type: "png",
+    margin: 1,
+    width: 320,
+    errorCorrectionLevel: "M",
+  });
 }

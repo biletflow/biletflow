@@ -14,6 +14,7 @@ vi.mock("@/i18n/navigation", () => ({
 
 import { ApiError } from "./api-error";
 import { requirePageRole } from "./auth-guard";
+import { safeNextPath } from "./auth-home";
 
 describe("organizer and admin page access", () => {
   beforeEach(() => {
@@ -66,6 +67,16 @@ describe("organizer and admin page access", () => {
       href: "/sign-in",
       locale: "en",
     });
+  });
+
+  it("accepts only in-app next paths after sign-in", () => {
+    expect(safeNextPath("/tickets")).toBe("/tickets");
+    expect(
+      safeNextPath("/events/kbtu-freshers-welcome/checkout?quantity=1"),
+    ).toBe("/events/kbtu-freshers-welcome/checkout?quantity=1");
+    expect(safeNextPath("//evil.example")).toBeUndefined();
+    expect(safeNextPath("https://evil.example")).toBeUndefined();
+    expect(safeNextPath("events/no-slash")).toBeUndefined();
   });
 
   it("does not conceal unexpected server errors", async () => {

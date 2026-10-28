@@ -18,6 +18,7 @@ import { POST as createEvent } from "@/app/api/organizer/events/route";
 import { DELETE as deleteTicketType } from "@/app/api/organizer/ticket-types/[id]/route";
 import { GET as listOrders, POST as createOrder } from "@/app/api/orders/route";
 import { POST as payOrder } from "@/app/api/orders/[id]/pay/route";
+import { GET as ticketQr } from "@/app/api/tickets/[id]/qr.png/route";
 import { POST as webhook } from "@/app/api/payments/webhook/route";
 import { POST as mobileLogin } from "@/app/api/mobile/auth/login/route";
 import { GET as sandboxGet, POST as sandboxPost } from "@/app/sandbox/pay/[intentId]/route";
@@ -238,6 +239,31 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       expect(freeOrder.status).toBe("PAID");
       expect(freeOrder.tickets).toHaveLength(1);
       expect(freeOrder.totalKzt).toBe(0);
+      expect(freeOrder.tickets[0].code).toMatch(/^BFT1\./);
+
+      const ticketId = freeOrder.tickets[0].id as string;
+      const png = await ticketQr(
+        request(`/api/tickets/${ticketId}/qr.png`, undefined, tokens.attendee),
+        { params: Promise.resolve({ id: ticketId }) },
+      );
+      expect(png.status).toBe(200);
+      expect(png.headers.get("content-type")).toBe("image/png");
+      const bytes = Buffer.from(await png.arrayBuffer());
+      expect(
+        bytes.subarray(0, 8).equals(
+          Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+        ),
+      ).toBe(true);
+      const denied = await ticketQr(
+        request(`/api/tickets/${ticketId}/qr.png`, undefined, tokens.organizer),
+        { params: Promise.resolve({ id: ticketId }) },
+      );
+      expect(denied.status).toBe(404);
+      const anonymousQr = await ticketQr(
+        request(`/api/tickets/${ticketId}/qr.png`),
+        { params: Promise.resolve({ id: ticketId }) },
+      );
+      expect(anonymousQr.status).toBe(401);
 
       const replay = await createOrder(
         request(

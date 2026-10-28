@@ -20,3 +20,12 @@ export function dashboardPathForRole(
   if (role === "PLATFORM_ADMIN") return "/admin";
   if (role === "ORGANIZER") return "/organizer";
 }
+
+/** In-app path after sign-in. Rejects protocol-relative and absolute URLs. */
+export function safeNextPath(value: string | null | undefined) {
+  if (!value) return;
+  if (!value.startsWith("/") || value.startsWith("//") || value.includes("://")) {
+    return;
+  }
+  return value;
+}

@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { TicketSelector, type SelectableTicketType } from "@/components/ticket-selector";
 import { Link } from "@/i18n/navigation";
+import { getSessionUser } from "@/lib/auth-guard";
 import { getPublicEventBySlug, listRelatedEvents } from "@/lib/events";
 import {
   categoryGradient,
@@ -46,6 +47,7 @@ export default async function EventPage({
   const tCategory = await getTranslations("categories");
   const tCountry = await getTranslations("countries");
   const related = await listRelatedEvents(event.id, event.category);
+  const sessionUser = await getSessionUser();
 
   const isCancelled = event.status === "CANCELLED";
   const hasPaidTickets = event.ticketTypes.some((type) => type.priceKzt > 0);
@@ -172,6 +174,8 @@ export default async function EventPage({
 
           <div>
             <TicketSelector
+              eventSlug={event.slug}
+              signedIn={Boolean(sessionUser)}
               ticketTypes={ticketTypes}
               disabled={isCancelled || paidSalesBlocked}
               disabledReason={
