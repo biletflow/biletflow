@@ -220,3 +220,30 @@ test("request timeout exits loading state and allows retry", async (context) => 
   assert.equal(auth.getSnapshot().phase, "retry");
   assert.equal(auth.getSnapshot().error, "network");
 });
+
+test("submits the raw QR payload for the selected event and accepts server admission", async () => {
+  const raw = "BFT1.ticket.signature";
+  const { auth } = fixture(null, async (url, init) => {
+    if (url.endsWith("/api/mobile/auth/login")) return response({ token: "token", user });
+    assert.equal(url, "https://example.test/api/checkin");
+    assert.equal(init.method, "POST");
+    assert.equal(init.headers.Authorization, "Bearer token");
+    assert.deepEqual(JSON.parse(init.body), { eventId: "event-1", payload: raw });
+    return response({ result: "VALID", message: "Ticket checked in" });
+  });
+  await auth.login(user.email, "test-input");
+  const result = await auth.submitScan("event-1", raw);
+  assert.equal(result.result, "VALID");
+});
+
+test("scanner preserves server rejection for already checked-in and promotional QR", async () => {
+  for (const outcome of ["ALREADY_CHECKED_IN", "NOT_A_TICKET"]) {
+    const { auth } = fixture(null, async (url) => {
+      if (url.endsWith("/api/mobile/auth/login")) return response({ token: "token", user });
+      return response({ result: outcome, message: "Rejected by server" });
+    });
+    await auth.login(user.email, "test-input");
+    const result = await auth.submitScan("event-1", "untrusted-raw-payload");
+    assert.equal(result.result, outcome);
+  }
+});
