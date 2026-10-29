@@ -1,5 +1,7 @@
+import type { CheckInResult } from "@biletflow/shared";
 import type { MessageKey } from "./messages";
 export const TOKEN_KEY = "biletflow.scanner.token";
+export type ScannerEvent = { id: string; title: string; startsAt: string; endsAt: string; status: string };
 export type ScannerUser = {
   email: string;
   name: string;
@@ -182,7 +184,33 @@ export function createScannerAuth(
     await pending;
     return restore();
   }
+  async function getEvents(): Promise<ScannerEvent[]> {
+    if (!token || state.phase !== "ready") throw new Error("Not authenticated");
+    const response = await api("/api/mobile/events", { headers: { Authorization: `Bearer ${token}` } });
+    if (!response.ok) throw new Error("Unable to load events");
+    const data = await response.json();
+    if (!Array.isArray(data?.events)) throw new Error("Invalid response");
+    return data.events as ScannerEvent[];
+  }
+  async function submitScan(eventId: string, payload: string): Promise<CheckInResult> {
+    if (!token || state.phase !== "ready") throw new Error("Not authenticated");
+    const response = await api("/api/checkin", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ eventId, payload }),
+    });
+    if (!response.ok) throw new Error("Server verification failed");
+    const body: unknown = await response.json();
+    if (!body || typeof body !== "object" || !("result" in body) ||
+      !("message" in body) || typeof body.message !== "string" ||
+      !["VALID", "ALREADY_CHECKED_IN", "CANCELLED", "REFUNDED", "WRONG_EVENT", "NOT_A_TICKET", "INVALID"].includes(String(body.result))) {
+      throw new Error("Invalid check-in response");
+    }
+    return body as CheckInResult;
+  }
   return {
+    submitScan,
+    getEvents,
     resume,
     getSnapshot: () => state,
     subscribe: (listener: () => void) => {

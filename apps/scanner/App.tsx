@@ -9,6 +9,7 @@ import {
 } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   AppState,
   Linking,
   Pressable,
@@ -20,12 +21,11 @@ import {
 } from "react-native";
 
 import {
-  parseScannedPayload,
   signInSchema,
-  type ScannedPayload,
+  type CheckInResult,
 } from "@biletflow/shared";
 
-import { createScannerAuth } from "./src/auth";
+import { createScannerAuth, type ScannerEvent } from "./src/auth";
 import { messages, type Locale } from "./src/messages";
 
 const auth = createScannerAuth(
@@ -46,13 +46,36 @@ export default function App() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [permission, requestPermission] = useCameraPermissions();
-  const [result, setResult] = useState<ScannedPayload | null>(null);
+  const [result, setResult] = useState<CheckInResult | null>(null);
+  const [scanPending, setScanPending] = useState(false);
+  const [scanError, setScanError] = useState(false);
+  const scanGeneration = useRef(0);
   const scanned = useRef(false);
+  const [events, setEvents] = useState<ScannerEvent[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+  const [eventsError, setEventsError] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [eventsReload, setEventsReload] = useState(0);
+  useEffect(() => {
+    if (session.phase !== "ready") { setSelectedEventId(null); setEvents([]); return; }
+    let active = true;
+    setEventsLoading(true);
+    setEventsError(false);
+    void auth.getEvents().then((list) => {
+      if (!active) return;
+      setEvents(list);
+      setSelectedEventId((previous) => previous && list.some((event) => event.id === previous) ? previous : null);
+    }).catch(() => { if (active) setEventsError(true); })
+      .finally(() => { if (active) setEventsLoading(false); });
+    return () => { active = false; };
+  }, [session.phase, eventsReload]);
 
   useEffect(() => {
     void auth.restore();
     const subscription = AppState.addEventListener("change", (state) => {
       if (state === "active") {
+        scanGeneration.current++;
+        setScanPending(false);
         setResult(null);
         scanned.current = false;
         void auth.resume();
@@ -73,6 +96,11 @@ export default function App() {
   }
 
   function signOut() {
+    scanGeneration.current++;
+    setScanPending(false);
+    setScanError(false);
+    setSelectedEventId(null);
+    setEvents([]);
     setResult(null);
     scanned.current = false;
     setPassword("");
@@ -81,10 +109,17 @@ export default function App() {
   }
 
   const onBarcodeScanned = useCallback(({ data }: { data: string }) => {
-    if (scanned.current || auth.getSnapshot().phase !== "ready") return;
+    if (scanned.current || !selectedEventId || auth.getSnapshot().phase !== "ready") return;
     scanned.current = true;
-    setResult(parseScannedPayload(data));
-  }, []);
+    const version = ++scanGeneration.current;
+    setScanPending(true);
+    setScanError(false);
+    setResult(null);
+    void auth.submitScan(selectedEventId, data)
+      .then((serverResult) => { if (scanGeneration.current === version) setResult(serverResult); })
+      .catch(() => { if (scanGeneration.current === version) setScanError(true); })
+      .finally(() => { if (scanGeneration.current === version) setScanPending(false); });
+  }, [selectedEventId]);
 
   if (session.phase === "checking")
     return (
@@ -160,6 +195,30 @@ export default function App() {
     );
   }
 
+  if (eventsLoading) return <Centered text={t.checking}><ActivityIndicator color="#fff" /></Centered>;
+  if (!selectedEventId || eventsError || !events.some((event) => event.id === selectedEventId)) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.eventList}>
+          <Text style={styles.heading}>{t.chooseEvent}</Text>
+          {eventsError ? <Text style={styles.error}>{t.eventsError}</Text> :
+            events.length === 0 ? <Text style={styles.detail}>{t.noEvents}</Text> :
+            events.map((event) => (
+              <Pressable key={event.id} style={styles.eventButton} onPress={() => {
+                scanGeneration.current++; setSelectedEventId(event.id); setResult(null); setScanError(false); scanned.current = false;
+              }}>
+                <Text style={styles.eventTitle}>{event.title}</Text>
+                <Text style={styles.detail}>{new Date(event.startsAt).toLocaleString(locale)}</Text>
+              </Pressable>
+            ))}
+          <Pressable style={styles.button} onPress={() => setEventsReload((value) => value + 1)}>
+            <Text style={styles.buttonText}>{t.retry}</Text>
+          </Pressable>
+          <Pressable onPress={signOut}><Text style={styles.detail}>{t.signOut}</Text></Pressable>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
   if (!permission) {
     return <Centered text={t.cameraChecking} />;
   }
@@ -186,16 +245,25 @@ export default function App() {
     );
   }
 
+  if (scanPending) return <Centered text={t.awaiting}><ActivityIndicator color="#fff" /></Centered>;
+  if (scanError) return (
+    <Centered text={t.scanFailed}>
+      <Pressable style={styles.button} onPress={() => { scanned.current = false; setScanError(false); }}>
+        <Text style={styles.buttonText}>{t.again}</Text>
+      </Pressable>
+    </Centered>
+  );
   if (result) {
     return (
-      <SafeAreaView style={[styles.container, styles[resultStyle(result)]]}>
+      <SafeAreaView style={[styles.container, result.result === "VALID" ? styles.ok : styles.reject]}>
         <View style={styles.center}>
-          <Text style={styles.heading}>{resultHeading(result, t)}</Text>
-          <Text style={styles.detail}>{resultDetail(result, t)}</Text>
+          <Text style={styles.heading}>{result.result === "VALID" ? t.admitted : result.result.replaceAll("_", " ")}</Text>
+          <Text style={styles.detail}>{result.message}</Text>
           <Pressable
             style={styles.button}
             onPress={() => {
               scanned.current = false;
+              setScanError(false);
               setResult(null);
             }}
           >
@@ -217,7 +285,11 @@ export default function App() {
         onBarcodeScanned={onBarcodeScanned}
       />
       <SafeAreaView style={styles.overlay}>
+        <Text style={styles.overlayText}>{events.find((event) => event.id === selectedEventId)?.title}</Text>
         <Text style={styles.overlayText}>{t.point}</Text>
+        <Pressable onPress={() => { scanGeneration.current++; setSelectedEventId(null); setResult(null); scanned.current = false; }} style={styles.signOut}>
+          <Text style={styles.overlayText}>{t.changeEvent}</Text>
+        </Pressable>
         <Pressable onPress={signOut} style={styles.signOut}>
           <Text style={styles.overlayText}>
             {t.signOut} · {session.user?.name}
@@ -245,34 +317,6 @@ function Centered({
   );
 }
 
-function resultStyle(result: ScannedPayload) {
-  return result.kind === "ADMISSION_TICKET"
-    ? ("ok" as const)
-    : ("reject" as const);
-}
-
-function resultHeading(result: ScannedPayload, t: typeof messages.en) {
-  switch (result.kind) {
-    case "ADMISSION_TICKET":
-      return t.recognised;
-    case "CAMPAIGN_QR":
-      return t.notTicket;
-    default:
-      return t.unknown;
-  }
-}
-
-function resultDetail(result: ScannedPayload, t: typeof messages.en) {
-  switch (result.kind) {
-    case "ADMISSION_TICKET":
-      return `${t.ticket} ${result.ticketId}\n${t.awaiting}`;
-    case "CAMPAIGN_QR":
-      return t.promotional;
-    default:
-      return result.raw.slice(0, 120);
-  }
-}
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0b0b0c" },
   center: {
@@ -283,6 +327,9 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   overlay: { flex: 1, justifyContent: "flex-end", padding: 32 },
+  eventList: { flexGrow: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 16 },
+  eventButton: { width: "100%", borderWidth: 1, borderColor: "#777", borderRadius: 8, padding: 16, gap: 8 },
+  eventTitle: { color: "#fff", fontSize: 20, fontWeight: "600", textAlign: "center" },
   overlayText: { color: "#fff", fontSize: 16, textAlign: "center" },
   heading: {
     color: "#fff",
