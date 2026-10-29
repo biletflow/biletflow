@@ -24,7 +24,7 @@ export default function PaidSalesActivation({ eventId, locale }: { eventId: stri
     if (!response.ok) throw new Error(json.error?.message ?? t.error);
     setData(json.activation as Activation);
   }, [base, t.error]);
-  useEffect(() => { void load().catch((e: Error) => setError(e.message)); }, [load]);
+  useEffect(() => { void Promise.resolve().then(load).catch((e: Error) => setError(e.message)); }, [load]);
   async function act(action: "accept-terms" | "pay-fee") {
     setBusy(true); setError("");
     try {
