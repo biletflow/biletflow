@@ -21,9 +21,8 @@ import {
 } from "react-native";
 
 import {
-  parseScannedPayload,
   signInSchema,
-  type ScannedPayload,
+  type CheckInResult,
 } from "@biletflow/shared";
 
 import { createScannerAuth, type ScannerEvent } from "./src/auth";
@@ -47,7 +46,10 @@ export default function App() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [permission, requestPermission] = useCameraPermissions();
-  const [result, setResult] = useState<ScannedPayload | null>(null);
+  const [result, setResult] = useState<CheckInResult | null>(null);
+  const [scanPending, setScanPending] = useState(false);
+  const [scanError, setScanError] = useState(false);
+  const scanGeneration = useRef(0);
   const scanned = useRef(false);
   const [events, setEvents] = useState<ScannerEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
@@ -72,6 +74,8 @@ export default function App() {
     void auth.restore();
     const subscription = AppState.addEventListener("change", (state) => {
       if (state === "active") {
+        scanGeneration.current++;
+        setScanPending(false);
         setResult(null);
         scanned.current = false;
         void auth.resume();
@@ -92,6 +96,9 @@ export default function App() {
   }
 
   function signOut() {
+    scanGeneration.current++;
+    setScanPending(false);
+    setScanError(false);
     setSelectedEventId(null);
     setEvents([]);
     setResult(null);
@@ -102,10 +109,17 @@ export default function App() {
   }
 
   const onBarcodeScanned = useCallback(({ data }: { data: string }) => {
-    if (scanned.current || auth.getSnapshot().phase !== "ready") return;
+    if (scanned.current || !selectedEventId || auth.getSnapshot().phase !== "ready") return;
     scanned.current = true;
-    setResult(parseScannedPayload(data));
-  }, []);
+    const version = ++scanGeneration.current;
+    setScanPending(true);
+    setScanError(false);
+    setResult(null);
+    void auth.submitScan(selectedEventId, data)
+      .then((serverResult) => { if (scanGeneration.current === version) setResult(serverResult); })
+      .catch(() => { if (scanGeneration.current === version) setScanError(true); })
+      .finally(() => { if (scanGeneration.current === version) setScanPending(false); });
+  }, [selectedEventId]);
 
   if (session.phase === "checking")
     return (
@@ -191,7 +205,7 @@ export default function App() {
             events.length === 0 ? <Text style={styles.detail}>{t.noEvents}</Text> :
             events.map((event) => (
               <Pressable key={event.id} style={styles.eventButton} onPress={() => {
-                setSelectedEventId(event.id); setResult(null); scanned.current = false;
+                scanGeneration.current++; setSelectedEventId(event.id); setResult(null); setScanError(false); scanned.current = false;
               }}>
                 <Text style={styles.eventTitle}>{event.title}</Text>
                 <Text style={styles.detail}>{new Date(event.startsAt).toLocaleString(locale)}</Text>
@@ -231,16 +245,25 @@ export default function App() {
     );
   }
 
+  if (scanPending) return <Centered text={t.awaiting}><ActivityIndicator color="#fff" /></Centered>;
+  if (scanError) return (
+    <Centered text={t.scanFailed}>
+      <Pressable style={styles.button} onPress={() => { scanned.current = false; setScanError(false); }}>
+        <Text style={styles.buttonText}>{t.again}</Text>
+      </Pressable>
+    </Centered>
+  );
   if (result) {
     return (
-      <SafeAreaView style={[styles.container, styles[resultStyle(result)]]}>
+      <SafeAreaView style={[styles.container, result.result === "VALID" ? styles.ok : styles.reject]}>
         <View style={styles.center}>
-          <Text style={styles.heading}>{resultHeading(result, t)}</Text>
-          <Text style={styles.detail}>{resultDetail(result, t)}</Text>
+          <Text style={styles.heading}>{result.result === "VALID" ? t.admitted : result.result.replaceAll("_", " ")}</Text>
+          <Text style={styles.detail}>{result.message}</Text>
           <Pressable
             style={styles.button}
             onPress={() => {
               scanned.current = false;
+              setScanError(false);
               setResult(null);
             }}
           >
@@ -264,7 +287,7 @@ export default function App() {
       <SafeAreaView style={styles.overlay}>
         <Text style={styles.overlayText}>{events.find((event) => event.id === selectedEventId)?.title}</Text>
         <Text style={styles.overlayText}>{t.point}</Text>
-        <Pressable onPress={() => { setSelectedEventId(null); setResult(null); scanned.current = false; }} style={styles.signOut}>
+        <Pressable onPress={() => { scanGeneration.current++; setSelectedEventId(null); setResult(null); scanned.current = false; }} style={styles.signOut}>
           <Text style={styles.overlayText}>{t.changeEvent}</Text>
         </Pressable>
         <Pressable onPress={signOut} style={styles.signOut}>
@@ -292,34 +315,6 @@ function Centered({
       </View>
     </SafeAreaView>
   );
-}
-
-function resultStyle(result: ScannedPayload) {
-  return result.kind === "ADMISSION_TICKET"
-    ? ("ok" as const)
-    : ("reject" as const);
-}
-
-function resultHeading(result: ScannedPayload, t: typeof messages.en) {
-  switch (result.kind) {
-    case "ADMISSION_TICKET":
-      return t.recognised;
-    case "CAMPAIGN_QR":
-      return t.notTicket;
-    default:
-      return t.unknown;
-  }
-}
-
-function resultDetail(result: ScannedPayload, t: typeof messages.en) {
-  switch (result.kind) {
-    case "ADMISSION_TICKET":
-      return `${t.ticket} ${result.ticketId}\n${t.awaiting}`;
-    case "CAMPAIGN_QR":
-      return t.promotional;
-    default:
-      return result.raw.slice(0, 120);
-  }
 }
 
 const styles = StyleSheet.create({
