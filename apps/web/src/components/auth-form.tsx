@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
-import { homePathForRole, roleOf } from "@/lib/auth-home";
+import { homePathForRole, roleOf, safeNextPath } from "@/lib/auth-home";
 import { signInSchema, signUpSchema } from "@biletflow/shared";
 
 type Mode = "sign-in" | "sign-up";
@@ -22,7 +22,7 @@ function messageKey(error: { code?: string; message?: string; status?: number } 
   return "errorGeneric";
 }
 
-export function AuthForm({ mode }: { mode: Mode }) {
+export function AuthForm({ mode, next }: { mode: Mode; next?: string }) {
   const t = useTranslations("auth");
   const locale = useLocale();
   const router = useRouter();
@@ -50,7 +50,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         setError(t(messageKey(authError)));
         return;
       }
-      router.replace(homePathForRole(roleOf(data?.user)));
+      router.replace(safeNextPath(next) ?? homePathForRole(roleOf(data?.user)));
       router.refresh();
       return;
     }

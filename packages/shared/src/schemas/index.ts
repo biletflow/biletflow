@@ -233,6 +233,22 @@ export const suspendSchema = z.object({
   reason: z.string().trim().min(3).max(500),
 });
 
+export const eventCancelSchema = z.object({
+  reason: z.string().trim().min(3).max(500),
+});
+
+export const activationReviewSchema = z.object({
+  decision: z.enum(["APPROVE", "REJECT"]),
+  note: z.string().trim().max(500).optional(),
+});
+
+export const paymentWebhookSchema = z.object({
+  intentId: z.string().trim().min(1).max(120),
+  outcome: z.enum(["APPROVED", "DECLINED", "ABANDONED"]),
+  // Stable per delivery so a retried webhook cannot issue a second set of tickets.
+  eventKey: z.string().trim().min(1).max(200),
+});
+
 // --- Analytics --------------------------------------------------------------
 
 export const analyticsQuerySchema = z.object({
@@ -249,3 +265,6 @@ export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 export type CampaignInput = z.infer<typeof campaignInputSchema>;
 export type CheckInInput = z.infer<typeof checkInSchema>;
 export type CheckInResult = z.infer<typeof checkInResultSchema>;
+export type EventCancelInput = z.infer<typeof eventCancelSchema>;
+export type ActivationReviewInput = z.infer<typeof activationReviewSchema>;
+export type PaymentWebhookInput = z.infer<typeof paymentWebhookSchema>;
