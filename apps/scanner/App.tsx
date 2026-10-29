@@ -257,7 +257,7 @@ export default function App() {
     return (
       <SafeAreaView style={[styles.container, result.result === "VALID" ? styles.ok : styles.reject]}>
         <View style={styles.center}>
-          <Text style={styles.heading}>{result.result === "VALID" ? t.admitted : result.result.replaceAll("_", " ")}</Text>
+          <Text style={styles.heading}>{resultHeading(result.result, t)}</Text>
           <Text style={styles.detail}>{result.message}</Text>
           <Pressable
             style={styles.button}
@@ -315,6 +315,18 @@ function Centered({
       </View>
     </SafeAreaView>
   );
+}
+
+function resultHeading(result: CheckInResult["result"], t: typeof messages.en) {
+  switch (result) {
+    case "VALID": return t.admitted;
+    case "ALREADY_CHECKED_IN": return t.alreadyIn;
+    case "NOT_A_TICKET": return t.notTicket;
+    case "WRONG_EVENT": return t.wrongEvent;
+    case "CANCELLED": return t.cancelled;
+    case "REFUNDED": return t.refunded;
+    case "INVALID": return t.invalidTicket;
+  }
 }
 
 const styles = StyleSheet.create({
