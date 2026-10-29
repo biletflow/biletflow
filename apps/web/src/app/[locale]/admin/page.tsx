@@ -1,3 +1,5 @@
+import { prisma } from "@biletflow/db";
+import ActivationReviews from "@/components/admin/activation-reviews";
 import { ShieldCheck, UserRound } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
 
@@ -13,6 +15,11 @@ export default async function AdminPage({
   setRequestLocale(locale);
   await requirePageRole(locale, ["PLATFORM_ADMIN"]);
   const users = await listAdminUsers();
+  const activations = await prisma.paidSalesActivation.findMany({
+    include: { event: { select: { title: true } }, organizer: { select: { name: true } } },
+    orderBy: { createdAt: "desc" },
+    take: 30,
+  });
 
   return (
     <div className="bg-ink-100 min-h-[70vh]">
@@ -27,6 +34,7 @@ export default async function AdminPage({
           </p>
         </div>
 
+        <ActivationReviews locale={locale} rows={activations.map((item) => ({ id: item.id, eventTitle: item.event.title, organizerName: item.organizer.name, feePaid: item.feePaid, identityVerified: item.identityVerified }))} />
         {users.length === 0 ? (
           <div className="border-ink-300 mt-8 rounded-xl border border-dashed bg-white p-12 text-center">
             <p className="text-ink-900 font-bold">No users found</p>
