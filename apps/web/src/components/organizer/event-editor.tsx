@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PaidSalesActivation from "./paid-sales-activation";
+import { canPublish, hasEnoughInventory, validateEventDates } from "@/lib/organizer-editor-validation";
 
 type EventData = {
   id: string; title: string; description: string | null; category: string | null;
@@ -11,9 +12,9 @@ type EventData = {
   ticketTypes: { id: string; name: string; description?: string | null; quantity: number; sold: number; reserved: number; available: number; priceKzt: number; maxPerOrder: number; isHidden: boolean }[];
 };
 const copy = {
-  en: { heading: "Event editor", title: "Title", description: "Description", category: "Category", start: "Starts at", end: "Ends at", visibility: "Visibility", save: "Save draft", update: "Save changes", ticket: "Ticket type", quantity: "Quantity", price: "Price (KZT)", add: "Add ticket type", publish: "Publish event", back: "Back to events", loading: "Loading event…", error: "Request failed", published: "Event published", required: "Add at least one ticket type before publishing." },
-  ru: { heading: "Редактор мероприятия", title: "Название", description: "Описание", category: "Категория", start: "Начало", end: "Конец", visibility: "Видимость", save: "Сохранить черновик", update: "Сохранить изменения", ticket: "Тип билета", quantity: "Количество", price: "Цена (₸)", add: "Добавить тип билета", publish: "Опубликовать", back: "К мероприятиям", loading: "Загрузка…", error: "Ошибка запроса", published: "Мероприятие опубликовано", required: "Для публикации добавьте хотя бы один тип билета." },
-  kk: { heading: "Іс-шара редакторы", title: "Атауы", description: "Сипаттама", category: "Санат", start: "Басталуы", end: "Аяқталуы", visibility: "Көрінуі", save: "Жобаны сақтау", update: "Өзгерістерді сақтау", ticket: "Билет түрі", quantity: "Саны", price: "Бағасы (₸)", add: "Билет түрін қосу", publish: "Жариялау", back: "Іс-шараларға қайту", loading: "Жүктелуде…", error: "Сұрау қатесі", published: "Іс-шара жарияланды", required: "Жариялау үшін кемінде бір билет түрін қосыңыз." },
+  en: { heading: "Event editor", title: "Title", description: "Description", category: "Category", start: "Starts at", end: "Ends at", visibility: "Visibility", save: "Save draft", update: "Save changes", ticket: "Ticket type", quantity: "Quantity", price: "Price (KZT)", add: "Add ticket type", publish: "Publish event", back: "Back to events", loading: "Loading event…", error: "Request failed", published: "Event published", required: "Add at least one visible ticket type before publishing.", dates: "End date must be after the start date.", stock: "Quantity cannot be lower than sold and reserved tickets.", cancel: "Cancel", hidden: "Hidden", edit: "Edit", sold: "Sold", reserved: "Reserved", available: "Available", saved: "Changes saved.", added: "Ticket type added." },
+  ru: { heading: "Редактор мероприятия", title: "Название", description: "Описание", category: "Категория", start: "Начало", end: "Конец", visibility: "Видимость", save: "Сохранить черновик", update: "Сохранить изменения", ticket: "Тип билета", quantity: "Количество", price: "Цена (₸)", add: "Добавить тип билета", publish: "Опубликовать", back: "К мероприятиям", loading: "Загрузка…", error: "Ошибка запроса", published: "Мероприятие опубликовано", required: "Для публикации добавьте хотя бы один видимый тип билета.", dates: "Дата окончания должна быть позже даты начала.", stock: "Количество не может быть меньше суммы проданных и зарезервированных билетов.", cancel: "Отмена", hidden: "Скрыт", edit: "Изменить", sold: "Продано", reserved: "Забронировано", available: "Доступно", saved: "Изменения сохранены.", added: "Тип билета добавлен." },
+  kk: { heading: "Іс-шара редакторы", title: "Атауы", description: "Сипаттама", category: "Санат", start: "Басталуы", end: "Аяқталуы", visibility: "Көрінуі", save: "Жобаны сақтау", update: "Өзгерістерді сақтау", ticket: "Билет түрі", quantity: "Саны", price: "Бағасы (₸)", add: "Билет түрін қосу", publish: "Жариялау", back: "Іс-шараларға қайту", loading: "Жүктелуде…", error: "Сұрау қатесі", published: "Іс-шара жарияланды", required: "Жариялау үшін кемінде бір көрінетін билет түрін қосыңыз.", dates: "Аяқталу күні басталу күнінен кейін болуы тиіс.", stock: "Билет саны сатылған және брондалған билеттерден аз болмауы тиіс.", cancel: "Бас тарту", hidden: "Жасырылған", edit: "Өңдеу", sold: "Сатылды", reserved: "Брондалды", available: "Қолжетімді", saved: "Өзгерістер сақталды.", added: "Билет түрі қосылды." },
 } as const;
 function localDate(value: string) {
   const date = new Date(value);
@@ -60,12 +61,14 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
     return () => { active = false; };
   }, [eventId]);
   async function run(operation: () => Promise<void>) {
+    if (busy) return;
     setBusy(true); setError(""); setNotice("");
     try { await operation(); } catch (e) { setError(e instanceof Error ? e.message : t.error); }
     finally { setBusy(false); }
   }
   async function save(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (validateEventDates(form.startsAt, form.endsAt)) { setError(t.dates); return; }
     await run(async () => {
       const payload = {
         ...form, description: form.description || undefined, category: form.category || undefined,
@@ -78,6 +81,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
       );
       setEvent(saved);
       if (!eventId) router.replace(`/${locale}/organizer/events/${saved.id}`);
+      setNotice(t.saved);
       router.refresh();
     });
   }
@@ -89,20 +93,24 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
       const { event: updated } = await request(`/api/organizer/events/${event.id}`, "GET");
       setEvent(updated);
       setTicket({ name: "", priceKzt: 0, quantity: 100 });
+      setNotice(t.added);
       router.refresh();
     });
   }
   async function updateTicket() {
     if (!event || !editType) return;
+    const current = event.ticketTypes.find((type) => type.id === editType);
+    if (!current) return;
+    if (!hasEnoughInventory(ticketDraft.quantity, current.sold, current.reserved)) { setError(t.stock); return; }
     await run(async () => {
       await request(`/api/organizer/ticket-types/${editType}`, "PUT", ticketDraft);
       const { event: updated } = await request(`/api/organizer/events/${event.id}`, "GET");
-      setEvent(updated); setEditType(null); router.refresh();
+      setEvent(updated); setEditType(null); setNotice(t.saved); router.refresh();
     });
   }
   async function publish() {
     if (!event) return;
-    if (!event.ticketTypes.some((type) => type.quantity > 0)) { setError(t.required); return; }
+    if (!canPublish(event.ticketTypes)) { setError(t.required); return; }
     await run(async () => {
       const { event: updated } = await request(`/api/organizer/events/${event.id}/publish`, "POST");
       setEvent(updated); setNotice(t.published); router.refresh();
@@ -132,10 +140,10 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
         {event && <section className="space-y-4 rounded-xl border border-ink-300 bg-white p-6">
           <h2 className="text-xl font-bold">{t.ticket}</h2>
           <div className="space-y-3">{event.ticketTypes.map((type) => <div key={type.id} className="rounded-lg border border-ink-200 p-3">
-            <div className="flex flex-wrap items-center justify-between gap-2"><strong>{type.name}{type.isHidden ? " (hidden)" : ""}</strong>
-            <button type="button" className="text-brand underline" onClick={() => { setEditType(type.id); setTicketDraft({ name: type.name, quantity: type.quantity, priceKzt: type.priceKzt, maxPerOrder: type.maxPerOrder, isHidden: type.isHidden }); }}> {locale === "ru" ? "Изменить" : locale === "kk" ? "Өзгерту" : "Edit"}</button></div>
+            <div className="flex flex-wrap items-center justify-between gap-2"><strong>{type.name}{type.isHidden ? ` (${t.hidden})` : ""}</strong>
+            <button type="button" className="text-brand underline" onClick={() => { setEditType(type.id); setTicketDraft({ name: type.name, quantity: type.quantity, priceKzt: type.priceKzt, maxPerOrder: type.maxPerOrder, isHidden: type.isHidden }); }}> {t.edit}</button></div>
             <div className="mt-2 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
-              {(["quantity","sold","reserved","available"] as const).map((key) => <span key={key}>{key}: {type[key]}</span>)}
+              {(["quantity","sold","reserved","available"] as const).map((key) => <span key={key}>{key === "quantity" ? t.quantity : t[key]}: {type[key]}</span>)}
             </div>
           </div>)}</div>
           {editType && <div className="space-y-3 rounded-lg border border-ink-300 p-4">
@@ -143,7 +151,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
             <label className={labelStyle}>{t.quantity}<input type="number" min={1} className={inputStyle} value={ticketDraft.quantity} onChange={(e) => setTicketDraft({ ...ticketDraft, quantity: Number(e.target.value) })}/></label>
             <label className={labelStyle}>{t.price}<input type="number" min={0} className={inputStyle} value={ticketDraft.priceKzt} onChange={(e) => setTicketDraft({ ...ticketDraft, priceKzt: Number(e.target.value) })}/></label>
             <label className="flex gap-2"><input type="checkbox" checked={ticketDraft.isHidden} onChange={(e) => setTicketDraft({ ...ticketDraft, isHidden: e.target.checked })}/>{locale === "ru" ? "Скрыть из продажи" : locale === "kk" ? "Сатылымнан жасыру" : "Hide from sale"}</label>
-            <div className="flex gap-3"><button type="button" disabled={busy} onClick={updateTicket} className="bg-brand rounded-lg px-4 py-2 text-white">{t.update}</button><button type="button" onClick={() => setEditType(null)}>Cancel</button></div>
+            <div className="flex gap-3"><button type="button" disabled={busy} onClick={updateTicket} className="bg-brand rounded-lg px-4 py-2 text-white">{t.update}</button><button type="button" onClick={() => setEditType(null)}>{t.cancel}</button></div>
           </div>}
           <form onSubmit={addTicket} className="grid gap-3 sm:grid-cols-3">
             <label className={labelStyle}>{t.ticket}<input required className={inputStyle} value={ticket.name} onChange={(e) => setTicket({ ...ticket, name: e.target.value })}/></label>
@@ -151,7 +159,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
             <label className={labelStyle}>{t.price}<input required type="number" min={0} step={1} className={inputStyle} value={ticket.priceKzt} onChange={(e) => setTicket({ ...ticket, priceKzt: Number(e.target.value) })}/></label>
             <button disabled={busy} className="bg-ink-900 rounded-lg px-5 py-3 font-bold text-white disabled:opacity-50 sm:col-span-3">{t.add}</button>
           </form>
-          {event.status === "DRAFT" && <button type="button" disabled={busy || event.ticketTypes.length === 0} onClick={publish} className="bg-brand rounded-lg px-5 py-3 font-bold text-white disabled:opacity-50">{t.publish}</button>}
+          {event.status === "DRAFT" && <button type="button" disabled={busy || !canPublish(event.ticketTypes)} onClick={publish} className="bg-brand rounded-lg px-5 py-3 font-bold text-white disabled:opacity-50">{t.publish}</button>}
         </section>}
         {event && <PaidSalesActivation eventId={event.id} locale={locale} />}
       </div>
