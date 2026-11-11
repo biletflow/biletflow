@@ -64,6 +64,8 @@ test.afterAll(async () => {
     where: { orderId: { in: orderIds } },
     select: { attendeeId: true },
   });
+  const issuedTickets = await prisma.ticket.findMany({ where: { orderId: { in: orderIds } }, select: { id: true } });
+  await prisma.checkInRecord.deleteMany({ where: { ticketId: { in: issuedTickets.map((ticket) => ticket.id) } } });
   await prisma.ticket.deleteMany({ where: { orderId: { in: orderIds } } });
   await prisma.attendee.deleteMany({
     where: { id: { in: tickets.map((ticket) => ticket.attendeeId) } },
@@ -325,4 +327,58 @@ test("paid checkout issues a ticket after simulated approval", async ({
       name: messages.en.tickets.qrAlt.replace("{event}", "Almaty Jazz Night"),
     }),
   ).toBeVisible();
+});
+
+// These checks use the same seeded test server and database as the normal team
+// workflow tests. They do not replace a real phone camera test.
+for (const outcome of ["Decline", "Abandon"] as const) {
+  test(`simulated payment ${outcome.toLowerCase()} does not issue an admission ticket`, async ({ page }) => {
+    const email = await signup(page);
+    await page.goto("/en/events/almaty-jazz-night");
+    await page.getByRole("link", { name: messages.en.event.buyTickets, exact: true }).click();
+    await page.getByRole("button", { name: messages.en.checkout.submitPaid, exact: true }).click();
+    await expect(page).toHaveURL(/\\/sandbox\\/pay\\//);
+    await page.getByRole("button", { name: outcome, exact: true }).click();
+    await expect(page.getByText("No ticket was issued.")).toBeVisible();
+
+    const user = await prisma.user.findUniqueOrThrow({ where: { email } });
+    expect(await prisma.ticket.count({ where: { order: { userId: user.id } } })).toBe(0);
+  });
+}
+
+test("admission is accepted once and a duplicate scan is rejected", async ({ page, browser }) => {
+  const email = await signup(page);
+  await page.goto("/en/events/kbtu-freshers-welcome");
+  await page.getByRole("link", { name: messages.en.event.register, exact: true }).click();
+  await page.getByRole("button", { name: messages.en.checkout.submitFree, exact: true }).click();
+  await expect(page).toHaveURL(/\\/en\\/tickets/);
+
+  const user = await prisma.user.findUniqueOrThrow({ where: { email } });
+  const ticket = await prisma.ticket.findFirstOrThrow({
+    where: { order: { userId: user.id } },
+    select: { id: true, code: true, eventId: true },
+  });
+  const scannerPage = await browser.newPage();
+  try {
+    await login(scannerPage, "admin@biletflow.kz");
+    await expect(scannerPage).toHaveURL(/\\/en\\/admin$/);
+    const checkIn = () => scannerPage.request.post("/api/checkin", {
+      data: { eventId: ticket.eventId, payload: ticket.code },
+    });
+    const first = await checkIn();
+    expect(first.status()).toBe(200);
+    expect((await first.json()).result).toBe("VALID");
+
+    const duplicate = await checkIn();
+    expect(duplicate.status()).toBe(200);
+    expect((await duplicate.json()).result).toBe("ALREADY_CHECKED_IN");
+
+    const promotional = await scannerPage.request.post("/api/checkin", {
+      data: { eventId: ticket.eventId, payload: "not-an-admission-ticket" },
+    });
+    expect(promotional.status()).toBe(200);
+    expect((await promotional.json()).result).toBe("NOT_A_TICKET");
+  } finally {
+    await scannerPage.close();
+  }
 });
