@@ -22,6 +22,12 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow BiletFlow Scanner to use the camera to verify admission tickets."
+        }
+      ],
       "expo-secure-store"
     ]
   }
