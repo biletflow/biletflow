@@ -9,7 +9,8 @@ import { formatKzt } from "@/lib/format";
 import { labelOf } from "@/lib/labels";
 
 function checkoutErrorKey(code: string) {
-  if (code === "CONFLICT" || code === "HOLD_EXPIRED") return "errorConflict";
+  if (code === "HOLD_EXPIRED") return "errorHoldExpired";
+  if (code === "CONFLICT") return "errorConflict";
   if (code === "VALIDATION_FAILED") return "errorValidation";
   return "errorGeneric";
 }
@@ -99,7 +100,9 @@ export function CheckoutForm({
         setError(t(checkoutErrorKey(paid?.error?.code ?? "")));
         return;
       }
-      window.location.assign(paid.url);
+      const gateway = new URL(paid.url, window.location.origin);
+      gateway.searchParams.set("locale", locale);
+      window.location.assign(gateway.toString());
     } catch {
       idempotencyKey.current = crypto.randomUUID();
       setError(t("errorGeneric"));

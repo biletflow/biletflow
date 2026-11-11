@@ -33,7 +33,9 @@ export default function PaidSalesActivation({ eventId, locale }: { eventId: stri
       if (!response.ok) throw new Error(result.error?.message ?? t.error);
       if (action === "pay-fee" && typeof result.url === "string") {
         // The server supplies the simulated gateway URL. Never construct payment URLs client-side.
-        window.location.assign(result.url);
+        const gateway = new URL(result.url, window.location.origin);
+        gateway.searchParams.set("locale", locale);
+        window.location.assign(gateway.toString());
         return;
       }
       await load();

@@ -111,6 +111,7 @@
     "back": "Back to event",
     "errorGeneric": "Could not complete checkout. Try again.",
     "errorConflict": "Those tickets are no longer available.",
+    "errorHoldExpired": "Your checkout hold expired. Start again from the event page.",
     "errorValidation": "Check the name, email, and quantity and try again."
   },
   "tickets": {
@@ -119,6 +120,8 @@
     "emptyBody": "Browse events to register or buy a ticket.",
     "browse": "Browse events",
     "qrAlt": "Admission QR for {event}",
+    "qrFailed": "Could not load the admission QR. Refresh the page.",
+    "qrUnavailable": "This ticket is no longer valid, so the admission QR is hidden.",
     "holder": "Holder",
     "status": {
       "VALID": "Valid",

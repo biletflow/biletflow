@@ -20,8 +20,10 @@ hold and create no ticket. The webhook checks `x-biletflow-signature` (HMAC-SHA2
 of the raw body, hex) and dedupes on `ProcessedWebhookEvent`.
 
 `GET /sandbox/pay/:intentId` is labelled simulated and offers Approve, Decline,
-and Abandon. No real money moves. When `PAYMENT_WEBHOOK_SECRET` is empty, local
-and CI runs use `dev-payment-webhook-secret`.
+and Abandon. The page speaks in the attendee locale and says whether tickets were
+issued, the hold expired, or nothing was charged. Cancelled and refunded tickets
+do not expose an admission QR. No real money moves. When `PAYMENT_WEBHOOK_SECRET`
+is empty, local and CI runs use `dev-payment-webhook-secret`.
 
 Paid checkout stays locked until the organizer pays the simulated activation fee
 and a platform admin approves it. Seeded events that already have

@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect as hardRedirect } from "next/navigation";
 
+import { TicketQr } from "@/components/ticket-qr";
 import { Link } from "@/i18n/navigation";
 import { getSessionUser } from "@/lib/auth-guard";
 import { formatEventDateTime } from "@/lib/format";
@@ -48,19 +49,18 @@ export default async function TicketsPage({
                 key={ticket.id}
                 className="border-ink-300 flex flex-col gap-5 rounded-xl border bg-white p-5 sm:flex-row sm:items-center"
               >
-                {/* Session cookie must go with the PNG; next/image fetches without it. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <TicketQr
                   src={`/api/tickets/${ticket.id}/qr.png`}
                   alt={t("qrAlt", { event: ticket.event.title })}
-                  width={160}
-                  height={160}
-                  className="border-ink-200 size-40 shrink-0 rounded-lg border bg-white p-2"
+                  show={ticket.status === "VALID" || ticket.status === "CHECKED_IN"}
                 />
                 <div className="min-w-0">
-                  <p className="text-ink-900 text-lg font-bold">
+                  <Link
+                    href={`/events/${ticket.event.slug}`}
+                    className="text-ink-900 hover:text-brand text-lg font-bold"
+                  >
                     {ticket.event.title}
-                  </p>
+                  </Link>
                   <p className="text-ink-600 mt-1 text-sm">
                     {formatEventDateTime(
                       ticket.event.startsAt,
@@ -74,7 +74,15 @@ export default async function TicketsPage({
                   <p className="text-ink-600 text-sm">
                     {t("holder")}: {ticket.attendee.fullName}
                   </p>
-                  <p className="text-brand mt-2 text-xs font-bold tracking-wider uppercase">
+                  <p
+                    className={`mt-2 text-xs font-bold tracking-wider uppercase ${
+                      ticket.status === "VALID"
+                        ? "text-brand"
+                        : ticket.status === "CHECKED_IN"
+                          ? "text-ink-700"
+                          : "text-error"
+                    }`}
+                  >
                     {t(`status.${ticket.status}`)}
                   </p>
                 </div>
