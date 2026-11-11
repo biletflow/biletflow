@@ -30,7 +30,7 @@ export function SignedInNav({
     <div className="flex items-center gap-3">
       <Link
         href="/tickets"
-        className="text-ink-800 hover:text-brand hidden text-sm font-semibold transition-colors sm:block"
+        className="text-ink-800 hover:text-brand text-sm font-semibold transition-colors"
       >
         {t("tickets")}
       </Link>
