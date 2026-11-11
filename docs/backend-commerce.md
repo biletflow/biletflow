@@ -42,3 +42,22 @@ pnpm --filter @biletflow/db exec tsx ../../scripts/team-demo.ts
 
 The same path is covered without a server by
 `apps/web/src/lib/commerce.integration.test.ts` when `RUN_AUTH_INTEGRATION=1`.
+
+## Regression invariants (#97)
+
+`apps/web/src/lib/commerce.invariants.test.ts` checks the rules that a repeated
+request must not duplicate:
+
+- an unsigned, forged, or malformed webhook does not issue a ticket or move inventory
+- decline and abandon release the hold once, leave the order cancelled, and create no ticket
+- replaying that webhook, or sending it again under a new event key, still creates no ticket
+- the same checkout idempotency key returns the same order and reserves one seat
+- repeating pay, or the activation-fee payment, returns the open intent
+- one approved webhook issues one ticket; a second delivery does not
+- accepting terms twice, or paying the fee twice, keeps a single activation row
+- a declined fee does not unlock paid checkout, and rejecting an activation locks it again
+- two check-ins of the same ticket leave one active check-in record
+
+No backend bug turned up in those cases. Run the file with `RUN_AUTH_INTEGRATION=1`
+against a migrated database. Physical scanner checks for issue #99 stay with the
+scanner app.
