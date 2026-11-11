@@ -64,6 +64,8 @@ test.afterAll(async () => {
     where: { orderId: { in: orderIds } },
     select: { attendeeId: true },
   });
+  const ownedTickets = await prisma.ticket.findMany({ where: { orderId: { in: orderIds } }, select: { id: true } });
+  await prisma.checkInRecord.deleteMany({ where: { ticketId: { in: ownedTickets.map((ticket) => ticket.id) } } });
   await prisma.ticket.deleteMany({ where: { orderId: { in: orderIds } } });
   await prisma.attendee.deleteMany({
     where: { id: { in: tickets.map((ticket) => ticket.attendeeId) } },
@@ -349,4 +351,52 @@ test("declined paid checkout issues no ticket", async ({ page }) => {
   ).toBeVisible();
   await page.goto("/en/tickets");
   await expect(page.getByText(messages.en.tickets.empty, { exact: true })).toBeVisible();
+});
+
+
+test("abandoned paid checkout leaves the attendee without a ticket", async ({ page }) => {
+  const email = await signup(page);
+  await page.goto("/en/events/almaty-jazz-night");
+  await page.getByRole("link", { name: messages.en.event.buyTickets, exact: true }).click();
+  await page.getByRole("button", { name: messages.en.checkout.submitPaid, exact: true }).click();
+  await expect(page).toHaveURL(/\/sandbox\/pay\//);
+  await page.getByRole("button", { name: "Abandon", exact: true }).click();
+  await expect(page.getByRole("heading", {
+    name: "You cancelled this payment. No ticket was issued.",
+  })).toBeVisible();
+  const user = await prisma.user.findUniqueOrThrow({ where: { email } });
+  expect(await prisma.ticket.count({ where: { order: { userId: user.id } } })).toBe(0);
+});
+
+test("free admission can only be checked in once", async ({ page, browser }) => {
+  const email = await signup(page);
+  await page.goto("/en/events/kbtu-freshers-welcome");
+  await page.getByRole("link", { name: messages.en.event.register, exact: true }).click();
+  await page.getByRole("button", { name: messages.en.checkout.submitFree, exact: true }).click();
+  await expect(page).toHaveURL(/\/en\/tickets/);
+
+  const user = await prisma.user.findUniqueOrThrow({ where: { email } });
+  const ticket = await prisma.ticket.findFirstOrThrow({
+    where: { order: { userId: user.id } },
+    select: { code: true, eventId: true },
+  });
+  const adminPage = await browser.newPage();
+  try {
+    await login(adminPage, "admin@biletflow.kz");
+    await expect(adminPage).toHaveURL(/\/en\/admin$/);
+    const checkIn = (payload: string) => adminPage.request.post("/api/checkin", {
+      data: { eventId: ticket.eventId, payload },
+    });
+    const first = await checkIn(ticket.code);
+    expect(first.status()).toBe(200);
+    expect((await first.json()).result).toBe("VALID");
+    const second = await checkIn(ticket.code);
+    expect(second.status()).toBe(200);
+    expect((await second.json()).result).toBe("ALREADY_CHECKED_IN");
+    const notATicket = await checkIn("not-an-admission-ticket");
+    expect(notATicket.status()).toBe(200);
+    expect((await notATicket.json()).result).toBe("NOT_A_TICKET");
+  } finally {
+    await adminPage.close();
+  }
 });
