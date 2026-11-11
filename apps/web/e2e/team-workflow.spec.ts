@@ -337,7 +337,7 @@ for (const outcome of ["Decline", "Abandon"] as const) {
     await page.goto("/en/events/almaty-jazz-night");
     await page.getByRole("link", { name: messages.en.event.buyTickets, exact: true }).click();
     await page.getByRole("button", { name: messages.en.checkout.submitPaid, exact: true }).click();
-    await expect(page).toHaveURL(/\\/sandbox\\/pay\\//);
+    await expect(page).toHaveURL(/\/sandbox\/pay\//);
     await page.getByRole("button", { name: outcome, exact: true }).click();
     await expect(page.getByText("No ticket was issued.")).toBeVisible();
 
@@ -351,7 +351,7 @@ test("admission is accepted once and a duplicate scan is rejected", async ({ pag
   await page.goto("/en/events/kbtu-freshers-welcome");
   await page.getByRole("link", { name: messages.en.event.register, exact: true }).click();
   await page.getByRole("button", { name: messages.en.checkout.submitFree, exact: true }).click();
-  await expect(page).toHaveURL(/\\/en\\/tickets/);
+  await expect(page).toHaveURL(/\/en\/tickets/);
 
   const user = await prisma.user.findUniqueOrThrow({ where: { email } });
   const ticket = await prisma.ticket.findFirstOrThrow({
@@ -361,7 +361,7 @@ test("admission is accepted once and a duplicate scan is rejected", async ({ pag
   const scannerPage = await browser.newPage();
   try {
     await login(scannerPage, "admin@biletflow.kz");
-    await expect(scannerPage).toHaveURL(/\\/en\\/admin$/);
+    await expect(scannerPage).toHaveURL(/\/en\/admin$/);
     const checkIn = () => scannerPage.request.post("/api/checkin", {
       data: { eventId: ticket.eventId, payload: ticket.code },
     });
