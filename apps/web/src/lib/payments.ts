@@ -301,6 +301,9 @@ async function settleActivation(
 export async function paymentPage(providerIntentId: string) {
   return prisma.payment.findUnique({
     where: { providerIntentId },
-    include: { order: true, activation: { include: { event: true } } },
+    include: {
+      order: { include: { event: { select: { slug: true, title: true } } } },
+      activation: { include: { event: { select: { slug: true, title: true } } } },
+    },
   });
 }

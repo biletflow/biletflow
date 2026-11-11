@@ -88,9 +88,11 @@ export async function listTicketsForUser(userId: string) {
 export async function qrPngForOwnedTicket(userId: string, ticketId: string) {
   const ticket = await prisma.ticket.findFirst({
     where: { id: ticketId, order: { userId } },
-    select: { code: true },
+    select: { code: true, status: true },
   });
-  if (!ticket) throw new ApiError(404, "NOT_FOUND");
+  if (!ticket || ticket.status === "CANCELLED" || ticket.status === "REFUNDED") {
+    throw new ApiError(404, "NOT_FOUND");
+  }
   return QRCode.toBuffer(ticket.code, {
     type: "png",
     margin: 1,

@@ -317,12 +317,36 @@ test("paid checkout issues a ticket after simulated approval", async ({
     .getByRole("button", { name: messages.en.checkout.submitPaid, exact: true })
     .click();
   await expect(page).toHaveURL(/\/sandbox\/pay\//);
+  await expect(page.getByText("Waiting for you to confirm this simulated payment.")).toBeVisible();
   await page.getByRole("button", { name: "Approve" }).click();
-  await expect(page.getByText("Tickets were issued.")).toBeVisible();
-  await page.goto("/en/tickets");
+  await expect(
+    page.getByRole("heading", { name: "Payment approved. Your tickets are ready." }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "View tickets" }).click();
+  await expect(page).toHaveURL(/\/en\/tickets/);
   await expect(
     page.getByRole("img", {
       name: messages.en.tickets.qrAlt.replace("{event}", "Almaty Jazz Night"),
     }),
   ).toBeVisible();
+});
+
+test("declined paid checkout issues no ticket", async ({ page }) => {
+  await signup(page);
+  await page.goto("/en/events/almaty-jazz-night");
+  await page
+    .getByRole("link", { name: messages.en.event.buyTickets, exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: messages.en.checkout.submitPaid, exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/sandbox\/pay\//);
+  await page.getByRole("button", { name: "Decline" }).click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Payment declined. No ticket was issued and you were not charged.",
+    }),
+  ).toBeVisible();
+  await page.goto("/en/tickets");
+  await expect(page.getByText(messages.en.tickets.empty, { exact: true })).toBeVisible();
 });
