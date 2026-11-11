@@ -187,18 +187,41 @@ export function createScannerAuth(
   async function getEvents(): Promise<ScannerEvent[]> {
     if (!token || state.phase !== "ready") throw new Error("Not authenticated");
     const response = await api("/api/mobile/events", { headers: { Authorization: `Bearer ${token}` } });
+    if (response.status === 401 || response.status === 403) {
+      await logout();
+      throw new Error("Session access expired");
+    }
     if (!response.ok) throw new Error("Unable to load events");
     const data = await response.json();
     if (!Array.isArray(data?.events)) throw new Error("Invalid response");
-    return data.events as ScannerEvent[];
+    // Do not expose events outside the currently authenticated staff assignments.
+    const assigned = new Set(state.user?.staffAssignments
+      .filter((assignment) => assignment.role === "EVENT_ADMIN" || assignment.role === "CO_ORGANIZER")
+      .map((assignment) => assignment.eventId) ?? []);
+    return data.events.filter((event: unknown): event is ScannerEvent => {
+      if (!event || typeof event !== "object") return false;
+      const candidate = event as Partial<ScannerEvent>;
+      return typeof candidate.id === "string" && assigned.has(candidate.id) &&
+        typeof candidate.title === "string" &&
+        typeof candidate.startsAt === "string" &&
+        typeof candidate.endsAt === "string";
+    });
   }
   async function submitScan(eventId: string, payload: string): Promise<CheckInResult> {
     if (!token || state.phase !== "ready") throw new Error("Not authenticated");
+    if (!state.user?.staffAssignments.some((a) =>
+      a.eventId === eventId && (a.role === "EVENT_ADMIN" || a.role === "CO_ORGANIZER"))) {
+      throw new Error("Event is not assigned to this scanner");
+    }
     const response = await api("/api/checkin", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ eventId, payload }),
     });
+    if (response.status === 401 || response.status === 403) {
+      await logout();
+      throw new Error("Session access expired");
+    }
     if (!response.ok) throw new Error("Server verification failed");
     const body: unknown = await response.json();
     if (!body || typeof body !== "object" || !("result" in body) ||

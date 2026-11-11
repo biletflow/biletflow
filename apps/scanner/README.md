@@ -36,3 +36,32 @@ These camera/OS checks require a physical device and are not covered by controll
 6. Sign out from the camera, permission or result screen. Restart: the login screen
    must remain visible. Sign-out clears the local token; it does not revoke the
    server session on other devices.
+
+## Issue #98 admission acceptance checklist
+
+Run the automated checks before merging:
+
+```sh
+pnpm --filter scanner typecheck
+pnpm --filter scanner test
+```
+
+On a **physical iOS or Android phone** with the API reachable via LAN:
+
+1. Sign in as assigned staff. Confirm that only assigned events appear. An
+   account with no scanner assignment must not gain camera access.
+2. Select an assigned event; allow camera access. Deny permission on a clean
+   installation and confirm the Settings recovery route after permanent denial.
+3. Scan a real My Tickets QR. Only a server `VALID` result grants admission.
+   The resulting screen displays attendee name, ticket type, and seat (if any).
+4. Scan the same ticket again: expect `ALREADY_CHECKED_IN`. Scan a campaign QR,
+   an unknown QR, and a ticket for another event. Each must be rejected.
+5. Turn off the API/network during a scan. Confirm that admission is **not**
+   reported and Scan again recovers after network access returns.
+6. Revoke the staff assignment while the app is open. A denied check-in or
+   events reload must clear the session. Background/foreground must revalidate.
+7. Switch events and verify no prior result survives; sign out and restart.
+
+**Physical-device verification is pending** until a tester records the device,
+OS version, API environment, and results of steps 1 through 7. Automated tests
+do not constitute device verification.

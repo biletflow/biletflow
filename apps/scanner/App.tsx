@@ -34,9 +34,8 @@ const auth = createScannerAuth(
 );
 
 /**
- * Week 4 scaffold: proves the camera works and that the shared payload classifier
- * runs on device. Real verification is server-side via POST /api/checkin — this
- * screen must never decide admission on its own.
+ * Admission is decided exclusively by POST /api/checkin. QR recognition alone
+ * never grants entry; the camera pauses while a result is being verified.
  */
 export default function App() {
   const [locale, setLocale] = useState<Locale>("ru");
@@ -109,7 +108,7 @@ export default function App() {
   }
 
   const onBarcodeScanned = useCallback(({ data }: { data: string }) => {
-    if (scanned.current || !selectedEventId || auth.getSnapshot().phase !== "ready") return;
+    if (scanned.current || !selectedEventId || !events.some((event) => event.id === selectedEventId) || auth.getSnapshot().phase !== "ready") return;
     scanned.current = true;
     const version = ++scanGeneration.current;
     setScanPending(true);
@@ -119,7 +118,7 @@ export default function App() {
       .then((serverResult) => { if (scanGeneration.current === version) setResult(serverResult); })
       .catch(() => { if (scanGeneration.current === version) setScanError(true); })
       .finally(() => { if (scanGeneration.current === version) setScanPending(false); });
-  }, [selectedEventId]);
+  }, [selectedEventId, events]);
 
   if (session.phase === "checking")
     return (
@@ -259,6 +258,13 @@ export default function App() {
         <View style={styles.center}>
           <Text style={styles.heading}>{resultHeading(result.result, t)}</Text>
           <Text style={styles.detail}>{result.message}</Text>
+          {result.ticket ? (
+            <View style={styles.ticketDetails}>
+              <Text style={styles.detail}>{result.ticket.attendeeName}</Text>
+              <Text style={styles.detail}>{result.ticket.ticketTypeName}</Text>
+              {result.ticket.seatLabel ? <Text style={styles.detail}>{result.ticket.seatLabel}</Text> : null}
+            </View>
+          ) : null}
           <Pressable
             style={styles.button}
             onPress={() => {
@@ -280,6 +286,8 @@ export default function App() {
   return (
     <View style={styles.container}>
       <CameraView
+        facing="back"
+        active={session.phase === "ready" && Boolean(selectedEventId) && !scanPending && !result && !scanError}
         style={StyleSheet.absoluteFill}
         barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
         onBarcodeScanned={onBarcodeScanned}
@@ -340,6 +348,7 @@ const styles = StyleSheet.create({
   },
   overlay: { flex: 1, justifyContent: "flex-end", padding: 32 },
   eventList: { flexGrow: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 16 },
+  ticketDetails: { gap: 6, alignItems: "center", padding: 12 },
   eventButton: { width: "100%", borderWidth: 1, borderColor: "#777", borderRadius: 8, padding: 16, gap: 8 },
   eventTitle: { color: "#fff", fontSize: 20, fontWeight: "600", textAlign: "center" },
   overlayText: { color: "#fff", fontSize: 16, textAlign: "center" },

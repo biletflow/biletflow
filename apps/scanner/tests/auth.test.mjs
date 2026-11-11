@@ -247,3 +247,41 @@ test("scanner preserves server rejection for already checked-in and promotional 
     assert.equal(result.result, outcome);
   }
 });
+
+test("only assigned events are exposed to the scanner", async () => {
+  const { auth } = fixture(null, async (url) => {
+    if (url.endsWith("/api/mobile/auth/login")) return response({ token: "token", user });
+    if (url.endsWith("/api/mobile/events")) return response({ events: [
+      { id: "event-1", title: "Assigned", startsAt: "2026-11-12T10:00:00Z", endsAt: "2026-11-12T11:00:00Z" },
+      { id: "event-2", title: "Unassigned", startsAt: "2026-11-12T10:00:00Z", endsAt: "2026-11-12T11:00:00Z" },
+      { id: 4, title: "Malformed" },
+    ] });
+    assert.fail("unexpected endpoint");
+  });
+  await auth.login(user.email, "test-input");
+  const events = await auth.getEvents();
+  assert.deepEqual(events.map((event) => event.id), ["event-1"]);
+});
+
+test("scanner refuses a selected event outside assigned staff access", async () => {
+  const { auth } = fixture(null, async (url) => {
+    if (url.endsWith("/api/mobile/auth/login")) return response({ token: "token", user });
+    assert.fail("unassigned ticket must not reach the server");
+  });
+  await auth.login(user.email, "test-input");
+  await assert.rejects(auth.submitScan("event-2", "payload"), /not assigned/);
+});
+
+for (const endpoint of ["events", "checkin"]) {
+  test(`revoked access on ${endpoint} locks scanner and deletes its token`, async () => {
+    const { auth, storage } = fixture(null, async (url) => {
+      if (url.endsWith("/api/mobile/auth/login")) return response({ token: "token", user });
+      return response({ error: "FORBIDDEN" }, 403);
+    });
+    await auth.login(user.email, "test-input");
+    if (endpoint === "events") await assert.rejects(auth.getEvents());
+    else await assert.rejects(auth.submitScan("event-1", "payload"));
+    assert.equal(auth.getSnapshot().phase, "signedOut");
+    assert.equal(storage.value, null);
+  });
+}
