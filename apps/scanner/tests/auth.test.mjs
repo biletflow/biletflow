@@ -236,8 +236,8 @@ test("submits the raw QR payload for the selected event and accepts server admis
   assert.equal(result.result, "VALID");
 });
 
-test("scanner preserves server rejection for already checked-in and promotional QR", async () => {
-  for (const outcome of ["ALREADY_CHECKED_IN", "NOT_A_TICKET"]) {
+test("scanner preserves every server rejection without granting admission", async () => {
+  for (const outcome of ["ALREADY_CHECKED_IN", "WRONG_EVENT", "CANCELLED", "REFUNDED", "NOT_A_TICKET", "INVALID"]) {
     const { auth } = fixture(null, async (url) => {
       if (url.endsWith("/api/mobile/auth/login")) return response({ token: "token", user });
       return response({ result: outcome, message: "Rejected by server" });
@@ -285,3 +285,19 @@ for (const endpoint of ["events", "checkin"]) {
     assert.equal(storage.value, null);
   });
 }
+
+test("scan network and malformed responses never confirm admission; retry can recover", async () => {
+  let mode = "offline";
+  const { auth } = fixture(null, async (url) => {
+    if (url.endsWith("/api/mobile/auth/login")) return response({ token: "token", user });
+    if (mode === "offline") throw new TypeError("network failure");
+    if (mode === "malformed") return response({ result: "VALID" });
+    return response({ result: "VALID", message: "Ticket checked in" });
+  });
+  await auth.login(user.email, "test-input");
+  await assert.rejects(auth.submitScan("event-1", "payload"), /network/);
+  mode = "malformed";
+  await assert.rejects(auth.submitScan("event-1", "payload"), /Invalid check-in response/);
+  mode = "online";
+  assert.equal((await auth.submitScan("event-1", "payload")).result, "VALID");
+});
