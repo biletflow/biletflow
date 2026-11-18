@@ -371,11 +371,11 @@ for (const kind of ["free", "paid"] as const) {
       exact: true,
     }).click();
     if (kind === "paid") {
-      await expect(page).toHaveURL(/\\/sandbox\\/pay\\//);
+      await expect(page).toHaveURL(/\/sandbox\/pay\//);
       await page.getByRole("button", { name: "Approve", exact: true }).click();
       await page.getByRole("link", { name: "View tickets" }).click();
     }
-    await expect(page).toHaveURL(/\\/en\\/tickets/);
+    await expect(page).toHaveURL(/\/en\/tickets/);
     const user = await prisma.user.findUniqueOrThrow({ where: { email } });
     const ticket = await prisma.ticket.findFirstOrThrow({
       where: { order: { userId: user.id } },
