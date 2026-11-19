@@ -85,8 +85,9 @@ bearer and cookie sessions, role checks, organizer/staff data, suspension,
 sign-up privilege injection, logout, session expiry, login origin checks,
 rate limiting, audit commit and rollback.
 
-Email verification delivery and password-reset delivery are not configured in
-this milestone. Sign-in/sign-up UI wiring remains the frontend task.
+Password-reset delivery uses SMTP (Mailpit in development) via
+`emailAndPassword.sendResetPassword`. Email verification delivery is still not
+required for the academic demo.
 
 References: [Better Auth Next.js](https://better-auth.com/docs/integrations/next),
 [Prisma adapter](https://better-auth.com/docs/adapters/prisma),
