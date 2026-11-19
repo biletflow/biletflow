@@ -9,6 +9,8 @@ import {
   verifyPassword,
 } from "@biletflow/shared/password.server";
 
+import { sendMail } from "./mail";
+
 const baseURL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
 
 export const auth = betterAuth({
@@ -24,6 +26,20 @@ export const auth = betterAuth({
     password: {
       hash: hashPassword,
       verify: ({ hash, password }) => verifyPassword(hash, password),
+    },
+    sendResetPassword: async ({ user, url }) => {
+      await sendMail({
+        to: user.email,
+        subject: "BiletFlow password reset",
+        text: [
+          `Hello ${user.name || "there"},`,
+          "",
+          "Use this link to choose a new BiletFlow password:",
+          url,
+          "",
+          "If you did not request a reset, you can ignore this email.",
+        ].join("\n"),
+      });
     },
   },
   user: {

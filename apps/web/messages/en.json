@@ -197,7 +197,18 @@
     "errorForbidden": "This account is suspended.",
     "errorExists": "An account with this email already exists.",
     "errorGeneric": "Could not complete that request. Try again.",
-    "back": "Back to events"
+    "back": "Back to events",
+    "forgotLink": "Forgot password?",
+    "forgotTitle": "Reset password",
+    "forgotLead": "Enter your account email. If it exists, we send a reset link to Mailpit in development.",
+    "forgotSent": "If that email is registered, check your inbox for a reset link.",
+    "sendReset": "Send reset link",
+    "sendingReset": "Sending…",
+    "resetTitle": "Choose a new password",
+    "resetLead": "Enter a new password with at least 10 characters.",
+    "resetInvalid": "This reset link is missing or invalid. Request a new one.",
+    "savePassword": "Save password",
+    "savingPassword": "Saving…"
   },
   "common": {
     "percentSold": "{percent}% sold",

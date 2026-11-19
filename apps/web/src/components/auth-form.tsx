@@ -146,6 +146,16 @@ export function AuthForm({ mode, next }: { mode: Mode; next?: string }) {
               ? t("submitSignIn")
               : t("submitSignUp")}
         </Button>
+        {mode === "sign-in" ? (
+          <p className="text-center text-sm">
+            <Link
+              href="/forgot-password"
+              className="text-brand hover:text-brand-dark font-semibold"
+            >
+              {t("forgotLink")}
+            </Link>
+          </p>
+        ) : null}
       </form>
 
       <p className="text-ink-600 mt-6 text-center text-sm">
