@@ -1,4 +1,4 @@
-import { prisma } from "@biletflow/db";
+import { prisma, type Prisma } from "@biletflow/db";
 
 import { ApiError, errorResponse } from "@/lib/api-error";
 import { json } from "@/lib/http";
@@ -9,9 +9,20 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   try {
     const user = await requireUser(request.headers);
-    if (user.staffAssignments.length === 0) throw new ApiError(403, "FORBIDDEN");
+    const authorizedScope = new URL(request.url).searchParams.get("scope") === "authorized";
+    let where: Prisma.EventWhereInput = { staff: { some: { userId: user.id } } };
+    if (authorizedScope) {
+      where = user.role === "PLATFORM_ADMIN" ? {} : {
+        OR: [
+          { organizerId: user.id },
+          { staff: { some: { userId: user.id, role: { in: ["EVENT_ADMIN", "CO_ORGANIZER"] } } } },
+        ],
+      };
+    } else if (user.staffAssignments.length === 0) {
+      throw new ApiError(403, "FORBIDDEN");
+    }
     const events = await prisma.event.findMany({
-      where: { staff: { some: { userId: user.id } } },
+      where,
       select: {
         id: true,
         title: true,

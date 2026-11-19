@@ -26,9 +26,9 @@ The Android and iOS projects include camera permissions. The Android project als
 
 - Native sign-in, secure local bearer-token storage, server-side sign-out and role-aware home.
 - Read-only organizer event list and details, with an owner-scoped API.
-- Starter camera screen with manual event selection and server-side check-in.
-- API-client and authentication widget tests.
+- QR scanner with authorized event selection, server check-in results, attendance counts, attendee search and check-in reversal.
+- API-client, authentication and scanner widget tests.
 
 The Dart API client was checked against a local Next.js server and disposable PostgreSQL database for organizer sign-in, current user, event list and token revocation. Android and iOS builds and device tests are pending.
 
-The Flutter scanner improvements are tracked separately in issue #132.
+Validate permission denial, valid and duplicate tickets, wrong event, invalid signatures, campaign codes, canceled or refunded tickets, network loss, and backgrounding. Verify attendance counts and check-in reversal separately on Android and iOS.
