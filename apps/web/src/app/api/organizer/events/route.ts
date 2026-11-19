@@ -9,6 +9,20 @@ import { requireRole } from "@/lib/session";
 
 export const runtime = "nodejs";
 
+export async function GET(request: Request) {
+  try {
+    const user = await requireRole(request.headers, ["ORGANIZER"]);
+    const events = await prisma.event.findMany({
+      where: { organizerId: user.id },
+      orderBy: { startsAt: "asc" },
+      select: { id: true, title: true, status: true, startsAt: true, endsAt: true },
+    });
+    return Response.json({ events }, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const user = await requireRole(request.headers, ["ORGANIZER", "PLATFORM_ADMIN"]);
