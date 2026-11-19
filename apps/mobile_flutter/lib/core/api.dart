@@ -54,7 +54,21 @@ class ApiClient {
     return data;
   }
 
-  Future<Map<String, dynamic>> get(String path) => request('GET', path);
+  Future<Map<String, dynamic>> get(
+    String path, {
+    Map<String, String>? query,
+  }) {
+    if (query == null || query.isEmpty) return request('GET', path);
+    final params = <String, String>{
+      for (final entry in query.entries)
+        if (entry.value.isNotEmpty) entry.key: entry.value,
+    };
+    final suffix = params.isEmpty
+        ? ''
+        : '?${Uri(queryParameters: params).query}';
+    return request('GET', '$path$suffix');
+  }
+
   Future<Map<String, dynamic>> post(String path, Map<String, dynamic> body) =>
       request('POST', path, body: body);
   Future<Map<String, dynamic>> put(String path, Map<String, dynamic> body) =>
