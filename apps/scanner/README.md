@@ -65,3 +65,43 @@ On a **physical iOS or Android phone** with the API reachable via LAN:
 **Physical-device verification is pending** until a tester records the device,
 OS version, API environment, and results of steps 1 through 7. Automated tests
 do not constitute device verification.
+
+
+## Issue #116 physical-phone test matrix
+
+Use an isolated development database only; do not modify real tickets.
+Start the web server with `pnpm --filter web exec next dev --hostname 0.0.0.0`
+after following the root README infrastructure and database setup.
+Connect the phone and computer to the same trusted network, set
+`EXPO_PUBLIC_API_URL=http://<computer-LAN-IP>:3000` in the scanner environment,
+and start Expo. Open that server URL in the phone browser first to confirm
+reachability. Use a compatible Expo Go version or a development build.
+
+Prepare two assigned events, a fresh valid ticket, two separate unused tickets
+with CANCELLED and REFUNDED status in the isolated database, and a campaign QR.
+Use actual signed ticket codes from My Tickets or test database fixtures; do not
+construct fake signatures. Display the codes on a second screen for scanning.
+For the wrong-event case, select the other assigned event and scan the fresh
+ticket before using it for valid admission.
+
+| Case | Expected API result | Expected device behavior | Actual |
+| --- | --- | --- | --- |
+| Wrong event | WRONG_EVENT | Red; no admission | Not run |
+| Fresh valid ticket (correct event) | VALID | Green; attendee and ticket details | Not run |
+| Same ticket again | ALREADY_CHECKED_IN | Red; no second admission | Not run |
+| Cancelled ticket | CANCELLED | Red; no admission | Not run |
+| Refunded ticket | REFUNDED | Red; no admission | Not run |
+| Campaign QR | NOT_A_TICKET | Red; no admission | Not run |
+| Forged ticket signature | INVALID | Red; no admission | Not run |
+| Network unavailable during scan | Request fails | No green result; retry after reconnect | Not run |
+
+Press Scan again between scans. Confirm one check-in record exists for the valid
+ticket and none for rejected tickets. Repeat the permission, background/resume
+and logout checks above. Record device model, OS, Expo version/build, commit SHA,
+API environment, date, tester, actual results and any defects. Avoid recording
+session tokens or real attendee data.
+
+Status: **physical device verification pending**. The automated scanner and
+commerce tests cover response handling and server decisions, not camera or
+native OS behavior. Do not close #116 until the phone run is recorded and any
+device defects are resolved.
