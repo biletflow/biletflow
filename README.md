@@ -1,62 +1,47 @@
 # BiletFlow
 
-Self-service event ticketing for Kazakhstan. Organizers create events and issue QR-code
-tickets; free events cost nothing, paid sales are activated per event. Event admins verify
-tickets with a mobile app.
+Self-service event ticketing platform for Kazakhstan. Organizers can create events and distribute free tickets without charge. Paid ticket sales require activation for each event.
 
-All payments in this build are **simulated**. No real money moves.
+## Project scope
+
+- Event creation, publication and ticket management
+- Free registration, simulated payments and QR/PDF tickets
+- Mobile ticket verification and attendee check-in
+- Promo codes, refunds and support cases
+- Organizer analytics, event history and admin moderation
+
+The project covers web and mobile applications with a shared backend and database. The mobile application is designed for iOS and Android with role-based functionality. Payments and identity verification are simulated.
 
 ## Stack
 
-| | |
+| Component | Technology |
 | --- | --- |
-| Web + API | Next.js (App Router), TypeScript |
-| Database | PostgreSQL + Prisma |
-| Auth | better-auth (cookies for web, bearer for mobile) |
-| UI | Tailwind CSS + shadcn/ui |
-| Mobile | Expo React Native (Event Admin scanner) |
-| Local services | Docker Compose: Postgres, Mailpit, MinIO |
+| Web and API | Next.js, TypeScript, Tailwind CSS |
+| Mobile | Flutter, Dart |
+| Database | PostgreSQL, Prisma |
+| Authentication | Better Auth |
+| Infrastructure | Docker Compose |
 
-## Quick start
+## Setup
 
 ```bash
 corepack enable && corepack use pnpm@latest
-cp .env.example .env      # fill BETTER_AUTH_SECRET + 2 signing keys
+cp .env.example .env
 pnpm install
-pnpm infra:up             # Postgres :5433, Mailpit :8025, MinIO :9001
+pnpm infra:up
 pnpm db:migrate && pnpm db:seed
 pnpm dev
 ```
 
-For the scanner app, set `EXPO_PUBLIC_API_URL` to the web server's reachable URL
-(for example `http://192.168.1.10:3000` on a phone on the same Wi-Fi), then run
-`pnpm --filter scanner start`. Sign in as `scanner@biletflow.kz` using the
-development password from the local seed configuration. The app stores its bearer token in secure
-device storage and validates it when reopened.
+Configure the required secrets in `.env`. Seed only a fresh development database.
 
-## Layout
+[API documentation](docs/api.md) · [Flutter setup](https://github.com/biletflow/biletflow/blob/mobile/flutter-starter/apps/mobile_flutter/README.md)
 
-```
-apps/web         Next.js: attendee + organizer + admin + API
-apps/scanner     Expo app for event admins
-packages/db      Prisma schema, client, seed
-packages/shared  Zod schemas, KZT money, QR parsing/signing
-infra            docker-compose, Dockerfile
-```
+## Team ADZK
 
-## Docs
-
-| | |
+| Member | Responsibilities |
 | --- | --- |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Branching, PRs, definition of done |
-| [api.md](docs/api.md) | Endpoint contract |
-| [backend-commerce.md](docs/backend-commerce.md) | Orders, simulated payments, check-in |
-
-## Team
-
-| | |
-| --- | --- |
-| A | Product owner, design, organizer + admin UI |
-| D | Tech lead, attendee web, integration |
-| Z | Backend: schema, auth, orders, payments, promos, analytics |
-| K | Scanner app + check-in backend |
+| Adina | Product owner, project management, design, organizer and admin UI |
+| Dariya | Tech lead, attendee web and mobile UI, frontend integration |
+| Zhansaya | Database, authentication, orders, payments, promotions, analytics and API |
+| Kamila | Flutter mobile application, QR scanner, check-in backend and mobile testing |
