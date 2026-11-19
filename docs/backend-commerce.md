@@ -25,6 +25,12 @@ issued, the hold expired, or nothing was charged. Cancelled and refunded tickets
 do not expose an admission QR. No real money moves. When `PAYMENT_WEBHOOK_SECRET`
 is empty, local and CI runs use `dev-payment-webhook-secret`.
 
+After a free order settles, or after an approved webhook issues tickets, the app
+writes `Notification` rows and sends SMTP mail (Mailpit in development). Payment
+decline/abandon/expiry and reservation cancel do the same for failure/cancel
+copy. Delivery is keyed by `orderId` in the payload so webhook replays do not
+resend mail.
+
 Paid checkout stays locked until the organizer pays the simulated activation fee
 and a platform admin approves it. Seeded events that already have
 `paidSalesActive` can still be used for demos.

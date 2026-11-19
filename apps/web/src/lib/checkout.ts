@@ -11,6 +11,10 @@ import { ApiError } from "./api-error";
 import { audit } from "./audit";
 import { clientIp, isUniqueViolation } from "./http";
 import { redeemCampaign, releaseInventory, reserveInventory, sellInventory } from "./inventory";
+import {
+  notifyOrderPaid,
+  notifyReservationCancelled,
+} from "./notifications";
 import { issueTickets, ticketSigningKey, type AttendeeInput } from "./tickets";
 
 const orderInclude = {
@@ -232,9 +236,22 @@ export async function createOrder(
 
       return tx.order.findUniqueOrThrow({
         where: { id: created.id },
-        include: orderInclude,
+        include: {
+          ...orderInclude,
+          event: { select: { title: true } },
+        },
       });
     });
+    if (order.status === "PAID") {
+      await notifyOrderPaid({
+        orderId: order.id,
+        userId: order.userId,
+        reference: order.reference,
+        eventTitle: order.event.title,
+        totalKzt: order.totalKzt,
+        ticketCount: order.tickets.length,
+      });
+    }
     return presentOrder(order);
   } catch (error) {
     if (!isUniqueViolation(error)) throw error;
@@ -315,7 +332,10 @@ export async function cancelReservation(userId: string, orderId: string, headers
   const order = await prisma.$transaction(async (tx) => {
     const current = await tx.order.findUnique({
       where: { id: orderId },
-      include: { items: true },
+      include: {
+        items: true,
+        event: { select: { title: true } },
+      },
     });
     if (!current || current.userId !== userId) throw new ApiError(404, "NOT_FOUND");
     if (current.status !== "AWAITING_PAYMENT" && current.status !== "PENDING") {
@@ -338,7 +358,13 @@ export async function cancelReservation(userId: string, orderId: string, headers
       description: "Checkout reservation released",
       ipAddress: clientIp(headers),
     });
-    return updated;
+    return { updated, eventTitle: current.event.title, reference: current.reference };
   });
-  return presentOrder(order);
+  await notifyReservationCancelled({
+    orderId: order.updated.id,
+    userId,
+    reference: order.reference,
+    eventTitle: order.eventTitle,
+  });
+  return presentOrder(order.updated);
 }

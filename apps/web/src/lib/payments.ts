@@ -8,6 +8,7 @@ import { audit } from "./audit";
 import { clientIp, isUniqueViolation } from "./http";
 import { convertReservation, releaseInventory } from "./inventory";
 import { maybeActivate } from "./activation";
+import { notifyOrderPaid, notifyPaymentFailed } from "./notifications";
 import { sandboxPayUrl, verifyWebhookSignature } from "./payments-signature";
 import { issueTickets, ticketSigningKey, type AttendeeInput } from "./tickets";
 
@@ -113,35 +114,56 @@ export async function processPaymentWebhook(raw: string, signature: string | nul
   const { intentId: providerIntentId, outcome, eventKey } = parsed.data;
 
   try {
-    return await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       await tx.processedWebhookEvent.create({
         data: { provider: "simulated", eventKey },
       });
       const payment = await tx.payment.findUnique({
         where: { providerIntentId },
-        include: { order: { include: { items: true } }, activation: true },
+        include: {
+          order: {
+            include: {
+              items: true,
+              event: { select: { title: true } },
+            },
+          },
+          activation: true,
+        },
       });
       if (!payment) throw new ApiError(404, "NOT_FOUND");
       if (payment.status !== "CREATED" && payment.status !== "PROCESSING") {
-        return { duplicate: false, ignored: true, tickets: 0 };
+        return { duplicate: false, ignored: true, tickets: 0 as number };
       }
       if (payment.purpose === "ACTIVATION_FEE") {
         await settleActivation(tx, payment, outcome);
-        return { duplicate: false, ignored: false, tickets: 0 };
+        return { duplicate: false, ignored: false, tickets: 0 as number };
       }
       const order = payment.order;
       if (!order) throw new ApiError(409, "CONFLICT");
       const failed = outcome !== "APPROVED" || order.status !== "AWAITING_PAYMENT";
       const expired = Boolean(order.expiresAt && order.expiresAt.getTime() <= Date.now());
       if (failed || expired) {
-        await releasePaidHold(
-          tx,
-          payment.id,
-          order,
-          outcome === "ABANDONED" ? "ABANDONED" : "FAILED",
-          expired && outcome === "APPROVED" ? "EXPIRED" : "CANCELLED",
-        );
-        return { duplicate: false, ignored: false, tickets: 0 };
+        const paymentStatus = outcome === "ABANDONED" ? "ABANDONED" : "FAILED";
+        const orderStatus =
+          expired && outcome === "APPROVED" ? "EXPIRED" : "CANCELLED";
+        await releasePaidHold(tx, payment.id, order, paymentStatus, orderStatus);
+        return {
+          duplicate: false,
+          ignored: false,
+          tickets: 0 as number,
+          notifyFailure: {
+            orderId: order.id,
+            userId: order.userId,
+            reference: order.reference,
+            eventTitle: order.event.title,
+            reason:
+              orderStatus === "EXPIRED"
+                ? ("EXPIRED" as const)
+                : paymentStatus === "ABANDONED"
+                  ? ("ABANDONED" as const)
+                  : ("FAILED" as const),
+          },
+        };
       }
 
       for (const item of order.items) {
@@ -171,8 +193,32 @@ export async function processPaymentWebhook(raw: string, signature: string | nul
         description: "Paid order settled and tickets issued",
         metadata: { tickets: issued.length, amountKzt: payment.amountKzt },
       });
-      return { duplicate: false, ignored: false, tickets: issued.length };
+      return {
+        duplicate: false,
+        ignored: false,
+        tickets: issued.length,
+        notifyPaid: {
+          orderId: order.id,
+          userId: order.userId,
+          reference: order.reference,
+          eventTitle: order.event.title,
+          totalKzt: order.totalKzt,
+          ticketCount: issued.length,
+        },
+      };
     });
+
+    if (result.notifyPaid) {
+      await notifyOrderPaid(result.notifyPaid);
+    }
+    if (result.notifyFailure) {
+      await notifyPaymentFailed(result.notifyFailure);
+    }
+    return {
+      duplicate: result.duplicate,
+      ignored: result.ignored,
+      tickets: result.tickets,
+    };
   } catch (error) {
     if (!isUniqueViolation(error)) throw error;
     return { duplicate: true, ignored: false, tickets: 0 };
