@@ -1,15 +1,33 @@
 # BiletFlow
 
-BiletFlow is a self-service event management and ticketing platform for Kazakhstan. The goal is to make it easier for organizers to manage events and for attendees to find events, obtain tickets and enter venues using QR codes.
+Self-service event ticketing platform for Kazakhstan.
+
+BiletFlow is designed for individuals, student organizations, businesses and community groups that organize physical events. Creating events and distributing free tickets is free of charge. Organizers who wish to sell paid tickets must activate paid sales for each event by paying a one-time activation fee, completing identity and payout verification, and accepting the paid-event terms.
 
 ## Project scope
 
-- **Attendees:** event discovery, registration, free and paid tickets, checkout, QR tickets, refunds and support.
-- **Organizers:** event creation and publication, ticket management, paid sales activation, attendee management, promotional campaigns and analytics.
-- **Event admins:** QR ticket verification, attendee search and check-in statistics.
-- **Platform admins:** user and event moderation, paid sales approval and platform management.
+The academic MVP covers a web application and an iOS and Android mobile application connected to a shared backend and database. The mobile application is intended to provide the same role-based functionality as the web application, including ticket verification for Event Admins.
 
-The project includes web and mobile applications connected to a shared backend and database. The system supports Kazakh, Russian and English. Payments and identity verification are simulated.
+| User | Requirements |
+| --- | --- |
+| Attendee | Discover events, register, purchase tickets, view orders, download and print QR tickets, apply promo codes and contact support |
+| Organizer | Create and publish events, manage ticket types and inventory, activate paid sales, manage attendees and orders, process refunds, create campaigns and review analytics and event history |
+| Event Admin | Select assigned events, scan and verify tickets, search attendees, record or reverse check-ins and view attendance statistics |
+| Platform Admin | Manage users and events, review paid-sales activation, moderate the platform and handle escalated support cases |
+
+The MVP also includes account management, organizer profiles, email confirmations and audit records. The system uses KZT and supports Kazakh, Russian and English.
+
+Payments, activation fees, identity verification and payouts use a sandbox or simulation. No real financial transactions are required.
+
+### Optional features
+
+- Assigned seating with a predefined venue layout
+- Calendar export
+- Advanced GA4 analytics
+- Offline check-in synchronization
+- Support attachments and enhanced real-time messaging
+
+Production financial processing, production identity verification and app store publication are outside the academic MVP.
 
 ## Technology stack
 
