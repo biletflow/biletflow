@@ -1,62 +1,67 @@
 # BiletFlow
 
-Self-service event ticketing for Kazakhstan. Organizers create events and issue QR-code
-tickets; free events cost nothing, paid sales are activated per event. Event admins verify
-tickets with a mobile app.
+BiletFlow is a self-service event ticketing platform for Kazakhstan. Attendees can discover events and obtain QR-code tickets, organizers can create and manage events, and event staff can verify tickets at admission.
 
-All payments in this build are **simulated**. No real money moves.
+The web application supports attendee, organizer and platform administrator workflows. A full Flutter mobile application is in development, using the same backend and database. The existing Expo scanner remains available for ticket check-in.
+
+All payments are simulated. No real money moves.
 
 ## Stack
 
-| | |
+| Component | Technology |
 | --- | --- |
-| Web + API | Next.js (App Router), TypeScript |
-| Database | PostgreSQL + Prisma |
-| Auth | better-auth (cookies for web, bearer for mobile) |
-| UI | Tailwind CSS + shadcn/ui |
-| Mobile | Expo React Native (Event Admin scanner) |
-| Local services | Docker Compose: Postgres, Mailpit, MinIO |
+| Web and API | Next.js (App Router), TypeScript |
+| Database | PostgreSQL, Prisma |
+| Authentication | Better Auth (web cookies, mobile bearer tokens) |
+| Web UI | Tailwind CSS, shadcn/ui |
+| Mobile | Flutter, Dart (in development); Expo React Native (existing scanner) |
+| Local services | Docker Compose, PostgreSQL, Mailpit, MinIO |
 
 ## Quick start
 
 ```bash
 corepack enable && corepack use pnpm@latest
-cp .env.example .env      # fill BETTER_AUTH_SECRET + 2 signing keys
+cp .env.example .env
 pnpm install
-pnpm infra:up             # Postgres :5433, Mailpit :8025, MinIO :9001
+pnpm infra:up
 pnpm db:migrate && pnpm db:seed
 pnpm dev
 ```
 
-For the scanner app, set `EXPO_PUBLIC_API_URL` to the web server's reachable URL
-(for example `http://192.168.1.10:3000` on a phone on the same Wi-Fi), then run
-`pnpm --filter scanner start`. Sign in as `scanner@biletflow.kz` using the
-development password from the local seed configuration. The app stores its bearer token in secure
-device storage and validates it when reopened.
+Configure the authentication secret and signing keys in `.env` before starting. Use the seed command only with a fresh development database.
 
-## Layout
+### Mobile
 
+The Flutter application is being developed for Android and iOS. Its initial code is available in the [mobile/flutter-starter branch](https://github.com/biletflow/biletflow/tree/mobile/flutter-starter/apps/mobile_flutter). See the [Flutter setup instructions](https://github.com/biletflow/biletflow/blob/mobile/flutter-starter/apps/mobile_flutter/README.md). The Flutter application is not yet part of the main branch.
+
+To run the existing Expo scanner, set `EXPO_PUBLIC_API_URL` to the reachable backend URL and run `pnpm --filter scanner start`. Use the scanner account from the local seed configuration.
+
+## Repository layout
+
+```text
+apps/web             Web interfaces and API
+apps/scanner         Existing Expo scanner
+packages/db          Prisma schema, client and seed
+packages/shared      Shared validation, money and QR utilities
+infra                Docker configuration
+docs                 Project documentation
 ```
-apps/web         Next.js: attendee + organizer + admin + API
-apps/scanner     Expo app for event admins
-packages/db      Prisma schema, client, seed
-packages/shared  Zod schemas, KZT money, QR parsing/signing
-infra            docker-compose, Dockerfile
-```
 
-## Docs
+The Flutter development branch adds `apps/mobile_flutter`.
 
-| | |
+## Documentation
+
+| Document | Description |
 | --- | --- |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Branching, PRs, definition of done |
-| [api.md](docs/api.md) | Endpoint contract |
-| [backend-commerce.md](docs/backend-commerce.md) | Orders, simulated payments, check-in |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Development workflow |
+| [api.md](docs/api.md) | API contracts |
+| [backend-commerce.md](docs/backend-commerce.md) | Orders, simulated payments and check-in |
 
-## Team
+## Team ADZK
 
-| | |
+| Member | Responsibilities |
 | --- | --- |
-| A | Product owner, design, organizer + admin UI |
-| D | Tech lead, attendee web, integration |
-| Z | Backend: schema, auth, orders, payments, promos, analytics |
-| K | Scanner app + check-in backend |
+| Adina | Project management, UI/UX design, organizer and admin interfaces |
+| Dariya | Tech lead, web and mobile attendee interfaces, frontend integration |
+| Zhansaya | Database, backend, authentication, payments and API integration |
+| Kamila | Flutter mobile application, QR scanner, check-in backend, mobile integration and testing |
