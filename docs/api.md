@@ -57,6 +57,7 @@ Every response includes the counters `quantity`, `sold`, `reserved`, `refunded`,
 | `GET` | `/api/orders/:id` | |
 | `POST` | `/api/orders/:id/cancel` | Releases reservation |
 | `POST` | `/api/orders/:id/pay` | Creates a payment intent, returns the simulated gateway URL |
+| `POST` | `/api/orders/:id/pay/simulate` | Authenticated mobile/demo settlement (`APPROVED`/`DECLINED`/`ABANDONED`). Signs the webhook server-side; no client secret |
 | `GET` | `/api/orders` | Attendee's own orders |
 
 ### Simulated payment gateway
