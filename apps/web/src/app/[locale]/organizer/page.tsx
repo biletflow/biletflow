@@ -27,7 +27,28 @@ export default async function OrganizerPage({
           </p>
         </div>
 
-        <div className="mt-6"><a className="bg-brand inline-flex rounded-lg px-5 py-3 font-bold text-white" href={`/${locale}/organizer/events/new`}>{locale === "ru" ? "Создать мероприятие" : locale === "kk" ? "Іс-шара құру" : "Create event"}</a></div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <a
+            className="bg-brand inline-flex rounded-lg px-5 py-3 font-bold text-white"
+            href={`/${locale}/organizer/events/new`}
+          >
+            {locale === "ru"
+              ? "Создать мероприятие"
+              : locale === "kk"
+                ? "Іс-шара құру"
+                : "Create event"}
+          </a>
+          <a
+            className="border-ink-300 text-ink-900 inline-flex rounded-lg border bg-white px-5 py-3 font-bold"
+            href={`/${locale}/organizer/settings`}
+          >
+            {locale === "ru"
+              ? "Профиль и выплаты"
+              : locale === "kk"
+                ? "Профиль және төлемдер"
+                : "Profile & payouts"}
+          </a>
+        </div>
 
         {events.length === 0 ? (
           <div className="border-ink-300 mt-8 rounded-xl border border-dashed bg-white p-12 text-center">
