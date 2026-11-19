@@ -15,7 +15,11 @@ class Session extends ChangeNotifier {
       role == 'PLATFORM_ADMIN' ||
       role == 'ORGANIZER' ||
       (user?['staffAssignments'] is List &&
-          (user!['staffAssignments'] as List).isNotEmpty);
+          (user!['staffAssignments'] as List).whereType<Map>().any(
+            (assignment) =>
+                assignment['role'] == 'EVENT_ADMIN' ||
+                assignment['role'] == 'CO_ORGANIZER',
+          ));
 
   String get _key => 'biletflow_token_${api.base.origin}';
   Future<void> restore() async {

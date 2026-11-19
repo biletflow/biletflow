@@ -5,7 +5,9 @@ import { hashPassword } from "@biletflow/shared/password.server";
 
 import { POST as reviewActivation } from "@/app/api/admin/activations/[id]/review/route";
 import { POST as checkIn } from "@/app/api/checkin/route";
+import { POST as reverseCheckIn } from "@/app/api/checkin/reverse/route";
 import { GET as mobileEvents } from "@/app/api/mobile/events/route";
+import { GET as attendeeSearch } from "@/app/api/mobile/events/[id]/attendees/route";
 import { GET as eventStats } from "@/app/api/mobile/events/[id]/stats/route";
 import { GET as activation } from "@/app/api/organizer/events/[id]/activation/route";
 import { POST as acceptTerms } from "@/app/api/organizer/events/[id]/activation/accept-terms/route";
@@ -400,6 +402,19 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       const assigned = await mobileEvents(request("/api/mobile/events", undefined, tokens.scanner));
       expect(assigned.status).toBe(200);
       expect((await assigned.json()).events.map((row: { id: string }) => row.id)).toContain(event.id);
+      for (const role of ["organizer", "admin", "scanner"] as const) {
+        const visible = await mobileEvents(
+          request("/api/mobile/events?scope=authorized", undefined, tokens[role]),
+        );
+        expect(visible.status).toBe(200);
+        expect(await visible.json()).toMatchObject({
+          events: expect.arrayContaining([expect.objectContaining({ id: event.id })]),
+        });
+      }
+      const unassigned = await mobileEvents(
+        request("/api/mobile/events?scope=authorized", undefined, tokens.attendee),
+      );
+      expect(await unassigned.json()).toEqual({ events: [] });
 
       const campaign = await checkIn(
         request(
@@ -486,6 +501,31 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
         where: { eventId: event.id, action: "ticket.checked_in" },
       });
       expect(auditCount).toBe(1);
+
+      const eventContext = { params: Promise.resolve({ id: event.id }) };
+      const found = await attendeeSearch(
+        request(`/api/mobile/events/${event.id}/attendees?q=a`, undefined, tokens.scanner),
+        eventContext,
+      );
+      const checkedIn = ((await found.json()).attendees as {
+        status: string;
+        checkInRecordId: string | null;
+      }[]).find((row) => row.status === "CHECKED_IN");
+      expect(checkedIn?.checkInRecordId).toEqual(expect.any(String));
+      const reversal = { checkInRecordId: checkedIn?.checkInRecordId, reason: "Wrong entrance" };
+      const deniedReversal = await reverseCheckIn(
+        request("/api/checkin/reverse", reversal, tokens.attendee),
+      );
+      expect(deniedReversal.status).toBe(403);
+      const reversed = await reverseCheckIn(
+        request("/api/checkin/reverse", reversal, tokens.scanner),
+      );
+      expect(await reversed.json()).toEqual({ reversed: true });
+      const afterReversal = await eventStats(
+        request(`/api/mobile/events/${event.id}/stats`, undefined, tokens.scanner),
+        eventContext,
+      );
+      expect(await afterReversal.json()).toEqual({ registered: 2, checkedIn: 0 });
 
       const removed = await deleteTicketType(
         request(`/api/organizer/ticket-types/${paidType.id}`, undefined, tokens.organizer, "DELETE"),

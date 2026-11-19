@@ -171,8 +171,8 @@ export async function reverseCheckIn(
   if (!allowed) throw new ApiError(403, "FORBIDDEN");
 
   await prisma.$transaction(async (tx) => {
-    await tx.checkInRecord.update({
-      where: { id: record.id },
+    const updated = await tx.checkInRecord.updateMany({
+      where: { id: record.id, activeKey: "active", reversedAt: null },
       data: {
         reversedById: user.id,
         reversedAt: new Date(),
@@ -180,10 +180,12 @@ export async function reverseCheckIn(
         activeKey: record.id,
       },
     });
-    await tx.ticket.update({
-      where: { id: record.ticketId },
+    if (updated.count !== 1) throw new ApiError(409, "CHECK_IN_ALREADY_REVERSED");
+    const restored = await tx.ticket.updateMany({
+      where: { id: record.ticketId, status: "CHECKED_IN" },
       data: { status: "VALID" },
     });
+    if (restored.count !== 1) throw new ApiError(409, "TICKET_STATUS_CHANGED");
     await audit(tx, {
       actorUserId: user.id,
       eventId: record.eventId,
@@ -238,6 +240,7 @@ export async function searchAttendees(user: Scanner, eventId: string, query: str
       attendee: { select: { fullName: true, email: true } },
       ticketType: { select: { name: true } },
       order: { select: { reference: true } },
+      checkIns: { where: { activeKey: "active" }, take: 1, select: { id: true } },
     },
   });
   return tickets.map((ticket) => ({
@@ -247,5 +250,6 @@ export async function searchAttendees(user: Scanner, eventId: string, query: str
     email: ticket.attendee.email,
     ticketTypeName: ticket.ticketType.name,
     orderReference: ticket.order.reference,
+    checkInRecordId: ticket.checkIns[0]?.id ?? null,
   }));
 }
