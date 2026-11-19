@@ -34,6 +34,12 @@ export function SignedInNav({
       >
         {t("tickets")}
       </Link>
+      <Link
+        href="/support"
+        className="text-ink-800 hover:text-brand text-sm font-semibold transition-colors"
+      >
+        {t("support")}
+      </Link>
       {dashboardHref && dashboardLabel ? (
         <Link
           href={dashboardHref}

@@ -85,12 +85,20 @@ export default async function TicketsPage({
                   >
                     {t(`status.${ticket.status}`)}
                   </p>
-                  <a
-                    href={`/api/tickets/${ticket.id}/pdf`}
-                    className="text-brand mt-3 inline-block text-sm font-semibold"
-                  >
-                    {t("downloadPdf")}
-                  </a>
+                  <div className="mt-3 flex flex-wrap gap-4">
+                    <a
+                      href={`/api/tickets/${ticket.id}/pdf`}
+                      className="text-brand text-sm font-semibold"
+                    >
+                      {t("downloadPdf")}
+                    </a>
+                    <Link
+                      href={`/support?ticketId=${ticket.id}&eventId=${ticket.event.id}`}
+                      className="text-brand text-sm font-semibold"
+                    >
+                      {t("openSupport")}
+                    </Link>
+                  </div>
                 </div>
               </li>
             ))}

@@ -12,6 +12,7 @@
     "signOut": "Sign out",
     "signingOut": "Signing out…",
     "tickets": "My tickets",
+    "support": "Support",
     "organizer": "Organizer",
     "admin": "Admin"
   },
@@ -124,11 +125,47 @@
     "qrUnavailable": "This ticket is no longer valid, so the admission QR is hidden.",
     "holder": "Holder",
     "downloadPdf": "Download PDF",
+    "openSupport": "Open support case",
     "status": {
       "VALID": "Valid",
       "CHECKED_IN": "Checked in",
       "CANCELLED": "Cancelled",
       "REFUNDED": "Refunded"
+    }
+  },
+  "support": {
+    "title": "Support",
+    "lead": "Ask about an order or ticket. Organizers and platform staff reply in the same thread.",
+    "empty": "You have no support cases yet.",
+    "emptyBody": "Open a case below, or from one of your tickets.",
+    "new": "New case",
+    "subject": "Subject",
+    "category": "Category",
+    "message": "Message",
+    "submit": "Create case",
+    "sending": "Sending…",
+    "reply": "Reply",
+    "send": "Send reply",
+    "back": "All cases",
+    "order": "Order",
+    "updateStatus": "Status",
+    "saveStatus": "Update status",
+    "errorGeneric": "Could not complete that request. Try again.",
+    "categories": {
+      "TICKET_DELIVERY": "Ticket delivery",
+      "PAYMENT": "Payment",
+      "REFUND": "Refund",
+      "SEATING": "Seating",
+      "EVENT_INFORMATION": "Event information",
+      "CHECK_IN": "Check-in",
+      "ACCOUNT": "Account",
+      "TECHNICAL": "Technical"
+    },
+    "status": {
+      "OPEN": "Open",
+      "IN_PROGRESS": "In progress",
+      "WAITING_FOR_CUSTOMER": "Waiting for you",
+      "RESOLVED": "Resolved"
     }
   },
   "auth": {
