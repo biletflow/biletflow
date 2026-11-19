@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'api.dart';
 
 class Session extends ChangeNotifier {
@@ -10,8 +11,11 @@ class Session extends ChangeNotifier {
   bool loading = true;
   String? error;
   String get role => '${user?['role'] ?? ''}';
-  bool get canScan => role == 'PLATFORM_ADMIN' || role == 'ORGANIZER' ||
-      (user?['staffAssignments'] is List && (user!['staffAssignments'] as List).isNotEmpty);
+  bool get canScan =>
+      role == 'PLATFORM_ADMIN' ||
+      role == 'ORGANIZER' ||
+      (user?['staffAssignments'] is List &&
+          (user!['staffAssignments'] as List).isNotEmpty);
 
   String get _key => 'biletflow_token_${api.base.origin}';
   Future<void> restore() async {
@@ -20,16 +24,28 @@ class Session extends ChangeNotifier {
       if (api.token != null) await refresh();
     } on ApiException catch (e) {
       if (e.status == 401 || e.status == 403) {
-        await logout();
-      } else { error = e.code; }
-    } catch (_) { error = 'Unable to restore session'; }
-    finally { loading = false; notifyListeners(); }
+        try {
+          await _clearSession();
+        } catch (_) {
+          error = 'Unable to clear the saved session';
+        }
+      } else {
+        error = e.code;
+      }
+    } catch (_) {
+      error = 'Unable to restore session';
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> refresh() async {
     final result = await api.get('/api/me');
     final value = result['user'];
-    if (value is! Map<String, dynamic>) throw const ApiException(500, 'INVALID_USER_RESPONSE');
+    if (value is! Map<String, dynamic>) {
+      throw const ApiException(500, 'INVALID_USER_RESPONSE');
+    }
     user = value;
     notifyListeners();
   }
@@ -37,28 +53,60 @@ class Session extends ChangeNotifier {
   Future<void> login(String email, String password) async {
     api.token = null;
     error = null;
-    final response = await api.post('/api/mobile/auth/login', {'email': email, 'password': password});
+    final response = await api.post('/api/mobile/auth/login', {
+      'email': email,
+      'password': password,
+    });
     final token = response['token'];
-    if (token is! String || token.isEmpty) throw const ApiException(500, 'MISSING_SESSION_TOKEN');
+    if (token is! String || token.isEmpty) {
+      throw const ApiException(500, 'MISSING_SESSION_TOKEN');
+    }
     api.token = token;
     try {
       final result = await api.get('/api/me');
       final value = result['user'];
-      if (value is! Map<String, dynamic>) throw const ApiException(500, 'INVALID_USER_RESPONSE');
+      if (value is! Map<String, dynamic>) {
+        throw const ApiException(500, 'INVALID_USER_RESPONSE');
+      }
       await storage.write(key: _key, value: token);
       user = value;
       notifyListeners();
     } catch (_) {
-      api.token = null; user = null; notifyListeners(); rethrow;
+      api.token = null;
+      user = null;
+      notifyListeners();
+      rethrow;
     }
   }
 
   Future<void> logout() async {
-    api.token = null; user = null;
+    if (loading) return;
+    loading = true;
+    error = null;
+    notifyListeners();
     try {
-      await storage.delete(key: _key);
+      if (api.token != null) {
+        await api.post('/api/auth/sign-out', {});
+      }
+    } on ApiException catch (e) {
+      if (e.status != 401) error = 'Unable to revoke the server session';
+    } catch (_) {
+      error = 'Unable to revoke the server session';
     } finally {
-      notifyListeners();
+      try {
+        await _clearSession();
+      } catch (_) {
+        error = 'Unable to clear the saved session';
+      } finally {
+        loading = false;
+        notifyListeners();
+      }
     }
+  }
+
+  Future<void> _clearSession() async {
+    api.token = null;
+    user = null;
+    await storage.delete(key: _key);
   }
 }
