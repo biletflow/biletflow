@@ -145,6 +145,8 @@ export async function renderTicketPdf(data: TicketPdfPayload): Promise<Buffer> {
 
         {qrDataUrl ? (
           <View style={styles.qrWrap}>
+            {/* PDF Image has no DOM alt; QR meaning is in the caption below. */}
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image style={styles.qr} src={qrDataUrl} />
             <Text style={styles.qrHint}>
               Present this QR at the entrance. Do not share publicly.
