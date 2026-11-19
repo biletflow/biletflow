@@ -456,6 +456,34 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       );
       expect((await wrong.json()).result).toBe("WRONG_EVENT");
 
+      // Use the unused free ticket to exercise terminal states without altering
+      // the paid-ticket admission or inventory assertions below.
+      const rejectedTicket = freeOrder.tickets[0];
+      try {
+        for (const status of ["CANCELLED", "REFUNDED"] as const) {
+          await prisma.ticket.update({
+            where: { id: rejectedTicket.id },
+            data: { status },
+          });
+          const rejected = await checkIn(
+            request("/api/checkin", { eventId: event.id, payload: rejectedTicket.code }, tokens.scanner),
+          );
+          expect(rejected.status).toBe(200);
+          expect((await rejected.json()).result).toBe(status);
+          expect(await prisma.checkInRecord.count({
+            where: { ticketId: rejectedTicket.id },
+          })).toBe(0);
+          expect((await prisma.ticket.findUniqueOrThrow({
+            where: { id: rejectedTicket.id },
+          })).status).toBe(status);
+        }
+      } finally {
+        await prisma.ticket.update({
+          where: { id: rejectedTicket.id },
+          data: { status: "VALID" },
+        });
+      }
+
       const admitted = await checkIn(
         request("/api/checkin", { eventId: event.id, payload: paidTickets[0]!.code, deviceLabel: "Door A" }, tokens.scanner),
       );

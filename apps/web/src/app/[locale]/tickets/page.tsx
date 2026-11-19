@@ -85,6 +85,12 @@ export default async function TicketsPage({
                   >
                     {t(`status.${ticket.status}`)}
                   </p>
+                  <a
+                    href={`/api/tickets/${ticket.id}/pdf`}
+                    className="text-brand mt-3 inline-block text-sm font-semibold"
+                  >
+                    {t("downloadPdf")}
+                  </a>
                 </div>
               </li>
             ))}

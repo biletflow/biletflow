@@ -123,6 +123,7 @@
     "qrFailed": "Could not load the admission QR. Refresh the page.",
     "qrUnavailable": "This ticket is no longer valid, so the admission QR is hidden.",
     "holder": "Holder",
+    "downloadPdf": "Download PDF",
     "status": {
       "VALID": "Valid",
       "CHECKED_IN": "Checked in",

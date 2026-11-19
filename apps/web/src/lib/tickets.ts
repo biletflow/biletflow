@@ -100,3 +100,79 @@ export async function qrPngForOwnedTicket(userId: string, ticketId: string) {
     errorCorrectionLevel: "M",
   });
 }
+
+const PDF_STATUS_LABEL: Record<string, string> = {
+  VALID: "Valid",
+  CHECKED_IN: "Checked in",
+  CANCELLED: "Cancelled",
+  REFUNDED: "Refunded",
+};
+
+export async function pdfForOwnedTicket(userId: string, ticketId: string) {
+  const ticket = await prisma.ticket.findFirst({
+    where: { id: ticketId, order: { userId } },
+    select: {
+      id: true,
+      code: true,
+      status: true,
+      sectionName: true,
+      rowLabel: true,
+      seatNumber: true,
+      attendee: { select: { fullName: true } },
+      ticketType: { select: { name: true } },
+      order: { select: { reference: true } },
+      event: {
+        select: {
+          title: true,
+          startsAt: true,
+          timezone: true,
+          venue: { select: { name: true, address: true, city: true } },
+        },
+      },
+    },
+  });
+  if (!ticket) throw new ApiError(404, "NOT_FOUND");
+
+  const showQr = ticket.status === "VALID" || ticket.status === "CHECKED_IN";
+  const qrPng = showQr
+    ? await QRCode.toBuffer(ticket.code, {
+        type: "png",
+        margin: 1,
+        width: 320,
+        errorCorrectionLevel: "M",
+      })
+    : null;
+
+  const venue = ticket.event.venue;
+  const venueLine = venue
+    ? [venue.name, venue.address, venue.city].filter(Boolean).join(" · ")
+    : null;
+
+  const seatBits = [ticket.sectionName, ticket.rowLabel, ticket.seatNumber]
+    .filter(Boolean)
+    .join(" / ");
+  const ticketTypeName = seatBits
+    ? `${ticket.ticketType.name} (${seatBits})`
+    : ticket.ticketType.name;
+
+  const { renderTicketPdf } = await import("./ticket-pdf");
+  return renderTicketPdf({
+    eventTitle: ticket.event.title,
+    eventWhen: new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: ticket.event.timezone,
+    }).format(ticket.event.startsAt),
+    venueLine,
+    ticketTypeName,
+    holderName: ticket.attendee.fullName,
+    orderReference: ticket.order.reference,
+    statusLabel: PDF_STATUS_LABEL[ticket.status] ?? ticket.status,
+    showQr,
+    qrPng,
+  });
+}
