@@ -1,23 +1,41 @@
 # BiletFlow
 
-BiletFlow is a self-service event ticketing platform for Kazakhstan. Attendees can discover events and obtain QR-code tickets, organizers can create and manage events, and event staff can verify tickets at admission.
+BiletFlow is a self-service event management and ticketing platform for Kazakhstan. The goal is to make it easier for organizers to manage events and for attendees to find events, obtain tickets and enter venues using QR codes.
 
-The web application supports attendee, organizer and platform administrator workflows. A full Flutter mobile application is in development, using the same backend and database. The existing Expo scanner remains available for ticket check-in.
+## Project scope
 
-All payments are simulated. No real money moves.
+- **Attendees:** event discovery, registration, free and paid tickets, checkout, QR tickets, refunds and support.
+- **Organizers:** event creation and publication, ticket management, paid sales activation, attendee management, promotional campaigns and analytics.
+- **Event admins:** QR ticket verification, attendee search and check-in statistics.
+- **Platform admins:** user and event moderation, paid sales approval and platform management.
 
-## Stack
+The project includes web and mobile applications connected to a shared backend and database. The system supports Kazakh, Russian and English. Payments and identity verification are simulated.
+
+## Technology stack
 
 | Component | Technology |
 | --- | --- |
-| Web and API | Next.js (App Router), TypeScript |
+| Web | Next.js, TypeScript, Tailwind CSS, shadcn/ui |
+| Mobile | Flutter, Dart |
+| API | Next.js |
 | Database | PostgreSQL, Prisma |
-| Authentication | Better Auth (web cookies, mobile bearer tokens) |
-| Web UI | Tailwind CSS, shadcn/ui |
-| Mobile | Flutter, Dart (in development); Expo React Native (existing scanner) |
-| Local services | Docker Compose, PostgreSQL, Mailpit, MinIO |
+| Authentication | Better Auth |
+| Infrastructure | Docker Compose, Mailpit, MinIO |
 
-## Quick start
+## Repository structure
+
+```text
+apps/web          Web application and API
+apps/scanner      Expo QR scanner
+packages/db       Database schema and seed data
+packages/shared   Shared validation and QR utilities
+infra             Docker configuration
+docs              Project documentation
+```
+
+Flutter source: [apps/mobile_flutter](https://github.com/biletflow/biletflow/tree/mobile/flutter-starter/apps/mobile_flutter)
+
+## Local setup
 
 ```bash
 corepack enable && corepack use pnpm@latest
@@ -28,40 +46,23 @@ pnpm db:migrate && pnpm db:seed
 pnpm dev
 ```
 
-Configure the authentication secret and signing keys in `.env` before starting. Use the seed command only with a fresh development database.
+Configure the required secrets in `.env` before starting. Seed only a fresh development database.
 
-### Mobile
-
-The Flutter application is being developed for Android and iOS. Its initial code is available in the [mobile/flutter-starter branch](https://github.com/biletflow/biletflow/tree/mobile/flutter-starter/apps/mobile_flutter). See the [Flutter setup instructions](https://github.com/biletflow/biletflow/blob/mobile/flutter-starter/apps/mobile_flutter/README.md). The Flutter application is not yet part of the main branch.
-
-To run the existing Expo scanner, set `EXPO_PUBLIC_API_URL` to the reachable backend URL and run `pnpm --filter scanner start`. Use the scanner account from the local seed configuration.
-
-## Repository layout
-
-```text
-apps/web             Web interfaces and API
-apps/scanner         Existing Expo scanner
-packages/db          Prisma schema, client and seed
-packages/shared      Shared validation, money and QR utilities
-infra                Docker configuration
-docs                 Project documentation
-```
-
-The Flutter development branch adds `apps/mobile_flutter`.
+For the Expo scanner, set `EXPO_PUBLIC_API_URL` to the backend URL and run `pnpm --filter scanner start`.
 
 ## Documentation
 
-| Document | Description |
-| --- | --- |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Development workflow |
-| [api.md](docs/api.md) | API contracts |
-| [backend-commerce.md](docs/backend-commerce.md) | Orders, simulated payments and check-in |
+- [Development workflow](CONTRIBUTING.md)
+- [API specification](docs/api.md)
+- [Authentication](docs/backend-auth.md)
+- [Orders, payments and check-in](docs/backend-commerce.md)
+- [Flutter setup](https://github.com/biletflow/biletflow/blob/mobile/flutter-starter/apps/mobile_flutter/README.md)
 
 ## Team ADZK
 
 | Member | Responsibilities |
 | --- | --- |
-| Adina | Project management, UI/UX design, organizer and admin interfaces |
-| Dariya | Tech lead, web and mobile attendee interfaces, frontend integration |
-| Zhansaya | Database, backend, authentication, payments and API integration |
-| Kamila | Flutter mobile application, QR scanner, check-in backend, mobile integration and testing |
+| Adina | Product owner, project management, design, organizer and admin UI |
+| Dariya | Tech lead, attendee web and mobile UI, frontend integration |
+| Zhansaya | Database, authentication, orders, payments, promotions, analytics and API |
+| Kamila | Flutter mobile application, QR scanner, check-in backend and mobile testing |
