@@ -33,10 +33,13 @@ export async function generateMetadata({
 
 export default async function EventPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<{ c?: string }>;
 }) {
   const { locale, slug } = await params;
+  const { c: campaignToken } = await searchParams;
   setRequestLocale(locale);
 
   const event = await getPublicEventBySlug(slug);
@@ -177,6 +180,7 @@ export default async function EventPage({
               eventSlug={event.slug}
               signedIn={Boolean(sessionUser)}
               ticketTypes={ticketTypes}
+              campaignToken={campaignToken}
               disabled={isCancelled || paidSalesBlocked}
               disabledReason={
                 isCancelled ? t("cancelled") : t("paidSalesInactive")

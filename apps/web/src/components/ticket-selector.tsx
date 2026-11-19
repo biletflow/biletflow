@@ -36,12 +36,14 @@ export function TicketSelector({
   eventSlug,
   signedIn,
   ticketTypes,
+  campaignToken,
   disabled = false,
   disabledReason,
 }: {
   eventSlug: string;
   signedIn: boolean;
   ticketTypes: SelectableTicketType[];
+  campaignToken?: string;
   disabled?: boolean;
   disabledReason?: string;
 }) {
@@ -185,11 +187,17 @@ export function TicketSelector({
         </p>
       ) : selected ? (
         <Link
-          href={
-            signedIn
-              ? `/events/${eventSlug}/checkout?ticketTypeId=${selected.id}&quantity=${quantity}`
-              : `/sign-in?next=${encodeURIComponent(`/events/${eventSlug}/checkout?ticketTypeId=${selected.id}&quantity=${quantity}`)}`
-          }
+          href={(() => {
+            const params = new URLSearchParams({
+              ticketTypeId: selected.id,
+              quantity: String(quantity),
+            });
+            if (campaignToken) params.set("c", campaignToken);
+            const checkoutPath = `/events/${eventSlug}/checkout?${params.toString()}`;
+            return signedIn
+              ? checkoutPath
+              : `/sign-in?next=${encodeURIComponent(checkoutPath)}`;
+          })()}
           className={cn(buttonVariants(), "mt-5 h-11 w-full text-sm font-bold")}
         >
           {signedIn
