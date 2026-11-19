@@ -1,7 +1,5 @@
 # BiletFlow Flutter mobile
 
-Native Flutter development starter. The existing web app and Expo scanner remain unchanged.
-
 ## Run
 
 Install Flutter stable, Android Studio and (for iOS) Xcode on macOS. From the repository root:
@@ -23,5 +21,3 @@ The platform folders must still be generated. Review generated changes and keep 
 - Read-only organizer event list and details, with an owner-scoped API.
 - QR camera and server-side check-in (manual event ID in this starter).
 - API-client unit tests.
-
-This is not a complete app. Flutter compilation and device tests have not been run. Registration, server logout, attendee checkout/tickets, organizer management and analytics, admin, support/refunds, campaign screens and full localization remain open. See issues #121 through #135. All screens must be built in Flutter without WebView. The existing Next.js API and PostgreSQL database are shared by web and mobile.
