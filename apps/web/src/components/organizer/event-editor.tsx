@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import EventCampaigns from "./event-campaigns";
 import PaidSalesActivation from "./paid-sales-activation";
 import { canPublish, hasEnoughInventory, validateEventDates } from "@/lib/organizer-editor-validation";
 
@@ -162,6 +163,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
           {event.status === "DRAFT" && <button type="button" disabled={busy || !canPublish(event.ticketTypes)} onClick={publish} className="bg-brand rounded-lg px-5 py-3 font-bold text-white disabled:opacity-50">{t.publish}</button>}
         </section>}
         {event && <PaidSalesActivation eventId={event.id} locale={locale} />}
+        {event && <EventCampaigns eventId={event.id} locale={locale} />}
       </div>
     </div>
   );

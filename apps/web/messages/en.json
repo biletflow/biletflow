@@ -110,10 +110,17 @@
     "submitPaid": "Continue to payment",
     "submitting": "Working…",
     "back": "Back to event",
+    "promoCode": "Promo code",
+    "applyPromo": "Apply",
+    "discount": "Discount",
+    "promoApplied": "Promo applied",
+    "campaignApplied": "Campaign link applied",
+    "campaignLinkHint": "A campaign link is attached to this checkout. You can still enter a matching promo code.",
     "errorGeneric": "Could not complete checkout. Try again.",
     "errorConflict": "Those tickets are no longer available.",
     "errorHoldExpired": "Your checkout hold expired. Start again from the event page.",
-    "errorValidation": "Check the name, email, and quantity and try again."
+    "errorValidation": "Check the name, email, and quantity and try again.",
+    "errorPromo": "That promo code or campaign link is not valid for this order."
   },
   "tickets": {
     "title": "My tickets",

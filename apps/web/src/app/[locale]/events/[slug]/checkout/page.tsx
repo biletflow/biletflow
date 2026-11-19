@@ -17,14 +17,19 @@ export default async function CheckoutPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
-  searchParams: Promise<{ ticketTypeId?: string; quantity?: string }>;
+  searchParams: Promise<{ ticketTypeId?: string; quantity?: string; c?: string }>;
 }) {
   const { locale, slug } = await params;
   const query = await searchParams;
   setRequestLocale(locale);
 
   const user = await getSessionUser();
-  const next = `/events/${slug}/checkout?ticketTypeId=${encodeURIComponent(query.ticketTypeId ?? "")}&quantity=${encodeURIComponent(query.quantity ?? "1")}`;
+  const nextParams = new URLSearchParams({
+    ticketTypeId: query.ticketTypeId ?? "",
+    quantity: query.quantity ?? "1",
+  });
+  if (query.c) nextParams.set("c", query.c);
+  const next = `/events/${slug}/checkout?${nextParams.toString()}`;
   if (!user) {
     hardRedirect(
       `/${locale}/sign-in?next=${encodeURIComponent(next)}`,
@@ -84,6 +89,7 @@ export default async function CheckoutPage({
           maxPerOrder: ticketType.maxPerOrder,
         }}
         initialQuantity={parseQuantity(query.quantity, maxQuantity)}
+        initialCampaignToken={query.c}
         attendee={{
           fullName: user.name?.trim() || "",
           email: user.email,
