@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
+import '../l10n/app_localizations.dart';
 import 'event_detail.dart';
 
 class EventsCatalogScreen extends StatefulWidget {
@@ -66,20 +67,21 @@ class _EventsCatalogScreenState extends State<EventsCatalogScreen> {
     }
   }
 
-  String _priceLabel(Map row) {
+  String _priceLabel(AppLocalizations l10n, Map row) {
     final free = row['isFree'] == true;
     final soldOut = row['isSoldOut'] == true;
-    if (soldOut) return 'Sold out';
-    if (free) return 'Free';
+    if (soldOut) return l10n.soldOut;
+    if (free) return l10n.free;
     final min = row['minPriceKzt'];
-    if (min is num) return 'from ₸${min.round()}';
+    if (min is num) return l10n.fromPrice(min.round());
     return '';
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Browse events')),
+      appBar: AppBar(title: Text(l10n.browseEvents)),
       body: Column(
         children: [
           Padding(
@@ -88,9 +90,9 @@ class _EventsCatalogScreenState extends State<EventsCatalogScreen> {
               controller: _query,
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
-                hintText: 'Search events, venues…',
+                hintText: l10n.searchEvents,
                 suffixIcon: IconButton(
-                  tooltip: 'Search',
+                  tooltip: l10n.search,
                   onPressed: _load,
                   icon: const Icon(Icons.search),
                 ),
@@ -107,11 +109,11 @@ class _EventsCatalogScreenState extends State<EventsCatalogScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: DropdownButton<String?>(
                     value: _city,
-                    hint: const Text('City'),
+                    hint: Text(l10n.city),
                     items: [
-                      const DropdownMenuItem<String?>(
+                      DropdownMenuItem<String?>(
                         value: null,
-                        child: Text('All cities'),
+                        child: Text(l10n.allCities),
                       ),
                       ..._cities.map(
                         (city) => DropdownMenuItem<String?>(
@@ -130,11 +132,11 @@ class _EventsCatalogScreenState extends State<EventsCatalogScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: DropdownButton<String?>(
                     value: _category,
-                    hint: const Text('Category'),
+                    hint: Text(l10n.category),
                     items: [
-                      const DropdownMenuItem<String?>(
+                      DropdownMenuItem<String?>(
                         value: null,
-                        child: Text('All categories'),
+                        child: Text(l10n.allCategories),
                       ),
                       ..._categories
                           .whereType<Map>()
@@ -157,23 +159,23 @@ class _EventsCatalogScreenState extends State<EventsCatalogScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: DropdownButton<String?>(
                     value: _price,
-                    hint: const Text('Price'),
-                    items: const [
+                    hint: Text(l10n.price),
+                    items: [
                       DropdownMenuItem<String?>(
                         value: null,
-                        child: Text('Any price'),
+                        child: Text(l10n.anyPrice),
                       ),
                       DropdownMenuItem<String?>(
                         value: 'free',
-                        child: Text('Free'),
+                        child: Text(l10n.free),
                       ),
                       DropdownMenuItem<String?>(
                         value: 'under10k',
-                        child: Text('Under ₸10,000'),
+                        child: Text(l10n.under10k),
                       ),
                       DropdownMenuItem<String?>(
                         value: 'over10k',
-                        child: Text('₸10,000+'),
+                        child: Text(l10n.over10k),
                       ),
                     ],
                     onChanged: (value) {
@@ -189,11 +191,14 @@ class _EventsCatalogScreenState extends State<EventsCatalogScreen> {
           if (_error != null)
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              child: Text(
+                l10n.apiError(_error!),
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
             ),
           Expanded(
             child: _events.isEmpty && !_loading
-                ? const Center(child: Text('No events found'))
+                ? Center(child: Text(l10n.noEvents))
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: _events.length,
@@ -214,7 +219,7 @@ class _EventsCatalogScreenState extends State<EventsCatalogScreen> {
                             [
                               if (city.isNotEmpty) city,
                               if (startsAt.isNotEmpty) startsAt,
-                              _priceLabel(row),
+                              _priceLabel(l10n, row),
                             ].where((part) => part.isNotEmpty).join(' · '),
                           ),
                           trailing: const Icon(Icons.chevron_right),

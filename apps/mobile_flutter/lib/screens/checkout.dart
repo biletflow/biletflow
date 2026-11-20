@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
 import '../core/uuid.dart';
+import '../l10n/app_localizations.dart';
 import 'order_status.dart';
 
 class CheckoutLine {
@@ -117,18 +118,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       });
       final totals = data['totals'];
       final campaign = data['campaign'];
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
       setState(() {
         _discountKzt = totals is Map && totals['discountKzt'] is num
             ? (totals['discountKzt'] as num).toInt()
             : 0;
         _promoLabel = campaign is Map
-            ? '${campaign['name'] ?? 'Promo applied'}'
-            : 'Promo applied';
+            ? '${campaign['name'] ?? l10n.promoApplied}'
+            : l10n.promoApplied;
       });
     } on ApiException catch (error) {
-      setState(() => _error = error.code);
+      if (mounted) setState(() => _error = error.code);
     } catch (_) {
-      setState(() => _error = 'REQUEST_FAILED');
+      if (mounted) setState(() => _error = 'REQUEST_FAILED');
     }
   }
 
@@ -202,8 +205,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Checkout')),
+      appBar: AppBar(title: Text(l10n.checkout)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -214,21 +218,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               contentPadding: EdgeInsets.zero,
               title: Text(line.name),
               subtitle: Text('× ${line.quantity}'),
-              trailing: Text(
-                line.priceKzt == 0 ? 'Free' : '₸${line.priceKzt * line.quantity}',
-              ),
+              trailing: Text(l10n.money(line.priceKzt * line.quantity)),
             ),
           ),
           const Divider(),
           TextField(
             controller: _name,
-            decoration: const InputDecoration(labelText: 'Full name'),
+            decoration: InputDecoration(labelText: l10n.fullName),
             textCapitalization: TextCapitalization.words,
           ),
           const SizedBox(height: 8),
           TextField(
             controller: _email,
-            decoration: const InputDecoration(labelText: 'Email'),
+            decoration: InputDecoration(labelText: l10n.email),
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 8),
@@ -237,7 +239,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Expanded(
                 child: TextField(
                   controller: _promo,
-                  decoration: const InputDecoration(labelText: 'Promo code'),
+                  decoration: InputDecoration(labelText: l10n.promoCode),
                   onChanged: (_) {
                     if (_discountKzt > 0 || _promoLabel != null) {
                       setState(() {
@@ -249,7 +251,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              TextButton(onPressed: _pending ? null : _applyPromo, child: const Text('Apply')),
+              TextButton(onPressed: _pending ? null : _applyPromo, child: Text(l10n.apply)),
             ],
           ),
           if (_promoLabel != null)
@@ -258,30 +260,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               child: Text(_promoLabel!),
             ),
           const SizedBox(height: 16),
-          if (_discountKzt > 0)
-            Text('Discount: −₸$_discountKzt'),
+          if (_discountKzt > 0) Text(l10n.discount(_discountKzt)),
           Text(
-            'Total: ${_total == 0 ? 'Free' : '₸$_total'}',
+            l10n.total(l10n.money(_total)),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           if (_error != null)
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: Text(
-                _error!,
+                l10n.apiError(_error!),
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ),
           const SizedBox(height: 16),
           FilledButton(
             onPressed: _pending ? null : _submit,
-            child: Text(_pending ? 'Working…' : 'Place order'),
+            child: Text(_pending ? l10n.working : l10n.placeOrder),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Server totals and inventory are authoritative. Paid orders use the authenticated simulated payment API.',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          Text(l10n.checkoutNote, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );
