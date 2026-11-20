@@ -73,5 +73,38 @@ class ApiClient {
       request('POST', path, body: body);
   Future<Map<String, dynamic>> put(String path, Map<String, dynamic> body) =>
       request('PUT', path, body: body);
+
+  /// Authenticated binary download (QR PNG / PDF). Token stays in the header only.
+  Future<List<int>> getBytes(String path, {String accept = '*/*'}) async {
+    if (!path.startsWith('/api/') || path.startsWith('//')) {
+      throw ArgumentError('Expected a local API path');
+    }
+    final uri = base.resolve(path);
+    if (uri.origin != base.origin || !uri.path.startsWith('/api/')) {
+      throw ArgumentError('Invalid API path');
+    }
+    final request = http.Request('GET', uri)
+      ..followRedirects = false
+      ..headers.addAll({
+        'Accept': accept,
+        if (token != null) 'Authorization': 'Bearer $token',
+      });
+    final response = await http.Response.fromStream(await _http
+            .send(request)
+            .timeout(const Duration(seconds: 30)))
+        .timeout(const Duration(seconds: 30));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      String code = 'REQUEST_FAILED';
+      try {
+        final value = jsonDecode(response.body);
+        if (value is Map && value['error'] is Map) {
+          code = '${value['error']['code'] ?? code}';
+        }
+      } catch (_) {}
+      throw ApiException(response.statusCode, code);
+    }
+    return response.bodyBytes;
+  }
+
   void close() => _http.close();
 }

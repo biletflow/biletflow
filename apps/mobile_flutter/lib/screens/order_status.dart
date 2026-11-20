@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
+import 'ticket_detail.dart';
 
 class OrderStatusScreen extends StatefulWidget {
   final ApiClient api;
@@ -178,16 +179,37 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                       if (tickets is List)
                         ...tickets.whereType<Map>().map((raw) {
                           final ticket = Map<String, dynamic>.from(raw);
+                          final id = '${ticket['id'] ?? ''}';
                           return Card(
                             child: ListTile(
                               title: Text('${ticket['ticketTypeName'] ?? 'Ticket'}'),
                               subtitle: Text(
                                 [
                                   '${ticket['attendeeName'] ?? ''}',
-                                  '${ticket['code'] ?? ''}',
                                   '${ticket['status'] ?? ''}',
                                 ].where((part) => part.isNotEmpty).join(' · '),
                               ),
+                              trailing: id.isEmpty ? null : const Icon(Icons.chevron_right),
+                              onTap: id.isEmpty
+                                  ? null
+                                  : () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => TicketDetailScreen(
+                                            api: widget.api,
+                                            ticketId: id,
+                                            summary: {
+                                              ...ticket,
+                                              'ticketTypeName': ticket['ticketTypeName'],
+                                              'attendeeName': ticket['attendeeName'],
+                                              'status': ticket['status'],
+                                              'event': {
+                                                'title': 'Order ${order?['reference'] ?? ''}',
+                                              },
+                                            },
+                                          ),
+                                        ),
+                                      ),
                             ),
                           );
                         }),

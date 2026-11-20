@@ -12,6 +12,8 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   mobile_scanner: ^6.0.7
   material_ui: ^1.1.0
+  path_provider: ^2.1.5
+  share_plus: ^10.1.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
