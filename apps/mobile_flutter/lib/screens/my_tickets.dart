@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
+import '../l10n/app_localizations.dart';
 import 'ticket_detail.dart';
 
 class MyTicketsScreen extends StatefulWidget {
@@ -42,12 +43,13 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My tickets'),
+        title: Text(l10n.myTickets),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: l10n.refresh,
             onPressed: _loading ? null : _load,
             icon: const Icon(Icons.refresh),
           ),
@@ -56,9 +58,9 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(child: Text(_error!))
+              ? Center(child: Text(l10n.apiError(_error!)))
               : _tickets.isEmpty
-                  ? const Center(child: Text('No tickets yet'))
+                  ? Center(child: Text(l10n.noTickets))
                   : ListView.separated(
                       padding: const EdgeInsets.all(16),
                       itemCount: _tickets.length,
@@ -73,6 +75,7 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
                             : 'Event';
                         final when = event is Map ? '${event['startsAt'] ?? ''}' : '';
                         final id = '${ticket['id'] ?? ''}';
+                        final ticketStatus = '${ticket['status'] ?? ''}';
                         return Card(
                           child: ListTile(
                             title: Text(title),
@@ -80,7 +83,7 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
                               [
                                 '${ticket['ticketTypeName'] ?? ''}',
                                 '${ticket['attendeeName'] ?? ''}',
-                                '${ticket['status'] ?? ''}',
+                                l10n.ticketStatus(ticketStatus),
                                 if (when.isNotEmpty) when,
                               ].where((part) => part.isNotEmpty).join(' · '),
                             ),

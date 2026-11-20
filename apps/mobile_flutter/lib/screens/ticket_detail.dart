@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../core/api.dart';
+import '../l10n/app_localizations.dart';
 
 class TicketDetailScreen extends StatefulWidget {
   final ApiClient api;
@@ -83,12 +84,16 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
       );
     } on ApiException catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.code)));
+        final l10n = AppLocalizations.of(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.apiError(error.code))),
+        );
       }
     } catch (_) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to open PDF')),
+          SnackBar(content: Text(l10n.pdfFailed)),
         );
       }
     } finally {
@@ -98,6 +103,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final summary = widget.summary;
     final event = summary['event'];
     final title = event is Map ? '${event['title'] ?? 'Ticket'}' : 'Ticket';
@@ -114,20 +120,23 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
           Text('${summary['ticketTypeName'] ?? ''}'),
           Text('${summary['attendeeName'] ?? ''}'),
           if (when.isNotEmpty) Text(when),
-          Text('Status: $status'),
+          Text(l10n.status(l10n.ticketStatus(status))),
           const SizedBox(height: 20),
-          Text('Admission QR', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.admissionQr, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           if (!_canShowQr)
             Text(
               status == 'REFUNDED' || status == 'CANCELLED'
-                  ? 'This ticket is not valid for entry.'
-                  : 'QR is unavailable for this ticket status.',
+                  ? l10n.ticketInvalid
+                  : l10n.qrUnavailable,
             )
           else if (_qrLoading)
             const Center(child: CircularProgressIndicator())
           else if (_qrError != null)
-            Text(_qrError!, style: TextStyle(color: Theme.of(context).colorScheme.error))
+            Text(
+              l10n.apiError(_qrError!),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            )
           else if (_qr != null)
             Center(
               child: Image.memory(
@@ -142,13 +151,10 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
           FilledButton.icon(
             onPressed: _pdfBusy ? null : _sharePdf,
             icon: const Icon(Icons.picture_as_pdf),
-            label: Text(_pdfBusy ? 'Preparing PDF…' : 'Share / save PDF'),
+            label: Text(_pdfBusy ? l10n.preparingPdf : l10n.sharePdf),
           ),
           const SizedBox(height: 8),
-          Text(
-            'QR and PDF come from the server with your bearer token. The token is never put in the image URL.',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          Text(l10n.qrNote, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );

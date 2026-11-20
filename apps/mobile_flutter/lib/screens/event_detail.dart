@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
+import '../l10n/app_localizations.dart';
 import 'checkout.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -64,6 +65,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final event = _event;
     final venue = event?['venue'];
     final organizer = event?['organizer'];
@@ -77,7 +79,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(child: Text(_error!))
+              ? Center(child: Text(l10n.apiError(_error!)))
               : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
@@ -104,19 +106,19 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     if (organizer is Map)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
-                        child: Text('Organizer: ${organizer['name'] ?? ''}'),
+                        child: Text(l10n.organizer('${organizer['name'] ?? ''}')),
                       ),
                     if (event?['description'] != null) ...[
                       const SizedBox(height: 16),
                       Text('${event!['description']}'),
                     ],
                     const SizedBox(height: 20),
-                    Text('Tickets', style: Theme.of(context).textTheme.titleMedium),
+                    Text(l10n.tickets, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
                     if (soldOut)
-                      const Text('This event is sold out')
+                      Text(l10n.soldOut)
                     else if (ticketTypes is! List || ticketTypes.isEmpty)
-                      const Text('No ticket types available')
+                      Text(l10n.noTicketTypes)
                     else
                       ...ticketTypes.whereType<Map>().map((raw) {
                         final type = Map<String, dynamic>.from(raw);
@@ -131,7 +133,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             : available;
                         final qty = _quantities[id] ?? 0;
                         final priceLabel = price is num
-                            ? (price == 0 ? 'Free' : '₸${price.round()}')
+                            ? (price == 0 ? l10n.free : '₸${price.round()}')
                             : '';
                         final disabled = available <= 0;
                         return Card(
@@ -140,7 +142,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             subtitle: Text(
                               [
                                 priceLabel,
-                                if (available > 0) '$available left' else 'Sold out',
+                                if (available > 0) l10n.left(available) else l10n.soldOut,
                               ].where((part) => part.isNotEmpty).join(' · '),
                             ),
                             trailing: disabled
@@ -149,7 +151,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
-                                        tooltip: 'Decrease',
                                         onPressed: qty <= 0
                                             ? null
                                             : () => _setQuantity(
@@ -162,7 +163,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                       ),
                                       Text('$qty'),
                                       IconButton(
-                                        tooltip: 'Increase',
                                         onPressed: qty >=
                                                 (maxPerOrder < available
                                                     ? maxPerOrder
@@ -219,8 +219,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           : null,
                       child: Text(
                         selected > 0
-                            ? 'Continue with $selected ticket${selected == 1 ? '' : 's'}'
-                            : 'Select tickets',
+                            ? l10n.continueWithTickets(selected)
+                            : l10n.selectTickets,
                       ),
                     ),
                   ],

@@ -2,12 +2,16 @@ import 'dart:async';
 
 import 'package:biletflow_mobile/core/api.dart';
 import 'package:biletflow_mobile/core/session.dart';
+import 'package:biletflow_mobile/l10n/locale_controller.dart';
 import 'package:biletflow_mobile/main.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+
+Widget app(Session session, {LocaleController? locales}) =>
+    BiletFlowApp(session: session, locales: locales ?? LocaleController());
 
 void main() {
   testWidgets('shows a loading indicator while restoring the session', (
@@ -18,7 +22,7 @@ void main() {
     addTearDown(api.close);
     addTearDown(session.dispose);
 
-    await tester.pumpWidget(BiletFlowApp(session: session));
+    await tester.pumpWidget(app(session));
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.text('Sign in'), findsNothing);
   });
@@ -39,13 +43,13 @@ void main() {
     addTearDown(api.close);
     addTearDown(session.dispose);
 
-    await tester.pumpWidget(BiletFlowApp(session: session));
+    await tester.pumpWidget(app(session));
     await tester.enterText(find.byType(TextFormField).at(0), 'a@example.test');
     await tester.enterText(find.byType(TextFormField).at(1), 'wrong-password');
     await tester.tap(find.text('Sign in'));
     await tester.pump();
 
-    final button = find.widgetWithText(FilledButton, 'Signing in...');
+    final button = find.widgetWithText(FilledButton, 'Signing in…');
     expect(tester.widget<FilledButton>(button).onPressed, isNull);
 
     response.complete(
@@ -53,7 +57,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('INVALID_CREDENTIALS'), findsOneWidget);
+    expect(find.text('Email or password is incorrect.'), findsOneWidget);
     expect(find.text('Sign in'), findsOneWidget);
     expect(api.token, isNull);
   });
@@ -80,7 +84,7 @@ void main() {
     addTearDown(api.close);
     addTearDown(session.dispose);
 
-    await tester.pumpWidget(BiletFlowApp(session: session));
+    await tester.pumpWidget(app(session));
     await tester.enterText(find.byType(TextFormField).at(0), 'a@example.test');
     await tester.enterText(find.byType(TextFormField).at(1), 'test-password');
     await tester.tap(find.text('Sign in'));
@@ -112,7 +116,7 @@ void main() {
       addTearDown(api.close);
       addTearDown(session.dispose);
 
-      await tester.pumpWidget(BiletFlowApp(session: session));
+      await tester.pumpWidget(app(session));
       await session.restore();
       await tester.pumpAndSettle();
 
@@ -149,7 +153,7 @@ void main() {
     addTearDown(api.close);
     addTearDown(session.dispose);
 
-    await tester.pumpWidget(BiletFlowApp(session: session));
+    await tester.pumpWidget(app(session));
     await tester.tap(find.byTooltip('Sign out'));
     await tester.pumpAndSettle();
 
