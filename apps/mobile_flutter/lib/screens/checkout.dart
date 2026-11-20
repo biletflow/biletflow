@@ -1,0 +1,289 @@
+import 'package:material_ui/material_ui.dart';
+
+import '../core/api.dart';
+import '../core/uuid.dart';
+import 'order_status.dart';
+
+class CheckoutLine {
+  final String ticketTypeId;
+  final String name;
+  final int priceKzt;
+  final int quantity;
+  const CheckoutLine({
+    required this.ticketTypeId,
+    required this.name,
+    required this.priceKzt,
+    required this.quantity,
+  });
+}
+
+class CheckoutScreen extends StatefulWidget {
+  final ApiClient api;
+  final String eventId;
+  final String eventTitle;
+  final List<CheckoutLine> lines;
+  final String? initialName;
+  final String? initialEmail;
+
+  const CheckoutScreen({
+    super.key,
+    required this.api,
+    required this.eventId,
+    required this.eventTitle,
+    required this.lines,
+    this.initialName,
+    this.initialEmail,
+  });
+
+  @override
+  State<CheckoutScreen> createState() => _CheckoutScreenState();
+}
+
+class _CheckoutScreenState extends State<CheckoutScreen> {
+  late final TextEditingController _name;
+  late final TextEditingController _email;
+  final _promo = TextEditingController();
+  late String _idempotencyKey;
+  int _discountKzt = 0;
+  String? _promoLabel;
+  String? _error;
+  bool _pending = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _name = TextEditingController(text: widget.initialName ?? '');
+    _email = TextEditingController(text: widget.initialEmail ?? '');
+    _idempotencyKey = randomUuid();
+    if ((widget.initialName == null || widget.initialName!.isEmpty) ||
+        (widget.initialEmail == null || widget.initialEmail!.isEmpty)) {
+      _prefillFromMe();
+    }
+  }
+
+  Future<void> _prefillFromMe() async {
+    try {
+      final data = await widget.api.get('/api/me');
+      final user = data['user'];
+      if (user is! Map || !mounted) return;
+      if (_name.text.trim().isEmpty) {
+        _name.text = '${user['name'] ?? ''}';
+      }
+      if (_email.text.trim().isEmpty) {
+        _email.text = '${user['email'] ?? ''}';
+      }
+      setState(() {});
+    } catch (_) {
+      // Attendee can still type details manually.
+    }
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _promo.dispose();
+    super.dispose();
+  }
+
+  int get _subtotal =>
+      widget.lines.fold(0, (sum, line) => sum + line.priceKzt * line.quantity);
+
+  int get _total => (_subtotal - _discountKzt).clamp(0, 1 << 30);
+
+  int get _ticketCount =>
+      widget.lines.fold(0, (sum, line) => sum + line.quantity);
+
+  Future<void> _applyPromo() async {
+    setState(() {
+      _error = null;
+      _promoLabel = null;
+      _discountKzt = 0;
+    });
+    final code = _promo.text.trim();
+    if (code.isEmpty) return;
+    try {
+      final data = await widget.api.post('/api/promo/preview', {
+        'eventId': widget.eventId,
+        'code': code,
+        'items': [
+          for (final line in widget.lines)
+            {
+              'ticketTypeId': line.ticketTypeId,
+              'quantity': line.quantity,
+              'unitPriceKzt': line.priceKzt,
+            },
+        ],
+      });
+      final totals = data['totals'];
+      final campaign = data['campaign'];
+      setState(() {
+        _discountKzt = totals is Map && totals['discountKzt'] is num
+            ? (totals['discountKzt'] as num).toInt()
+            : 0;
+        _promoLabel = campaign is Map
+            ? '${campaign['name'] ?? 'Promo applied'}'
+            : 'Promo applied';
+      });
+    } on ApiException catch (error) {
+      setState(() => _error = error.code);
+    } catch (_) {
+      setState(() => _error = 'REQUEST_FAILED');
+    }
+  }
+
+  Future<void> _submit() async {
+    final fullName = _name.text.trim();
+    final email = _email.text.trim().toLowerCase();
+    if (fullName.length < 2 || !email.contains('@')) {
+      setState(() => _error = 'VALIDATION_FAILED');
+      return;
+    }
+    setState(() {
+      _pending = true;
+      _error = null;
+    });
+    try {
+      final attendees = List.generate(
+        _ticketCount,
+        (_) => {'fullName': fullName, 'email': email},
+      );
+      final promo = _promo.text.trim();
+      final created = await widget.api.post('/api/orders', {
+        'eventId': widget.eventId,
+        'items': [
+          for (final line in widget.lines)
+            {
+              'ticketTypeId': line.ticketTypeId,
+              'quantity': line.quantity,
+            },
+        ],
+        'attendees': attendees,
+        if (promo.isNotEmpty) 'promoCode': promo,
+        'clientIdempotencyKey': _idempotencyKey,
+      });
+      final order = created['order'];
+      if (order is! Map) {
+        throw const ApiException(500, 'INVALID_ORDER_RESPONSE');
+      }
+      final orderId = '${order['id'] ?? ''}';
+      final status = '${order['status'] ?? ''}';
+      if (orderId.isEmpty) {
+        throw const ApiException(500, 'INVALID_ORDER_RESPONSE');
+      }
+      if (status == 'PAID') {
+        if (!mounted) return;
+        await Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OrderStatusScreen(api: widget.api, orderId: orderId),
+          ),
+        );
+        return;
+      }
+      await widget.api.post('/api/orders/$orderId/pay', {});
+      if (!mounted) return;
+      await Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => OrderStatusScreen(api: widget.api, orderId: orderId),
+        ),
+      );
+    } on ApiException catch (error) {
+      _idempotencyKey = randomUuid();
+      setState(() => _error = error.code);
+    } catch (_) {
+      _idempotencyKey = randomUuid();
+      setState(() => _error = 'REQUEST_FAILED');
+    } finally {
+      if (mounted) setState(() => _pending = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Checkout')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text(widget.eventTitle, style: Theme.of(context).textTheme.headlineSmall),
+          const SizedBox(height: 12),
+          ...widget.lines.map(
+            (line) => ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(line.name),
+              subtitle: Text('× ${line.quantity}'),
+              trailing: Text(
+                line.priceKzt == 0 ? 'Free' : '₸${line.priceKzt * line.quantity}',
+              ),
+            ),
+          ),
+          const Divider(),
+          TextField(
+            controller: _name,
+            decoration: const InputDecoration(labelText: 'Full name'),
+            textCapitalization: TextCapitalization.words,
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _email,
+            decoration: const InputDecoration(labelText: 'Email'),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _promo,
+                  decoration: const InputDecoration(labelText: 'Promo code'),
+                  onChanged: (_) {
+                    if (_discountKzt > 0 || _promoLabel != null) {
+                      setState(() {
+                        _discountKzt = 0;
+                        _promoLabel = null;
+                      });
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              TextButton(onPressed: _pending ? null : _applyPromo, child: const Text('Apply')),
+            ],
+          ),
+          if (_promoLabel != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(_promoLabel!),
+            ),
+          const SizedBox(height: 16),
+          if (_discountKzt > 0)
+            Text('Discount: −₸$_discountKzt'),
+          Text(
+            'Total: ${_total == 0 ? 'Free' : '₸$_total'}',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          if (_error != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Text(
+                _error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: _pending ? null : _submit,
+            child: Text(_pending ? 'Working…' : 'Place order'),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Server totals and inventory are authoritative. Paid orders use the authenticated simulated payment API.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ),
+    );
+  }
+}

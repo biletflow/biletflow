@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
+import 'checkout.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final ApiClient api;
@@ -184,10 +185,33 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     FilledButton(
                       onPressed: selected > 0
                           ? () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Checkout ships in #125. Selection is saved for the next step.',
+                              final eventId = '${event?['id'] ?? ''}';
+                              if (eventId.isEmpty || ticketTypes is! List) return;
+                              final lines = <CheckoutLine>[];
+                              for (final raw in ticketTypes.whereType<Map>()) {
+                                final type = Map<String, dynamic>.from(raw);
+                                final id = '${type['id'] ?? ''}';
+                                final qty = _quantities[id] ?? 0;
+                                if (id.isEmpty || qty <= 0) continue;
+                                final price = type['priceKzt'];
+                                lines.add(
+                                  CheckoutLine(
+                                    ticketTypeId: id,
+                                    name: '${type['name'] ?? 'Ticket'}',
+                                    priceKzt: price is num ? price.toInt() : 0,
+                                    quantity: qty,
+                                  ),
+                                );
+                              }
+                              if (lines.isEmpty) return;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CheckoutScreen(
+                                    api: widget.api,
+                                    eventId: eventId,
+                                    eventTitle: title,
+                                    lines: lines,
                                   ),
                                 ),
                               );

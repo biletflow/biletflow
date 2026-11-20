@@ -9,7 +9,12 @@ import { clientIp, isUniqueViolation } from "./http";
 import { convertReservation, releaseInventory } from "./inventory";
 import { maybeActivate } from "./activation";
 import { notifyOrderPaid, notifyPaymentFailed } from "./notifications";
-import { sandboxPayUrl, verifyWebhookSignature } from "./payments-signature";
+import { getOwnedOrder, presentOrder } from "./checkout";
+import {
+  sandboxPayUrl,
+  signWebhookBody,
+  verifyWebhookSignature,
+} from "./payments-signature";
 import { issueTickets, ticketSigningKey, type AttendeeInput } from "./tickets";
 
 function intentId() {
@@ -99,6 +104,26 @@ function paymentPayload(
     payment: { id, intentId: providerIntentId, amountKzt, status },
     url: sandboxPayUrl(providerIntentId),
   };
+}
+
+/** Mobile/demo settlement without WebView or client-held webhook secrets. */
+export async function simulateOrderPayment(
+  userId: string,
+  role: string,
+  orderId: string,
+  outcome: "APPROVED" | "DECLINED" | "ABANDONED",
+  headers: Headers,
+) {
+  const started = await startOrderPayment(userId, orderId, headers);
+  const intentId = started.payment.intentId;
+  const payload = JSON.stringify({
+    intentId,
+    outcome,
+    eventKey: `${intentId}:${outcome}`,
+  });
+  const simulation = await processPaymentWebhook(payload, signWebhookBody(payload));
+  const order = await getOwnedOrder(userId, role, orderId);
+  return { order: presentOrder(order), simulation, payment: started.payment };
 }
 
 export async function processPaymentWebhook(raw: string, signature: string | null) {
