@@ -2,6 +2,8 @@ import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/empty_state.dart';
+import '../widgets/event_card.dart';
 import 'event_detail.dart';
 
 class EventsCatalogScreen extends StatefulWidget {
@@ -188,56 +190,44 @@ class _EventsCatalogScreenState extends State<EventsCatalogScreen> {
             ),
           ),
           if (_loading) const LinearProgressIndicator(),
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                l10n.apiError(_error!),
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ),
           Expanded(
-            child: _events.isEmpty && !_loading
-                ? Center(child: Text(l10n.noEvents))
-                : ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _events.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      final raw = _events[index];
-                      if (raw is! Map) return const SizedBox.shrink();
-                      final row = Map<String, dynamic>.from(raw);
-                      final venue = row['venue'];
-                      final city = venue is Map ? '${venue['city'] ?? ''}' : '';
-                      final title = '${row['title'] ?? ''}';
-                      final startsAt = '${row['startsAt'] ?? ''}';
-                      final slug = row['slug'];
-                      return Card(
-                        child: ListTile(
-                          title: Text(title),
-                          subtitle: Text(
-                            [
-                              if (city.isNotEmpty) city,
-                              if (startsAt.isNotEmpty) startsAt,
-                              _priceLabel(l10n, row),
-                            ].where((part) => part.isNotEmpty).join(' · '),
-                          ),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: slug is String
-                              ? () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => EventDetailScreen(
-                                        api: widget.api,
-                                        slug: slug,
+            child: _error != null
+                ? ErrorState(
+                    message: l10n.apiError(_error!),
+                    onRetry: _load,
+                    retryLabel: l10n.refresh,
+                  )
+                : _events.isEmpty && !_loading
+                    ? EmptyState(
+                        icon: Icons.event_busy_outlined,
+                        title: l10n.noEvents,
+                      )
+                    : ListView.separated(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: _events.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, index) {
+                          final raw = _events[index];
+                          if (raw is! Map) return const SizedBox.shrink();
+                          final row = Map<String, dynamic>.from(raw);
+                          final slug = row['slug'];
+                          return EventCard.fromJson(
+                            row,
+                            priceLabel: (item) => _priceLabel(l10n, item),
+                            onTap: slug is String
+                                ? () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => EventDetailScreen(
+                                          api: widget.api,
+                                          slug: slug,
+                                        ),
                                       ),
-                                    ),
-                                  )
-                              : null,
-                        ),
-                      );
-                    },
-                  ),
+                                    )
+                                : null,
+                          );
+                        },
+                      ),
           ),
         ],
       ),

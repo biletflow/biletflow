@@ -2,6 +2,8 @@ import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/empty_state.dart';
+import '../widgets/quantity_stepper.dart';
 import 'checkout.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -77,9 +79,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const LoadingState()
           : _error != null
-              ? Center(child: Text(l10n.apiError(_error!)))
+              ? ErrorState(
+                  message: l10n.apiError(_error!),
+                  onRetry: _load,
+                  retryLabel: l10n.refresh,
+                )
               : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
@@ -147,36 +153,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             ),
                             trailing: disabled
                                 ? null
-                                : Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        onPressed: qty <= 0
-                                            ? null
-                                            : () => _setQuantity(
-                                                  id,
-                                                  qty - 1,
-                                                  maxPerOrder,
-                                                  available,
-                                                ),
-                                        icon: const Icon(Icons.remove_circle_outline),
-                                      ),
-                                      Text('$qty'),
-                                      IconButton(
-                                        onPressed: qty >=
-                                                (maxPerOrder < available
-                                                    ? maxPerOrder
-                                                    : available)
-                                            ? null
-                                            : () => _setQuantity(
-                                                  id,
-                                                  qty + 1,
-                                                  maxPerOrder,
-                                                  available,
-                                                ),
-                                        icon: const Icon(Icons.add_circle_outline),
-                                      ),
-                                    ],
+                                : QuantityStepper(
+                                    value: qty,
+                                    max: maxPerOrder < available
+                                        ? maxPerOrder
+                                        : available,
+                                    onChanged: (next) => _setQuantity(
+                                      id,
+                                      next,
+                                      maxPerOrder,
+                                      available,
+                                    ),
                                   ),
                           ),
                         );

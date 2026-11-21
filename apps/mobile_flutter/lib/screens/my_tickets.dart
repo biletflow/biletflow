@@ -1,7 +1,10 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
+import '../core/format.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/empty_state.dart';
+import '../widgets/status_badge.dart';
 import 'ticket_detail.dart';
 
 class MyTicketsScreen extends StatefulWidget {
@@ -56,11 +59,18 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const LoadingState()
           : _error != null
-              ? Center(child: Text(l10n.apiError(_error!)))
+              ? ErrorState(
+                  message: l10n.apiError(_error!),
+                  onRetry: _load,
+                  retryLabel: l10n.refresh,
+                )
               : _tickets.isEmpty
-                  ? Center(child: Text(l10n.noTickets))
+                  ? EmptyState(
+                      icon: Icons.confirmation_number_outlined,
+                      title: l10n.noTickets,
+                    )
                   : ListView.separated(
                       padding: const EdgeInsets.all(16),
                       itemCount: _tickets.length,
@@ -73,7 +83,9 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
                         final title = event is Map
                             ? '${event['title'] ?? 'Event'}'
                             : 'Event';
-                        final when = event is Map ? '${event['startsAt'] ?? ''}' : '';
+                        final when = event is Map
+                            ? formatEventWhen(event['startsAt'])
+                            : '';
                         final id = '${ticket['id'] ?? ''}';
                         final ticketStatus = '${ticket['status'] ?? ''}';
                         return Card(
@@ -83,11 +95,19 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
                               [
                                 '${ticket['ticketTypeName'] ?? ''}',
                                 '${ticket['attendeeName'] ?? ''}',
-                                l10n.ticketStatus(ticketStatus),
                                 if (when.isNotEmpty) when,
                               ].where((part) => part.isNotEmpty).join(' · '),
                             ),
-                            trailing: const Icon(Icons.chevron_right),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                StatusBadge.ticket(
+                                  ticketStatus,
+                                  l10n.ticketStatus(ticketStatus),
+                                ),
+                                const Icon(Icons.chevron_right),
+                              ],
+                            ),
                             onTap: id.isEmpty
                                 ? null
                                 : () => Navigator.push(

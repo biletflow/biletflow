@@ -5,6 +5,8 @@ import 'l10n/app_localizations.dart';
 import 'l10n/locale_controller.dart';
 import 'screens/login.dart';
 import 'screens/home.dart';
+import 'theme/biletflow_theme.dart';
+import 'widgets/empty_state.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,17 +34,12 @@ class BiletFlowApp extends StatelessWidget {
             AppLocalizations.delegate,
             ...GlobalMaterialLocalizations.delegates,
           ],
-          theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff6950b7)),
-            scaffoldBackgroundColor: const Color(0xfff8f7fb),
-            inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder()),
-          ),
+          theme: biletFlowTheme(),
           home: ListenableBuilder(
             listenable: session,
             builder: (context, _) {
               if (session.loading) {
-                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                return const Scaffold(body: LoadingState());
               }
               return session.user == null
                   ? LoginScreen(session: session, locales: locales)

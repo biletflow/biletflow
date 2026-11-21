@@ -6,7 +6,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../core/api.dart';
+import '../core/format.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/status_badge.dart';
 
 class TicketDetailScreen extends StatefulWidget {
   final ApiClient api;
@@ -107,7 +109,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     final summary = widget.summary;
     final event = summary['event'];
     final title = event is Map ? '${event['title'] ?? 'Ticket'}' : 'Ticket';
-    final when = event is Map ? '${event['startsAt'] ?? ''}' : '';
+    final when = event is Map ? formatEventWhen(event['startsAt']) : '';
     final status = '${summary['status'] ?? ''}';
 
     return Scaffold(
@@ -120,7 +122,11 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
           Text('${summary['ticketTypeName'] ?? ''}'),
           Text('${summary['attendeeName'] ?? ''}'),
           if (when.isNotEmpty) Text(when),
-          Text(l10n.status(l10n.ticketStatus(status))),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: StatusBadge.ticket(status, l10n.ticketStatus(status)),
+          ),
           const SizedBox(height: 20),
           Text(l10n.admissionQr, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
