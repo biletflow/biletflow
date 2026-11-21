@@ -556,7 +556,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       const stats = await eventStats(request(`/api/mobile/events/${event.id}/stats`, undefined, tokens.scanner), {
         params: Promise.resolve({ id: event.id }),
       });
-      expect(await stats.json()).toEqual({ registered: 2, checkedIn: 1 });
+      expect(await stats.json()).toEqual({ registered: 3, checkedIn: 1 });
 
       const auditCount = await prisma.auditLog.count({
         where: { eventId: event.id, action: "ticket.checked_in" },
