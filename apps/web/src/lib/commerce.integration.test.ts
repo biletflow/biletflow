@@ -18,8 +18,13 @@ import { POST as publish } from "@/app/api/organizer/events/[id]/publish/route";
 import { GET as ticketTypes, POST as createTicketType } from "@/app/api/organizer/events/[id]/ticket-types/route";
 import { POST as createEvent } from "@/app/api/organizer/events/route";
 import { DELETE as deleteTicketType } from "@/app/api/organizer/ticket-types/[id]/route";
+import { GET as listPublicEvents } from "@/app/api/events/route";
+import { GET as getPublicEvent } from "@/app/api/events/[slug]/route";
 import { GET as listOrders, POST as createOrder } from "@/app/api/orders/route";
 import { POST as payOrder } from "@/app/api/orders/[id]/pay/route";
+import { POST as simulatePay } from "@/app/api/orders/[id]/pay/simulate/route";
+import { GET as listTickets } from "@/app/api/tickets/route";
+import { GET as ticketPdf } from "@/app/api/tickets/[id]/pdf/route";
 import { GET as ticketQr } from "@/app/api/tickets/[id]/qr.png/route";
 import { POST as webhook } from "@/app/api/payments/webhook/route";
 import { POST as mobileLogin } from "@/app/api/mobile/auth/login/route";
@@ -217,6 +222,24 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       expect(published.status).toBe(200);
       expect((await published.json()).event.status).toBe("PUBLISHED");
 
+      const catalog = await listPublicEvents(
+        request(`/api/events?query=${encodeURIComponent(suffix)}`),
+      );
+      expect(catalog.status).toBe(200);
+      const catalogBody = await catalog.json();
+      expect(catalogBody.events.map((row: { id: string }) => row.id)).toContain(event.id);
+      const detail = await getPublicEvent(request(`/api/events/${event.slug}`), {
+        params: Promise.resolve({ slug: event.slug }),
+      });
+      expect(detail.status).toBe(200);
+      expect((await detail.json()).event).toMatchObject({
+        id: event.id,
+        slug: event.slug,
+        ticketTypes: expect.arrayContaining([
+          expect.objectContaining({ id: freeType.id }),
+        ]),
+      });
+
       const timeline = await history(request(`/api/organizer/events/${event.id}/history`, undefined, tokens.organizer), {
         params: Promise.resolve({ id: event.id }),
       });
@@ -244,6 +267,13 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       expect(freeOrder.tickets[0].code).toMatch(/^BFT1\./);
 
       const ticketId = freeOrder.tickets[0].id as string;
+      const ownedTickets = await listTickets(
+        request("/api/tickets", undefined, tokens.attendee),
+      );
+      expect(ownedTickets.status).toBe(200);
+      expect(
+        ((await ownedTickets.json()).tickets as { id: string }[]).map((row) => row.id),
+      ).toContain(ticketId);
       const png = await ticketQr(
         request(`/api/tickets/${ticketId}/qr.png`, undefined, tokens.attendee),
         { params: Promise.resolve({ id: ticketId }) },
@@ -256,6 +286,14 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
           Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
         ),
       ).toBe(true);
+      const pdf = await ticketPdf(
+        request(`/api/tickets/${ticketId}/pdf`, undefined, tokens.attendee),
+        { params: Promise.resolve({ id: ticketId }) },
+      );
+      expect(pdf.status).toBe(200);
+      expect(pdf.headers.get("content-type")).toBe("application/pdf");
+      const pdfBytes = Buffer.from(await pdf.arrayBuffer());
+      expect(pdfBytes.subarray(0, 5).toString()).toBe("%PDF-");
       const denied = await ticketQr(
         request(`/api/tickets/${ticketId}/qr.png`, undefined, tokens.organizer),
         { params: Promise.resolve({ id: ticketId }) },
@@ -378,6 +416,27 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       const approved = await paidAttempt("APPROVED");
       await settle(approved.intentId, "APPROVED");
 
+      const mobilePaid = await createOrder(
+        request(
+          "/api/orders",
+          {
+            eventId: event.id,
+            items: [{ ticketTypeId: paidType.id, quantity: 1 }],
+            attendees: [{ fullName: "Mobile Dana", email: `mobile-${suffix}@commerce.test` }],
+            clientIdempotencyKey: randomUUID(),
+          },
+          tokens.attendee,
+        ),
+      );
+      expect(mobilePaid.status).toBe(201);
+      const mobileOrder = (await mobilePaid.json()).order;
+      const simulated = await simulatePay(
+        request(`/api/orders/${mobileOrder.id}/pay/simulate`, { outcome: "APPROVED" }, tokens.attendee),
+        { params: Promise.resolve({ id: mobileOrder.id }) },
+      );
+      expect(simulated.status).toBe(200);
+      expect((await simulated.json()).order.status).toBe("PAID");
+
       const orders = await listOrders(request("/api/orders", undefined, tokens.attendee));
       const mine = (await orders.json()).orders as { id: string; status: string; tickets: unknown[] }[];
       expect(mine.find((order) => order.id === declined.order.id)?.tickets).toHaveLength(0);
@@ -386,6 +445,8 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       expect(mine.find((order) => order.id === abandoned.order.id)?.status).toBe("CANCELLED");
       const paidTickets = mine.find((order) => order.id === approved.order.id)?.tickets as { code: string }[];
       expect(paidTickets).toHaveLength(1);
+      expect(mine.find((order) => order.id === mobileOrder.id)?.status).toBe("PAID");
+      expect(mine.find((order) => order.id === mobileOrder.id)?.tickets).toHaveLength(1);
 
       const counters = await ticketTypes(
         request(`/api/organizer/events/${event.id}/ticket-types`, undefined, tokens.organizer),
@@ -394,7 +455,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       const general = ((await counters.json()).ticketTypes as { id: string; sold: number; reserved: number }[]).find(
         (type) => type.id === paidType.id,
       );
-      expect(general).toMatchObject({ sold: 1, reserved: 0 });
+      expect(general).toMatchObject({ sold: 2, reserved: 0 });
 
       await prisma.staffAssignment.create({
         data: { eventId: event.id, userId: ids.scanner, role: "EVENT_ADMIN" },
