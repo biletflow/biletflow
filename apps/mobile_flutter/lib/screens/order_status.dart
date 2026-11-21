@@ -1,7 +1,10 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
+import '../core/format.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/empty_state.dart';
+import '../widgets/status_badge.dart';
 import 'ticket_detail.dart';
 
 class OrderStatusScreen extends StatefulWidget {
@@ -121,9 +124,13 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const LoadingState()
           : _error != null && order == null
-              ? Center(child: Text(l10n.apiError(_error!)))
+              ? ErrorState(
+                  message: l10n.apiError(_error!),
+                  onRetry: _load,
+                  retryLabel: l10n.refresh,
+                )
               : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
@@ -132,11 +139,16 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 8),
-                    Text(l10n.status(status)),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: StatusBadge.order(status, status),
+                    ),
                     if (total is num)
                       Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(l10n.totalLabel(l10n.money(total.round()))),
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          l10n.totalLabel(formatKzt(total, freeLabel: l10n.free)),
+                        ),
                       ),
                     if (_error != null)
                       Padding(
