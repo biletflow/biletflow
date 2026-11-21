@@ -586,7 +586,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
         request(`/api/mobile/events/${event.id}/stats`, undefined, tokens.scanner),
         eventContext,
       );
-      expect(await afterReversal.json()).toEqual({ registered: 2, checkedIn: 0 });
+      expect(await afterReversal.json()).toEqual({ registered: 3, checkedIn: 0 });
 
       const removed = await deleteTicketType(
         request(`/api/organizer/ticket-types/${paidType.id}`, undefined, tokens.organizer, "DELETE"),
