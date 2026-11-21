@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
+import '../l10n/app_localizations.dart';
 import 'ticket_detail.dart';
 
 class OrderStatusScreen extends StatefulWidget {
@@ -100,6 +101,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final order = _order;
     final status = '${order?['status'] ?? ''}';
     final reference = '${order?['reference'] ?? ''}';
@@ -109,10 +111,10 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Order'),
+        title: Text(l10n.order),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: l10n.refresh,
             onPressed: _busy ? null : _load,
             icon: const Icon(Icons.refresh),
           ),
@@ -121,72 +123,73 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null && order == null
-              ? Center(child: Text(_error!))
+              ? Center(child: Text(l10n.apiError(_error!)))
               : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
                     Text(
-                      reference.isEmpty ? 'Order' : reference,
+                      reference.isEmpty ? l10n.order : reference,
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 8),
-                    Text('Status: $status'),
+                    Text(l10n.status(status)),
                     if (total is num)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text(total == 0 ? 'Total: Free' : 'Total: ₸${total.round()}'),
+                        child: Text(l10n.totalLabel(l10n.money(total.round()))),
                       ),
                     if (_error != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
-                          _error!,
+                          l10n.apiError(_error!),
                           style: TextStyle(color: Theme.of(context).colorScheme.error),
                         ),
                       ),
                     if (awaiting) ...[
                       const SizedBox(height: 16),
                       Text(
-                        'Simulated payment — no real money moves.',
+                        l10n.simulatedPayment,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       const SizedBox(height: 8),
                       FilledButton(
                         onPressed: _busy ? null : () => _simulate('APPROVED'),
-                        child: const Text('Approve payment'),
+                        child: Text(l10n.approvePayment),
                       ),
                       const SizedBox(height: 8),
                       OutlinedButton(
                         onPressed: _busy ? null : () => _simulate('DECLINED'),
-                        child: const Text('Decline'),
+                        child: Text(l10n.decline),
                       ),
                       const SizedBox(height: 8),
                       OutlinedButton(
                         onPressed: _busy ? null : () => _simulate('ABANDONED'),
-                        child: const Text('Abandon'),
+                        child: Text(l10n.abandon),
                       ),
                       const SizedBox(height: 8),
                       TextButton(
                         onPressed: _busy ? null : _cancel,
-                        child: const Text('Cancel reservation'),
+                        child: Text(l10n.cancelReservation),
                       ),
                     ],
                     if (status == 'PAID') ...[
                       const SizedBox(height: 16),
-                      Text('Payment succeeded. Tickets are ready.',
+                      Text(l10n.paymentSucceeded,
                           style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 8),
                       if (tickets is List)
                         ...tickets.whereType<Map>().map((raw) {
                           final ticket = Map<String, dynamic>.from(raw);
                           final id = '${ticket['id'] ?? ''}';
+                          final ticketStatus = '${ticket['status'] ?? ''}';
                           return Card(
                             child: ListTile(
                               title: Text('${ticket['ticketTypeName'] ?? 'Ticket'}'),
                               subtitle: Text(
                                 [
                                   '${ticket['attendeeName'] ?? ''}',
-                                  '${ticket['status'] ?? ''}',
+                                  l10n.ticketStatus(ticketStatus),
                                 ].where((part) => part.isNotEmpty).join(' · '),
                               ),
                               trailing: id.isEmpty ? null : const Icon(Icons.chevron_right),
@@ -204,7 +207,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                                               'attendeeName': ticket['attendeeName'],
                                               'status': ticket['status'],
                                               'event': {
-                                                'title': 'Order ${order?['reference'] ?? ''}',
+                                                'title': '${l10n.order} ${order?['reference'] ?? ''}',
                                               },
                                             },
                                           ),
@@ -219,9 +222,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                         status == 'FAILED') ...[
                       const SizedBox(height: 16),
                       Text(
-                        status == 'EXPIRED'
-                            ? 'Checkout hold expired. No ticket was issued.'
-                            : 'Order closed without tickets.',
+                        status == 'EXPIRED' ? l10n.holdExpired : l10n.orderClosed,
                       ),
                     ],
                   ],
