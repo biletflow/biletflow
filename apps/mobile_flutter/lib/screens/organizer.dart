@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import '../core/api.dart';
+import 'organizer_reports.dart';
 
 class OrganizerScreen extends StatefulWidget {
   final ApiClient api;
@@ -53,6 +54,12 @@ class _EventScreenState extends State<EventScreen> {
     return ListView(padding: const EdgeInsets.all(16), children: [
       Text('${event['title'] ?? ''}', style: Theme.of(context).textTheme.headlineSmall),
       Text('${event['status'] ?? ''}'), const SizedBox(height: 12), Text('${event['description'] ?? ''}'),
+      OutlinedButton(
+        onPressed: () => Navigator.push(context, MaterialPageRoute(
+          builder: (_) => OrganizerReports(api: widget.api, eventId: widget.id),
+        )),
+        child: const Text('Attendance and campaigns'),
+      ),
       const SizedBox(height: 20), const Text('Ticket types'),
       if (types is List) for (final type in types) if (type is Map) Card(child: ListTile(title: Text('${type['name']}'), subtitle: Text('${type['sold']} sold · ${type['available']} available'), trailing: Text('${type['priceKzt']} KZT'))),
     ]);
