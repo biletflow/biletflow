@@ -8,6 +8,7 @@ import {
 import type { z } from "zod";
 
 import { ApiError } from "./api-error";
+import { notifySupportMessage } from "./notifications";
 
 type SessionUser = {
   id: string;
@@ -321,7 +322,20 @@ export async function postSupportMessage(
     }),
   ]);
 
-  return getSupportCaseOrThrow(user, caseId);
+  const updated = await getSupportCaseOrThrow(user, caseId);
+  const latest = updated.messages[updated.messages.length - 1];
+  const recipientId =
+    user.id === updated.requester.id ? updated.assignee?.id : updated.requester.id;
+  if (latest && recipientId && recipientId !== user.id) {
+    await notifySupportMessage({
+      recipientId,
+      caseId: updated.id,
+      messageId: latest.id,
+      reference: updated.reference,
+      subject: updated.subject,
+    });
+  }
+  return updated;
 }
 
 export async function updateSupportStatus(
