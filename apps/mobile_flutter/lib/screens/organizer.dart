@@ -24,7 +24,9 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
   }
 
   void refresh() {
-    setState(() => events = widget.api.get('/api/organizer/events'));
+    setState(() {
+      events = widget.api.get('/api/organizer/events');
+    });
   }
 
   @override
@@ -144,7 +146,9 @@ class _EventScreenState extends State<EventScreen> {
           final event = snapshot.data?['event'];
           if (snapshot.hasError || event is! Map<String, dynamic>) {
             return _organizerError(l10n, snapshot.error, () {
-              setState(() => eventFuture = loadEvent());
+              setState(() {
+                eventFuture = loadEvent();
+              });
             });
           }
           final types = event['ticketTypes'];
