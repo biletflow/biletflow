@@ -30,6 +30,7 @@ import { POST as webhook } from "@/app/api/payments/webhook/route";
 import { POST as mobileLogin } from "@/app/api/mobile/auth/login/route";
 import { GET as sandboxGet, POST as sandboxPost } from "@/app/sandbox/pay/[intentId]/route";
 import { signWebhookBody } from "@/lib/payments-signature";
+import { maybeActivate } from "@/lib/activation";
 
 // Team demo (#88) and the commerce routes behind it. Opt in with a migrated
 // database: RUN_AUTH_INTEGRATION=1. Never point this at production.
@@ -142,6 +143,8 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
         where: { OR: [{ eventId: { in: eventIds } }, { actorUserId: { in: userIds } }] },
       });
       await prisma.event.deleteMany({ where: { id: { in: eventIds } } });
+      await prisma.payoutAccount.deleteMany({ where: { organizerProfile: { userId: { in: userIds } } } });
+      await prisma.organizerProfile.deleteMany({ where: { userId: { in: userIds } } });
       await prisma.session.deleteMany({ where: { userId: { in: userIds } } });
       await prisma.account.deleteMany({ where: { userId: { in: userIds } } });
       await prisma.user.deleteMany({ where: { id: { in: userIds } } });
@@ -383,7 +386,37 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
         request(`/api/organizer/events/${event.id}/activation`, undefined, tokens.organizer),
         { params: Promise.resolve({ id: event.id }) },
       );
-      expect((await afterFee.json()).activation.activated).toBe(true);
+      expect((await afterFee.json()).activation.activated).toBe(false);
+      const organizerProfile = await prisma.organizerProfile.create({
+        data: {
+          userId: ids.organizer,
+          displayName: "Commerce organizer",
+          contactEmail: emails.organizer,
+        },
+      });
+      await prisma.payoutAccount.create({
+        data: {
+          organizerProfileId: organizerProfile.id,
+          holderName: "Commerce organizer",
+          bankName: "Test bank",
+          ibanLast4: "1234",
+          isDefault: true,
+        },
+      });
+      const completedActivation = await activation(
+        request(`/api/organizer/events/${event.id}/activation`, undefined, tokens.organizer),
+        { params: Promise.resolve({ id: event.id }) },
+      );
+      expect((await completedActivation.json()).activation.activated).toBe(false);
+      await prisma.$transaction(async (tx) => {
+        const updated = await tx.paidSalesActivation.findUniqueOrThrow({ where: { eventId: event.id } });
+        await maybeActivate(tx, updated);
+      });
+      const nowActive = await activation(
+        request(`/api/organizer/events/${event.id}/activation`, undefined, tokens.organizer),
+        { params: Promise.resolve({ id: event.id }) },
+      );
+      expect((await nowActive.json()).activation.activated).toBe(true);
 
       async function paidAttempt(outcome?: "APPROVED" | "DECLINED" | "ABANDONED") {
         const response = await createOrder(
