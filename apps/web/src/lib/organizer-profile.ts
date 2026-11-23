@@ -1,4 +1,5 @@
 import { prisma } from "@biletflow/db";
+import { maybeActivate } from "./activation";
 import {
   organizerProfileSchema,
   payoutAccountSchema,
@@ -216,6 +217,12 @@ export async function createPayoutAccount(
       metadata: { bankName: created.bankName, ibanLast4: created.ibanLast4 },
       ipAddress: clientIp(headers),
     });
+    const eligible = await tx.paidSalesActivation.findMany({
+      where: { organizerId: user.id, feePaid: true, identityVerified: true, activatedAt: null },
+    });
+    for (const activation of eligible) {
+      await maybeActivate(tx, activation);
+    }
     return created;
   });
 

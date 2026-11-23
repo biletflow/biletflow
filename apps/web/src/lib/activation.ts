@@ -96,6 +96,7 @@ export async function acceptActivationTerms(
       description: "Organizer accepted paid-sales terms",
       ipAddress: clientIp(headers),
     });
+    await maybeActivate(tx, row);
     return row;
   });
   return presentActivation(updated.eventId, updated.organizerId);
@@ -211,6 +212,16 @@ export async function maybeActivate(
   },
 ) {
   if (!activation.feePaid || !activation.identityVerified) return;
+  const [current, accountCount] = await Promise.all([
+    tx.paidSalesActivation.findUnique({
+      where: { id: activation.id },
+      select: { termsAcceptedAt: true, activatedAt: true },
+    }),
+    tx.payoutAccount.count({
+      where: { organizerProfile: { userId: activation.organizerId } },
+    }),
+  ]);
+  if (!current?.termsAcceptedAt || accountCount === 0 || current.activatedAt) return;
   if (!activation.activatedAt) {
     await tx.paidSalesActivation.update({
       where: { id: activation.id },
