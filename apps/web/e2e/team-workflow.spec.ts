@@ -27,6 +27,32 @@ const messages = Object.fromEntries(
   ]),
 );
 
+function scannerFor(request: import("@playwright/test").APIRequestContext) {
+  // Node fetch adds browser metadata without an Origin. Expo's native transport
+  // does not. Use the API transport to preserve native requests and CSRF checks.
+  const nativeFetch: typeof fetch = async (input, init) => {
+    const response = await request.fetch(
+      input instanceof Request ? input.url : String(input),
+      {
+        method: init?.method,
+        headers: Object.fromEntries(new Headers(init?.headers).entries()),
+        data: init?.body ? String(init.body) : undefined,
+      },
+    );
+    return new Response(await response.text(), {
+      status: response.status(),
+      headers: response.headers(),
+    });
+  };
+  const device = {
+    token: null as string | null,
+    async getItemAsync() { return this.token; },
+    async setItemAsync(_key: string, token: string) { this.token = token; },
+    async deleteItemAsync() { this.token = null; },
+  };
+  return createScannerAuth(device, "http://localhost:3000", nativeFetch);
+}
+
 async function login(page: Page, email: string, value = password!) {
   await page.goto("/en/sign-in");
   await page.getByLabel("Email", { exact: true }).fill(email);
@@ -222,52 +248,15 @@ test("expiring a session returns the browser to anonymous access", async ({
   await expect(page).toHaveURL(/\/en\/sign-in$/);
 });
 
-test("both seeded scanner accounts work through the running Next.js API", async ({
-  request,
-}) => {
-  // Node fetch adds browser metadata without an Origin. Expo's native transport
-  // does not. Use the API transport to preserve native requests and CSRF checks.
-  const nativeFetch: typeof fetch = async (input, init) => {
-    const response = await request.fetch(
-      input instanceof Request ? input.url : String(input),
-      {
-        method: init?.method,
-        headers: Object.fromEntries(new Headers(init?.headers).entries()),
-        data: init?.body ? String(init.body) : undefined,
-      },
-    );
-    return new Response(await response.text(), {
-      status: response.status(),
-      headers: response.headers(),
-    });
-  };
+test("both seeded scanner accounts work through the running Next.js API", async ({ request }) => {
   for (const email of ["scanner@biletflow.kz", "scanner2@biletflow.kz"]) {
-    const device = {
-      token: null as string | null,
-      async getItemAsync() {
-        return this.token;
-      },
-      async setItemAsync(_key: string, token: string) {
-        this.token = token;
-      },
-      async deleteItemAsync() {
-        this.token = null;
-      },
-    };
-    const scanner = createScannerAuth(
-      device,
-      "http://localhost:3000",
-      nativeFetch,
-    );
+    const scanner = scannerFor(request);
     await scanner.login(email, password!);
-    expect(scanner.getSnapshot()).toMatchObject({
-      phase: "ready",
-      user: { email },
-    });
+    expect(scanner.getSnapshot()).toMatchObject({ phase: "ready", user: { email } });
     await scanner.restore();
     expect(scanner.getSnapshot().phase).toBe("ready");
     await scanner.logout();
-    expect(device.token).toBeNull();
+    expect(scanner.getSnapshot().phase).toBe("signedOut");
   }
 });
 
@@ -368,35 +357,50 @@ test("abandoned paid checkout leaves the attendee without a ticket", async ({ pa
   expect(await prisma.ticket.count({ where: { order: { userId: user.id } } })).toBe(0);
 });
 
-test("free admission can only be checked in once", async ({ page, browser }) => {
-  const email = await signup(page);
-  await page.goto("/en/events/kbtu-freshers-welcome");
-  await page.getByRole("link", { name: messages.en.event.register, exact: true }).click();
-  await page.getByRole("button", { name: messages.en.checkout.submitFree, exact: true }).click();
-  await expect(page).toHaveURL(/\/en\/tickets/);
-
-  const user = await prisma.user.findUniqueOrThrow({ where: { email } });
-  const ticket = await prisma.ticket.findFirstOrThrow({
-    where: { order: { userId: user.id } },
-    select: { code: true, eventId: true },
-  });
-  const adminPage = await browser.newPage();
-  try {
-    await login(adminPage, "admin@biletflow.kz");
-    await expect(adminPage).toHaveURL(/\/en\/admin$/);
-    const checkIn = (payload: string) => adminPage.request.post("/api/checkin", {
-      data: { eventId: ticket.eventId, payload },
+for (const kind of ["free", "paid"] as const) {
+  test(`${kind} browser checkout reaches assigned scanner exactly once`, async ({ page, request }) => {
+    const email = await signup(page);
+    const slug = kind === "free" ? "kbtu-freshers-welcome" : "almaty-jazz-night";
+    await page.goto(`/en/events/${slug}`);
+    await page.getByRole("link", {
+      name: kind === "free" ? messages.en.event.register : messages.en.event.buyTickets,
+      exact: true,
+    }).click();
+    await page.getByRole("button", {
+      name: kind === "free" ? messages.en.checkout.submitFree : messages.en.checkout.submitPaid,
+      exact: true,
+    }).click();
+    if (kind === "paid") {
+      await expect(page).toHaveURL(/\/sandbox\/pay\//);
+      await page.getByRole("button", { name: "Approve", exact: true }).click();
+      await page.getByRole("link", { name: "View tickets" }).click();
+    }
+    await expect(page).toHaveURL(/\/en\/tickets/);
+    const user = await prisma.user.findUniqueOrThrow({ where: { email } });
+    const ticket = await prisma.ticket.findFirstOrThrow({
+      where: { order: { userId: user.id } },
+      select: { id: true, code: true, eventId: true },
     });
-    const first = await checkIn(ticket.code);
-    expect(first.status()).toBe(200);
-    expect((await first.json()).result).toBe("VALID");
-    const second = await checkIn(ticket.code);
-    expect(second.status()).toBe(200);
-    expect((await second.json()).result).toBe("ALREADY_CHECKED_IN");
-    const notATicket = await checkIn("not-an-admission-ticket");
-    expect(notATicket.status()).toBe(200);
-    expect((await notATicket.json()).result).toBe("NOT_A_TICKET");
-  } finally {
-    await adminPage.close();
-  }
-});
+    const scanner = scannerFor(request);
+    await scanner.login("scanner@biletflow.kz", password!);
+    expect(scanner.getSnapshot().phase).toBe("ready");
+    try {
+      const events = await scanner.getEvents();
+      expect(events.map((event) => event.id)).toContain(ticket.eventId);
+      const other = events.find((event) => event.id !== ticket.eventId);
+      expect(other).toBeDefined();
+      expect((await scanner.submitScan(other!.id, ticket.code)).result).toBe("WRONG_EVENT");
+      expect((await scanner.submitScan(ticket.eventId, "not-an-admission-ticket")).result).toBe("NOT_A_TICKET");
+      expect(await prisma.checkInRecord.count({ where: { ticketId: ticket.id } })).toBe(0);
+      const admitted = await scanner.submitScan(ticket.eventId, ticket.code);
+      expect(admitted.result).toBe("VALID");
+      expect(admitted.ticket?.id).toBe(ticket.id);
+      expect((await scanner.submitScan(ticket.eventId, ticket.code)).result).toBe("ALREADY_CHECKED_IN");
+      expect(await prisma.checkInRecord.count({ where: { ticketId: ticket.id } })).toBe(1);
+      const stored = await prisma.ticket.findUniqueOrThrow({ where: { id: ticket.id } });
+      expect(stored.status).toBe("CHECKED_IN");
+    } finally {
+      await scanner.logout();
+    }
+  });
+}
