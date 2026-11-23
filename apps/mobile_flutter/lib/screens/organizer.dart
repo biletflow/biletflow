@@ -55,8 +55,9 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
     events = widget.api.get('/api/organizer/events');
   }
 
-  void refresh() =>
-      setState(() => events = widget.api.get('/api/organizer/events'));
+  void refresh() => setState(() {
+    events = widget.api.get('/api/organizer/events');
+  });
   Future<void> createEvent() async {
     final starts = DateTime.now().toUtc().add(const Duration(days: 1));
     final saved = await Navigator.push<bool>(
@@ -150,7 +151,9 @@ class _EventScreenState extends State<EventScreen> {
   bool changing = false;
   String get path => '/api/organizer/events/${Uri.encodeComponent(widget.id)}';
 
-  void reload() => setState(() => eventFuture = widget.api.get(path));
+  void reload() => setState(() {
+    eventFuture = widget.api.get(path);
+  });
 
   Future<void> editEvent(Map event) async {
     final saved = await Navigator.push<bool>(
