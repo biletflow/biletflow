@@ -1,4 +1,3 @@
-import 'support.dart';
 import 'package:material_ui/material_ui.dart';
 import '../core/session.dart';
 import '../l10n/app_localizations.dart';
@@ -80,15 +79,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.support_agent),
-              title: const Text('Support'),
-              onTap: () => Navigator.push(context, MaterialPageRoute(
-                builder: (_) => SupportScreen(api: session.api),
-              )),
-            ),
-          ),
           if (session.canScan)
             Card(
               child: ListTile(
