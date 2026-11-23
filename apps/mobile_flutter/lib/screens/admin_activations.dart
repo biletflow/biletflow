@@ -17,7 +17,9 @@ class _AdminActivationsState extends State<AdminActivations> {
   late var queue = widget.api.get(path);
   bool reviewing = false;
 
-  void reload() => setState(() => queue = widget.api.get(path));
+  void reload() => setState(() {
+    queue = widget.api.get(path);
+  });
 
   Future<void> review(String id, String decision) async {
     if (reviewing) return;
