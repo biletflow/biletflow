@@ -104,8 +104,9 @@ class _CampaignReportState extends State<_CampaignReport> {
             SelectableText(code),
           _ReportResult(
             data: report,
-            retry: () =>
-                setState(() => report = widget.api.get('$path/report')),
+            retry: () => setState(() {
+              report = widget.api.get('$path/report');
+            }),
             content: (result) {
               final row = result['report'] as Map;
               return Column(
@@ -146,7 +147,9 @@ class _CampaignReportState extends State<_CampaignReport> {
                 return _reportError(
                   context,
                   snapshot.error,
-                  () => setState(() => qr = loadQr()),
+                  () => setState(() {
+                    qr = loadQr();
+                  }),
                 );
               }
               return Image.memory(

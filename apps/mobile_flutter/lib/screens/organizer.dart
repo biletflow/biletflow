@@ -13,7 +13,11 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
   late Future<Map<String, dynamic>> events;
   @override
   void initState() { super.initState(); events = widget.api.get('/api/organizer/events'); }
-  void refresh() => setState(() => events = widget.api.get('/api/organizer/events'));
+  void refresh() {
+    setState(() {
+      events = widget.api.get('/api/organizer/events');
+    });
+  }
   @override
   Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('My events'), actions: [IconButton(onPressed: refresh, icon: const Icon(Icons.refresh))]), body: FutureBuilder(future: events, builder: (context, snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
