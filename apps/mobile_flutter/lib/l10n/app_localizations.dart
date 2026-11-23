@@ -83,6 +83,8 @@ class AppLocalizations {
       'decline': 'Decline',
       'abandon': 'Abandon',
       'cancelReservation': 'Cancel reservation',
+      'refundOrder': 'Refund order',
+      'refundConfirmation': 'All tickets in this order will be invalidated. Continue with the refund?',
       'paymentSucceeded': 'Payment succeeded. Tickets are ready.',
       'holdExpired': 'Checkout hold expired. No ticket was issued.',
       'orderClosed': 'Order closed without tickets.',
@@ -175,6 +177,8 @@ class AppLocalizations {
       'decline': 'Отклонить',
       'abandon': 'Отменить',
       'cancelReservation': 'Отменить бронь',
+      'refundOrder': 'Вернуть заказ',
+      'refundConfirmation': 'Все билеты в заказе станут недействительными. Продолжить возврат?',
       'paymentSucceeded': 'Оплата прошла. Билеты готовы.',
       'holdExpired': 'Время брони истекло. Билет не выдан.',
       'orderClosed': 'Заказ закрыт без билетов.',
@@ -267,6 +271,8 @@ class AppLocalizations {
       'decline': 'Қабылдамау',
       'abandon': 'Бас тарту',
       'cancelReservation': 'Бронды болдырмау',
+      'refundOrder': 'Тапсырысты қайтару',
+      'refundConfirmation': 'Тапсырыстағы барлық билет жарамсыз болады. Қайтаруды жалғастырасыз ба?',
       'paymentSucceeded': 'Төлем өтті. Билеттер дайын.',
       'holdExpired': 'Брондау уақыты бітті. Билет берілген жоқ.',
       'orderClosed': 'Тапсырыс билетсіз жабылды.',
@@ -368,6 +374,8 @@ class AppLocalizations {
   String get working => _t('working');
   String get checkoutNote => _t('checkoutNote');
   String get order => _t('order');
+  String get refundOrder => _t('refundOrder');
+  String get refundConfirmation => _t('refundConfirmation');
   String get refresh => _t('refresh');
   String status(String value) => _fmt('status', {'status': value});
   String totalLabel(String amount) => _fmt('totalLabel', {'amount': amount});
