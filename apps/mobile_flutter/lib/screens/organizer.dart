@@ -217,6 +217,48 @@ class _EventScreenState extends State<EventScreen> {
     if (mounted && saved == true) reload();
   }
 
+  Future<void> deleteTicket(String id) async {
+    if (changing) return;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete ticket type?'),
+        content: const Text(
+          'Only ticket types without issued tickets or reservations can be deleted.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Back'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirm != true || changing) return;
+    setState(() => changing = true);
+    try {
+      await widget.api.request(
+        'DELETE',
+        '/api/organizer/ticket-types/${Uri.encodeComponent(id)}',
+      );
+      if (mounted) reload();
+    } catch (error) {
+      if (!mounted) return;
+      final message = error is ApiException && error.status == 409
+          ? 'This ticket type has tickets or reservations. Hide it from sales instead.'
+          : AppLocalizations.of(context)
+                .apiError(error is ApiException ? error.code : '');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (mounted) setState(() => changing = false);
+    }
+  }
+
   Future<void> eventAction(String action) async {
     if (changing) return;
     if (action == 'cancel') {
@@ -338,14 +380,23 @@ class _EventScreenState extends State<EventScreen> {
                 if (type is Map)
                   Card(
                     child: ListTile(
-                      title: Text('${type['name']}'),
+                      title: Text('${type['name']} · ${type['priceKzt']} KZT'),
                       onTap: editable && !changing
                           ? () => editTicket(type)
                           : null,
                       subtitle: Text(
-                        '${type['sold']} sold · ${type['available']} available',
+                        '${type['sold']} sold · ${type['available']} available'
+                        '${type['isHidden'] == true ? ' · Hidden' : ''}',
                       ),
-                      trailing: Text('${type['priceKzt']} KZT'),
+                      trailing: editable && type['id'] is String
+                          ? IconButton(
+                              tooltip: 'Delete ticket type',
+                              onPressed: changing
+                                  ? null
+                                  : () => deleteTicket(type['id'] as String),
+                              icon: const Icon(Icons.delete_outline),
+                            )
+                          : null,
                     ),
                   ),
           ],
