@@ -45,46 +45,35 @@ class Session extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
-    final token = api.token;
-    final profile = await _fetchProfile();
-    if (api.token != token) return;
-    user = profile;
-    notifyListeners();
-  }
-
-  Future<Map<String, dynamic>> _fetchProfile() async {
     final result = await api.get('/api/me');
     final value = result['user'];
     if (value is! Map<String, dynamic>) {
       throw const ApiException(500, 'INVALID_USER_RESPONSE');
     }
-    return value;
+    user = value;
+    notifyListeners();
   }
 
   Future<void> login(String email, String password) async {
     api.token = null;
     error = null;
-    final Map<String, dynamic> response;
-    try {
-      response = await api.post('/api/mobile/auth/login', {
-        'email': email,
-        'password': password,
-      });
-    } on ApiException catch (e) {
-      if (e.status == 401 && e.code == 'UNAUTHENTICATED') {
-        throw const ApiException(401, 'INVALID_CREDENTIALS');
-      }
-      rethrow;
-    }
+    final response = await api.post('/api/mobile/auth/login', {
+      'email': email,
+      'password': password,
+    });
     final token = response['token'];
     if (token is! String || token.isEmpty) {
       throw const ApiException(500, 'MISSING_SESSION_TOKEN');
     }
     api.token = token;
     try {
-      final profile = await _fetchProfile();
+      final result = await api.get('/api/me');
+      final value = result['user'];
+      if (value is! Map<String, dynamic>) {
+        throw const ApiException(500, 'INVALID_USER_RESPONSE');
+      }
       await storage.write(key: _key, value: token);
-      user = profile;
+      user = value;
       notifyListeners();
     } catch (_) {
       api.token = null;
