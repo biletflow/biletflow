@@ -74,6 +74,7 @@ export async function listTicketsForUser(userId: string) {
     orderBy: { issuedAt: "desc" },
     select: {
       id: true,
+      orderId: true,
       status: true,
       issuedAt: true,
       attendee: { select: { fullName: true, email: true } },

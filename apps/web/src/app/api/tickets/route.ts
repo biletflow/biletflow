@@ -10,6 +10,7 @@ function presentTicket(
 ) {
   return {
     id: ticket.id,
+    orderId: ticket.orderId,
     status: ticket.status,
     issuedAt: ticket.issuedAt.toISOString(),
     attendeeName: ticket.attendee.fullName,
