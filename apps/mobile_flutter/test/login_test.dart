@@ -14,6 +14,32 @@ Widget app(Session session, {LocaleController? locales}) =>
     BiletFlowApp(session: session, locales: locales ?? LocaleController());
 
 void main() {
+  test('a pending profile refresh cannot restore a signed-out user', () async {
+    FlutterSecureStorage.setMockInitialValues({});
+    final response = Completer<http.Response>();
+    final api = ApiClient(
+      'https://example.test',
+      client: MockClient((request) async {
+        if (request.url.path == '/api/me') return response.future;
+        expect(request.url.path, '/api/auth/sign-out');
+        return http.Response('{}', 200);
+      }),
+    )..token = 'old-token';
+    final session = Session(api)
+      ..loading = false
+      ..user = {'role': 'ATTENDEE'};
+    addTearDown(api.close);
+    addTearDown(session.dispose);
+
+    final refresh = session.refresh();
+    await session.logout();
+    response.complete(http.Response('{"user":{"role":"ATTENDEE"}}', 200));
+    await refresh;
+
+    expect(session.user, isNull);
+    expect(api.token, isNull);
+  });
+
   testWidgets('shows a loading indicator while restoring the session', (
     tester,
   ) async {
@@ -53,7 +79,7 @@ void main() {
     expect(tester.widget<FilledButton>(button).onPressed, isNull);
 
     response.complete(
-      http.Response('{"error":{"code":"INVALID_CREDENTIALS"}}', 401),
+      http.Response('{"error":{"code":"UNAUTHENTICATED"}}', 401),
     );
     await tester.pumpAndSettle();
 
