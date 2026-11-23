@@ -56,13 +56,22 @@ class _OrganizerReportsState extends State<OrganizerReports> {
                       '${row['status']} · ${row['redeemed']} redemptions',
                     ),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            _CampaignReport(api: widget.api, campaign: row),
-                      ),
-                    ),
+                    onTap: () async {
+                      final changed = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              _CampaignReport(api: widget.api, campaign: row),
+                        ),
+                      );
+                      if (mounted && changed == true) {
+                        setState(() {
+                          campaigns = widget.api.get(
+                            '/api/organizer/events/$id/campaigns',
+                          );
+                        });
+                      }
+                    },
                   ),
               ],
             );
@@ -88,6 +97,33 @@ class _CampaignReportState extends State<_CampaignReport> {
   late var report = widget.api.get('$path/report');
   late var qr = loadQr();
 
+  late final campaign = widget.campaign;
+  bool saving = false;
+
+  Future<void> editCampaign() async {
+    final update = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => _EditCampaign(campaign: campaign),
+    );
+    if (!mounted || update == null || saving) return;
+    setState(() => saving = true);
+    try {
+      final result = await widget.api.put(path, update);
+      if (!mounted) return;
+      final updated = result['campaign'];
+      if (updated is! Map<String, dynamic>) throw const FormatException();
+      Navigator.pop(context, true);
+    } catch (error) {
+      if (!mounted) return;
+      final message = AppLocalizations.of(context)
+          .apiError(error is ApiException ? error.code : '');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (mounted) setState(() => saving = false);
+    }
+  }
+
   Future<Uint8List> loadQr() async => Uint8List.fromList(
     await widget.api.getBytes('$path/qr.png', accept: 'image/png'),
   );
@@ -96,7 +132,16 @@ class _CampaignReportState extends State<_CampaignReport> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('${widget.campaign['name']}')),
+      appBar: AppBar(
+        title: Text('${campaign['name']}'),
+        actions: [
+          IconButton(
+            onPressed: saving ? null : editCampaign,
+            tooltip: 'Edit campaign',
+            icon: const Icon(Icons.edit),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -163,6 +208,70 @@ class _CampaignReportState extends State<_CampaignReport> {
       ),
     );
   }
+}
+
+class _EditCampaign extends StatefulWidget {
+  const _EditCampaign({required this.campaign});
+  final Map<String, dynamic> campaign;
+
+  @override
+  State<_EditCampaign> createState() => _EditCampaignState();
+}
+
+class _EditCampaignState extends State<_EditCampaign> {
+  final form = GlobalKey<FormState>();
+  late final name = TextEditingController(
+    text: widget.campaign['name'] as String,
+  );
+  late bool active = widget.campaign['status'] == 'ACTIVE';
+
+  @override
+  void dispose() {
+    name.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Edit campaign'),
+    content: Form(
+      key: form,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextFormField(
+            controller: name,
+            decoration: const InputDecoration(labelText: 'Campaign name'),
+            maxLength: 120,
+            validator: (value) => (value?.trim().length ?? 0) < 2
+                ? 'Enter at least 2 characters'
+                : null,
+          ),
+          SwitchListTile(
+            title: const Text('Active'),
+            value: active,
+            onChanged: (value) => setState(() => active = value),
+          ),
+        ],
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Cancel'),
+      ),
+      FilledButton(
+        onPressed: () {
+          if (!form.currentState!.validate()) return;
+          Navigator.pop(context, <String, dynamic>{
+            'name': name.text.trim(),
+            'status': active ? 'ACTIVE' : 'DISABLED',
+          });
+        },
+        child: const Text('Save'),
+      ),
+    ],
+  );
 }
 
 class _ReportResult extends StatelessWidget {
