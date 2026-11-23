@@ -1,3 +1,4 @@
+import 'support.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
@@ -186,6 +187,18 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                       ),
                     ],
                     if (status == 'PAID') ...[
+                      OutlinedButton(
+                        onPressed: () async {
+                          final id = await Navigator.push<String>(context, MaterialPageRoute(
+                            builder: (_) => SupportComposer(api: widget.api, orderId: widget.orderId),
+                          ));
+                          if (!context.mounted || id == null) return;
+                          await Navigator.push<void>(context, MaterialPageRoute(
+                            builder: (_) => SupportThread(api: widget.api, id: id),
+                          ));
+                        },
+                        child: const Text('Ask about a refund'),
+                      ),
                       const SizedBox(height: 16),
                       Text(l10n.paymentSucceeded,
                           style: Theme.of(context).textTheme.titleMedium),

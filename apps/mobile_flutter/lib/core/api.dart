@@ -63,10 +63,14 @@ class ApiClient {
       for (final entry in query.entries)
         if (entry.value.isNotEmpty) entry.key: entry.value,
     };
-    final suffix = params.isEmpty
-        ? ''
-        : '?${Uri(queryParameters: params).query}';
-    return request('GET', '$path$suffix');
+    if (params.isEmpty) return request('GET', path);
+    final uri = Uri.parse(path);
+    return request(
+      'GET',
+      uri
+          .replace(queryParameters: {...uri.queryParametersAll, ...params})
+          .toString(),
+    );
   }
 
   Future<Map<String, dynamic>> post(String path, Map<String, dynamic> body) =>
