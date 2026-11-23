@@ -17,7 +17,9 @@ class SupportScreen extends StatefulWidget {
 class _SupportScreenState extends State<SupportScreen> {
   late var cases = widget.api.get(_casesPath);
 
-  void reload() => setState(() => cases = widget.api.get(_casesPath));
+  void reload() => setState(() {
+    cases = widget.api.get(_casesPath);
+  });
 
   Future<void> openCase(String id) async {
     await Navigator.push<void>(
@@ -183,7 +185,9 @@ class _SupportThreadState extends State<SupportThread> {
   bool sending = false;
   String? error;
 
-  void reload() => setState(() => thread = widget.api.get(path));
+  void reload() => setState(() {
+    thread = widget.api.get(path);
+  });
 
   @override
   void dispose() {
@@ -202,7 +206,9 @@ class _SupportThreadState extends State<SupportThread> {
       final updated = await widget.api.post('$path/messages', {'body': body});
       if (!mounted) return;
       reply.clear();
-      setState(() => thread = Future.value(updated));
+      setState(() {
+        thread = Future.value(updated);
+      });
     } catch (failure) {
       if (mounted) setState(() => error = _error(context, failure));
     } finally {
