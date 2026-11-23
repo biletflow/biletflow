@@ -16,6 +16,7 @@ import { POST as payOrder } from "@/app/api/orders/[id]/pay/route";
 import { POST as webhook } from "@/app/api/payments/webhook/route";
 import { POST as mobileLogin } from "@/app/api/mobile/auth/login/route";
 import { signWebhookBody } from "@/lib/payments-signature";
+import { createPayoutAccount } from "@/lib/organizer-profile";
 
 // Issue #97. Failed payments must not create tickets, and a repeated checkout,
 // payment, activation, webhook, or check-in must not create a second row.
@@ -101,6 +102,11 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       tokens.attendee = await login(emails.attendee);
       tokens.admin = await login(emails.admin);
       tokens.scanner = await login(emails.scanner);
+      await createPayoutAccount(
+        { id: ids.organizer, role: "ORGANIZER", email: emails.organizer, name: emails.organizer },
+        { holderName: "Invariant organizer", bankName: "Test bank", ibanLast4: "1234" },
+        new Headers(),
+      );
     });
 
     afterAll(async () => {
@@ -133,6 +139,8 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
         where: { OR: [{ eventId: { in: eventIds } }, { actorUserId: { in: userIds } }] },
       });
       await prisma.event.deleteMany({ where: { id: { in: eventIds } } });
+      await prisma.payoutAccount.deleteMany({ where: { organizerProfile: { userId: { in: userIds } } } });
+      await prisma.organizerProfile.deleteMany({ where: { userId: { in: userIds } } });
       await prisma.session.deleteMany({ where: { userId: { in: userIds } } });
       await prisma.account.deleteMany({ where: { userId: { in: userIds } } });
       await prisma.user.deleteMany({ where: { id: { in: userIds } } });
