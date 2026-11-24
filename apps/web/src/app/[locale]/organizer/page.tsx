@@ -3,6 +3,13 @@ import { setRequestLocale } from "next-intl/server";
 
 import { requirePageRole } from "@/lib/auth-guard";
 import { listOrganizerEvents } from "@/lib/dashboard";
+import { eventPhase } from "@/lib/organizer-report";
+
+const phaseLabels = {
+  en: { DRAFT: "Draft", UPCOMING: "Upcoming", ACTIVE: "Active", COMPLETED: "Completed", CANCELLED: "Cancelled", overview: "Overview & analytics", title: "Events", intro: "Manage your events, tickets and sales.", organizer: "Organizer", empty: "No events found", emptyBody: "Create your first event." },
+  ru: { DRAFT: "Черновик", UPCOMING: "Предстоящие", ACTIVE: "Активные", COMPLETED: "Завершённые", CANCELLED: "Отменённые", overview: "Обзор и аналитика", title: "Мероприятия", intro: "Управляйте мероприятиями, билетами и продажами.", organizer: "Организатор", empty: "Нет мероприятий", emptyBody: "Создайте первое мероприятие." },
+  kk: { DRAFT: "Жоба", UPCOMING: "Алдағы", ACTIVE: "Белсенді", COMPLETED: "Аяқталған", CANCELLED: "Бас тартылған", overview: "Шолу және аналитика", title: "Іс-шаралар", intro: "Іс-шараларды, билеттерді және сатылымды басқарыңыз.", organizer: "Ұйымдастырушы", empty: "Іс-шаралар жоқ", emptyBody: "Алғашқы іс-шараны құрыңыз." },
+} as const;
 
 export default async function OrganizerPage({
   params,
@@ -13,17 +20,19 @@ export default async function OrganizerPage({
   setRequestLocale(locale);
   const { user } = await requirePageRole(locale, ["ORGANIZER"]);
   const events = await listOrganizerEvents(user.id);
+  const t = phaseLabels[locale as keyof typeof phaseLabels] ?? phaseLabels.en;
+  const phases = ["UPCOMING", "ACTIVE", "DRAFT", "COMPLETED", "CANCELLED"] as const;
 
   return (
     <div className="bg-ink-100 min-h-[70vh]">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div>
-          <p className="text-brand text-xs font-bold tracking-wider uppercase">Organizer</p>
+          <p className="text-brand text-xs font-bold tracking-wider uppercase">{t.organizer}</p>
           <h1 className="font-display text-ink-900 mt-1 text-3xl font-extrabold tracking-tight">
-            Events
+            {t.title}
           </h1>
           <p className="text-ink-600 mt-2 text-sm">
-            Seeded events available in the local BiletFlow database.
+            {t.intro}
           </p>
         </div>
 
@@ -52,12 +61,18 @@ export default async function OrganizerPage({
 
         {events.length === 0 ? (
           <div className="border-ink-300 mt-8 rounded-xl border border-dashed bg-white p-12 text-center">
-            <p className="text-ink-900 font-bold">No events found</p>
-            <p className="text-ink-600 mt-1 text-sm">Run the database seed to populate this view.</p>
+            <p className="text-ink-900 font-bold">{t.empty}</p>
+            <p className="text-ink-600 mt-1 text-sm">{t.emptyBody}</p>
           </div>
         ) : (
-          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {events.map((event) => {
+          <div className="mt-8 space-y-8">
+            {phases.map((phase) => {
+              const group = events.filter((event) => eventPhase(event) === phase);
+              if (!group.length) return null;
+              return <section key={phase} className="space-y-4">
+                <h2 className="text-xl font-bold">{t[phase]} ({group.length})</h2>
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {group.map((event) => {
               const quantity = event.ticketTypes.reduce((sum, type) => sum + type.quantity, 0);
               const sold = event.ticketTypes.reduce((sum, type) => sum + type.sold, 0);
               const reserved = event.ticketTypes.reduce((sum, type) => sum + type.reserved, 0);
@@ -73,7 +88,7 @@ export default async function OrganizerPage({
                       <h2 className="text-ink-900 mt-1 text-lg font-bold">{event.title}</h2>
                     </div>
                     <span className="bg-brand-tint text-brand rounded-full px-2.5 py-1 text-xs font-bold">
-                      {event.status}
+                      {t[phase]}
                     </span>
                   </div>
 
@@ -96,6 +111,7 @@ export default async function OrganizerPage({
                   </div>
 
                   <a className="text-brand mt-4 inline-block text-sm font-semibold underline" href={`/${locale}/organizer/events/${event.id}`}>{locale === "ru" ? "Редактировать" : locale === "kk" ? "Өңдеу" : "Edit event"}</a>
+                  <a className="text-brand ml-4 mt-4 inline-block text-sm font-semibold underline" href={`/${locale}/organizer/events/${event.id}/overview`}>{t.overview}</a>
                   <div className="border-ink-200 mt-5 flex justify-between border-t pt-4 text-xs">
                     <span className="text-ink-500">{event.visibility}</span>
                     <span className="text-ink-700 font-semibold">
@@ -104,6 +120,9 @@ export default async function OrganizerPage({
                   </div>
                 </article>
               );
+            })}
+                </div>
+              </section>;
             })}
           </div>
         )}

@@ -19,7 +19,7 @@ Implemented auth response shapes, role checks, migration notes and audit usage:
 ## Organizer profile and payouts
 
 | `GET` `PUT` | `/api/organizer/profile` | `organizerProfileSchema` |
-| `POST` | `/api/organizer/verification` | Uploads the simulated identity document |
+| `POST` | `/api/organizer/verification` | `identityVerificationSchema`. Marks the profile `PENDING_REVIEW` with a simulated document reference. No file bytes are stored |
 | `GET` `POST` | `/api/organizer/payout-accounts` | `payoutAccountSchema` |
 | `GET` | `/api/organizer/payouts` | Simulated payout list with status |
 
@@ -27,6 +27,7 @@ Implemented auth response shapes, role checks, migration notes and audit usage:
 
 | `GET` | `/api/events` | Public listing. Only `PUBLISHED` + `PUBLIC`. Filters: category, date, query |
 | `GET` | `/api/events/:slug` | Public event page payload including visible ticket types |
+| `POST` | `/api/events/:slug/report` | `eventReportSchema`. Signed-in user reports a published event |
 | `POST` | `/api/organizer/events` | `eventInputSchema` |
 | `GET` `PUT` | `/api/organizer/events/:id` | `eventInputSchema` |
 | `POST` | `/api/organizer/events/:id/publish` | Rejects if no visible ticket type exists |
@@ -56,6 +57,7 @@ Every response includes the counters `quantity`, `sold`, `reserved`, `refunded`,
 | `POST` | `/api/orders` | `createOrderSchema`. Reserves inventory atomically, returns the order with `expiresAt`. Free orders return `PAID` immediately with tickets issued |
 | `GET` | `/api/orders/:id` | |
 | `POST` | `/api/orders/:id/cancel` | Releases reservation |
+| `POST` | `/api/orders/:id/refund` | `refundOrderSchema`. Simulated refund when the event refund policy window is still open. Checked-in tickets are refused. Repeating the request does not create a second refund |
 | `POST` | `/api/orders/:id/pay` | Creates a payment intent, returns the simulated gateway URL |
 | `POST` | `/api/orders/:id/pay/simulate` | Authenticated mobile/demo settlement (`APPROVED`/`DECLINED`/`ABANDONED`). Signs the webhook server-side; no client secret |
 | `GET` | `/api/orders` | Attendee's own orders |
@@ -122,9 +124,10 @@ All accept `analyticsQuerySchema`. All are scoped to events the caller manages, 
 
 ## Administration 
 
-| `GET` | `/api/admin/search` | Users, events, orders, payments |
-| `POST` | `/api/admin/users/:id/suspend` | `suspendSchema` |
-| `POST` | `/api/admin/events/:id/suspend` | Sets `paidSalesSuspended`, stopping further sales immediately |
-| `GET` | `/api/admin/reports` | Reported events queue |
-| `GET` `PUT` | `/api/admin/settings` | Activation fee and fee configuration |
-| `GET` | `/api/admin/exports/:report.csv` | Basic operational reports |
+| `GET` | `/api/admin/activations` | Paid-sales reviews waiting for a platform admin |
+| `GET` | `/api/admin/search` | Users, events, orders, payments. Query `q` must be at least two characters |
+| `POST` | `/api/admin/users/:id/suspend` | `suspendSchema`. Existing sessions are rejected on the next request |
+| `POST` | `/api/admin/events/:id/suspend` | Sets `paidSalesSuspended`, stopping further paid sales immediately |
+| `GET` | `/api/admin/reports` | Unresolved reported events |
+| `GET` `PUT` | `/api/admin/settings` | `platformSettingsSchema` for the activation fee, platform fee, and checkout hold |
+| `GET` | `/api/admin/exports/orders.csv` | Operational order export. Cells that could be formulas are quoted |

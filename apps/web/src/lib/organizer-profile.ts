@@ -1,4 +1,5 @@
 import { prisma } from "@biletflow/db";
+import { maybeActivate } from "./activation";
 import {
   organizerProfileSchema,
   payoutAccountSchema,
@@ -115,6 +116,42 @@ export async function upsertOrganizerProfile(
   return presentProfile(profile);
 }
 
+export async function submitIdentityVerification(
+  user: SessionUser,
+  documentName: string | undefined,
+  headers: Headers,
+) {
+  await requireOrganizer(user);
+  const profile = await prisma.$transaction(async (tx) => {
+    const current = await tx.organizerProfile.findUnique({
+      where: { userId: user.id },
+    });
+    if (!current) throw new ApiError(409, "CONFLICT");
+    if (current.verificationStatus === "APPROVED") {
+      throw new ApiError(409, "CONFLICT");
+    }
+    const saved = await tx.organizerProfile.update({
+      where: { id: current.id },
+      data: {
+        verificationStatus: "PENDING_REVIEW",
+        identityDocUrl: `simulated://identity/${current.id}`,
+        reviewNote: documentName ?? current.reviewNote,
+      },
+    });
+    await audit(tx, {
+      actorUserId: user.id,
+      action: "organizer.verification_submitted",
+      entityType: "OrganizerProfile",
+      entityId: saved.id,
+      description: "Simulated identity document submitted for review",
+      metadata: { documentName: documentName ?? null },
+      ipAddress: clientIp(headers),
+    });
+    return saved;
+  });
+  return presentProfile(profile);
+}
+
 export async function listPayoutAccounts(user: SessionUser) {
   await requireOrganizer(user);
   const profile = await prisma.organizerProfile.findUnique({
@@ -180,6 +217,12 @@ export async function createPayoutAccount(
       metadata: { bankName: created.bankName, ibanLast4: created.ibanLast4 },
       ipAddress: clientIp(headers),
     });
+    const eligible = await tx.paidSalesActivation.findMany({
+      where: { organizerId: user.id, feePaid: true, identityVerified: true, activatedAt: null },
+    });
+    for (const activation of eligible) {
+      await maybeActivate(tx, activation);
+    }
     return created;
   });
 

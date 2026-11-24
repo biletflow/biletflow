@@ -2,6 +2,7 @@ import { eventCancelSchema } from "@biletflow/shared";
 
 import { errorResponse } from "@/lib/api-error";
 import { assertParsed, json, readJson } from "@/lib/http";
+import { notifyCancelledEventOrders } from "@/lib/notifications";
 import { cancelEvent, presentEvent } from "@/lib/organizer";
 import { requireRole } from "@/lib/session";
 
@@ -13,6 +14,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const { id } = await context.params;
     const input = assertParsed(eventCancelSchema.safeParse(await readJson(request)));
     const event = await cancelEvent(user, id, input.reason, request.headers);
+    await notifyCancelledEventOrders(event.id);
     return json({ event: await presentEvent(event) });
   } catch (error) {
     return errorResponse(error);
