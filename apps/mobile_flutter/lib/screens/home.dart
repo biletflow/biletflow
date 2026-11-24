@@ -1,3 +1,4 @@
+import 'admin_activations.dart';
 import 'package:material_ui/material_ui.dart';
 import '../core/session.dart';
 import '../l10n/app_localizations.dart';
@@ -77,6 +78,16 @@ class HomeScreen extends StatelessWidget {
                     builder: (_) => OrganizerScreen(api: session.api),
                   ),
                 ),
+              ),
+            ),
+          if (session.role == 'PLATFORM_ADMIN')
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.admin_panel_settings),
+                title: const Text('Paid-sales reviews'),
+                onTap: () => Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => AdminActivations(api: session.api),
+                )),
               ),
             ),
           if (session.canScan)
