@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
+import 'organizer_reports.dart';
 import '../l10n/app_localizations.dart';
 import 'organizer_editor.dart';
 
@@ -50,6 +51,12 @@ class OrganizerScreen extends StatefulWidget {
 class _OrganizerScreenState extends State<OrganizerScreen> {
   late Future<Map<String, dynamic>> events;
   @override
+  void initState() { super.initState(); events = widget.api.get('/api/organizer/events'); }
+  void refresh() {
+    setState(() {
+      events = widget.api.get('/api/organizer/events');
+    });
+  }
   void initState() {
     super.initState();
     events = widget.api.get('/api/organizer/events');
@@ -312,6 +319,25 @@ class _EventScreenState extends State<EventScreen> {
   }
 
   @override
+  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Event details')), body: FutureBuilder(future: eventFuture, builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+    if (snapshot.hasError) return Center(child: Text('${snapshot.error}'));
+    final event = snapshot.data?['event'];
+    if (event is! Map) return const Center(child: Text('Unexpected event response'));
+    final types = event['ticketTypes'];
+    return ListView(padding: const EdgeInsets.all(16), children: [
+      Text('${event['title'] ?? ''}', style: Theme.of(context).textTheme.headlineSmall),
+      Text('${event['status'] ?? ''}'), const SizedBox(height: 12), Text('${event['description'] ?? ''}'),
+      OutlinedButton(
+        onPressed: () => Navigator.push(context, MaterialPageRoute(
+          builder: (_) => OrganizerReports(api: widget.api, eventId: widget.id),
+        )),
+        child: const Text('Attendance and campaigns'),
+      ),
+      const SizedBox(height: 20), const Text('Ticket types'),
+      if (types is List) for (final type in types) if (type is Map) Card(child: ListTile(title: Text('${type['name']}'), subtitle: Text('${type['sold']} sold · ${type['available']} available'), trailing: Text('${type['priceKzt']} KZT'))),
+    ]);
+  }));
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Event details')),
     body: FutureBuilder(
