@@ -19,6 +19,22 @@ void main() {
     await expectLater(client.get('/api/me'), throwsA(isA<ApiException>().having((e) => e.status, 'status', 403)));
     client.close();
   });
+  test('API merges new parameters with existing query parameters', () async {
+    final client = ApiClient(
+      'https://example.test',
+      client: MockClient((request) async {
+        expect(request.url.path, '/api/events');
+        expect(request.url.queryParametersAll, {
+          'tag': ['music', 'sport'],
+          'q': ['A & B'],
+        });
+        return http.Response('{}', 200);
+      }),
+    );
+    addTearDown(client.close);
+    await client.get('/api/events?tag=music&tag=sport', query: {'q': 'A & B'});
+  });
+
   test('API rejects external paths', () async {
     final client = ApiClient('https://example.test');
     await expectLater(client.get('//other.test/api/me'), throwsArgumentError);

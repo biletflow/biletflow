@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import '../core/api.dart';
 import '../core/session.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/locale_controller.dart';
@@ -34,10 +35,14 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     try {
       await widget.session.login(email.text.trim(), password.text);
-    } catch (e) {
+    } on ApiException catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context);
-        setState(() => error = l10n.apiError('$e'));
+        setState(() => error = l10n.apiError(e.code));
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => error = AppLocalizations.of(context).apiError(''));
       }
     } finally {
       if (mounted) setState(() => busy = false);

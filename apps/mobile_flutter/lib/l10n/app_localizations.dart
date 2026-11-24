@@ -28,6 +28,14 @@ class AppLocalizations {
       'myTickets': 'My tickets',
       'myTicketsSubtitle': 'QR and printable PDF',
       'myEvents': 'My events',
+      'allEventStatuses': 'All',
+      'eventDraft': 'Draft',
+      'eventPublished': 'Published',
+      'eventCancelled': 'Cancelled',
+      'eventCompleted': 'Completed',
+      'eventDetails': 'Event details',
+      'ticketTypes': 'Ticket types',
+      'ticketInventory': '{sold} sold · {available} available',
       'scanTicket': 'Scan ticket',
       'email': 'Email',
       'password': 'Password',
@@ -114,6 +122,14 @@ class AppLocalizations {
       'myTickets': 'Мои билеты',
       'myTicketsSubtitle': 'QR и PDF для печати',
       'myEvents': 'Мои события',
+      'allEventStatuses': 'Все',
+      'eventDraft': 'Черновик',
+      'eventPublished': 'Опубликовано',
+      'eventCancelled': 'Отменено',
+      'eventCompleted': 'Завершено',
+      'eventDetails': 'Детали события',
+      'ticketTypes': 'Типы билетов',
+      'ticketInventory': 'Продано: {sold} · Доступно: {available}',
       'scanTicket': 'Сканировать билет',
       'email': 'Email',
       'password': 'Пароль',
@@ -200,6 +216,14 @@ class AppLocalizations {
       'myTickets': 'Менің билеттерім',
       'myTicketsSubtitle': 'QR және басып шығаруға арналған PDF',
       'myEvents': 'Менің іс-шараларым',
+      'allEventStatuses': 'Барлығы',
+      'eventDraft': 'Нобай',
+      'eventPublished': 'Жарияланған',
+      'eventCancelled': 'Бас тартылған',
+      'eventCompleted': 'Аяқталған',
+      'eventDetails': 'Іс-шара туралы',
+      'ticketTypes': 'Билет түрлері',
+      'ticketInventory': 'Сатылды: {sold} · Қолжетімді: {available}',
       'scanTicket': 'Билетті сканерлеу',
       'email': 'Email',
       'password': 'Құпиясөз',
@@ -298,6 +322,19 @@ class AppLocalizations {
   String get myTickets => _t('myTickets');
   String get myTicketsSubtitle => _t('myTicketsSubtitle');
   String get myEvents => _t('myEvents');
+  String get allEventStatuses => _t('allEventStatuses');
+  String get eventDetails => _t('eventDetails');
+  String get ticketTypes => _t('ticketTypes');
+  String ticketInventory(int sold, int available) =>
+      _fmt('ticketInventory', {'sold': '$sold', 'available': '$available'});
+
+  String eventStatus(String value) => switch (value) {
+    'DRAFT' => _t('eventDraft'),
+    'PUBLISHED' => _t('eventPublished'),
+    'CANCELLED' => _t('eventCancelled'),
+    'COMPLETED' => _t('eventCompleted'),
+    _ => value,
+  };
   String get scanTicket => _t('scanTicket');
   String get email => _t('email');
   String get password => _t('password');
