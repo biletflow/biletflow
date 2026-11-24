@@ -252,7 +252,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                             builder: (_) => SupportThread(api: widget.api, id: id),
                           ));
                         },
-                        child: Text(l10n.askRefund),
+                        child: const Text('Ask about a refund'),
                       ),
                       const SizedBox(height: 16),
                       Text(l10n.paymentSucceeded,

@@ -280,8 +280,7 @@ class AppLocalizations {
       'abandon': 'Отменить',
       'cancelReservation': 'Отменить бронь',
       'refundOrder': 'Вернуть заказ',
-      'refundConfirmation':
-          'Все билеты в заказе станут недействительными. Продолжить возврат?',
+      'refundConfirmation': 'Все билеты в заказе станут недействительными. Продолжить возврат?',
       'paymentSucceeded': 'Оплата прошла. Билеты готовы.',
       'holdExpired': 'Время брони истекло. Билет не выдан.',
       'orderClosed': 'Заказ закрыт без билетов.',

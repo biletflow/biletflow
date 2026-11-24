@@ -89,6 +89,16 @@ class HomeScreen extends StatelessWidget {
               )),
             ),
           ),
+          if (session.role == 'PLATFORM_ADMIN')
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.admin_panel_settings),
+                title: const Text('Paid-sales reviews'),
+                onTap: () => Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => AdminActivations(api: session.api),
+                )),
+              ),
+            ),
           if (session.canScan)
             Card(
               child: ListTile(
