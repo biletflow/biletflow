@@ -5,6 +5,7 @@ import '../core/format.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/status_badge.dart';
+import 'order_status.dart';
 import 'ticket_detail.dart';
 
 class MyTicketsScreen extends StatefulWidget {
@@ -33,12 +34,13 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
     });
     try {
       final data = await widget.api.get('/api/tickets');
+      if (!mounted) return;
       final tickets = data['tickets'];
       setState(() => _tickets = tickets is List ? tickets : const []);
     } on ApiException catch (error) {
-      setState(() => _error = error.code);
+      if (mounted) setState(() => _error = error.code);
     } catch (_) {
-      setState(() => _error = 'REQUEST_FAILED');
+      if (mounted) setState(() => _error = 'REQUEST_FAILED');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -87,6 +89,7 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
                             ? formatEventWhen(event['startsAt'])
                             : '';
                         final id = '${ticket['id'] ?? ''}';
+                        final orderId = ticket['orderId'];
                         final ticketStatus = '${ticket['status'] ?? ''}';
                         return Card(
                           child: ListTile(
@@ -105,7 +108,25 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
                                   ticketStatus,
                                   l10n.ticketStatus(ticketStatus),
                                 ),
-                                const Icon(Icons.chevron_right),
+                                if (orderId is String && orderId.isNotEmpty)
+                                  IconButton(
+                                    tooltip: l10n.order,
+                                    icon: const Icon(Icons.receipt_long_outlined),
+                                    onPressed: () async {
+                                      await Navigator.push<void>(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => OrderStatusScreen(
+                                            api: widget.api,
+                                            orderId: orderId,
+                                          ),
+                                        ),
+                                      );
+                                      if (mounted) await _load();
+                                    },
+                                  )
+                                else
+                                  const Icon(Icons.chevron_right),
                               ],
                             ),
                             onTap: id.isEmpty

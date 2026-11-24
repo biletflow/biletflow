@@ -58,6 +58,59 @@ void main() {
     expect(find.textContaining('Aliya'), findsOneWidget);
   });
 
+  testWidgets('refund requires confirmation and refreshes the order', (
+    tester,
+  ) async {
+    var refunded = false;
+    var refundRequests = 0;
+    final api = ApiClient(
+      'https://example.test',
+      client: MockClient((request) async {
+        if (request.method == 'POST') {
+          expect(request.url.path, '/api/orders/ord1/refund');
+          refundRequests++;
+          refunded = true;
+          return http.Response('{"status":"REFUNDED"}', 201);
+        }
+        expect(request.url.path, '/api/orders/ord1');
+        final status = refunded ? 'REFUNDED' : 'PAID';
+        final ticketStatus = refunded ? 'REFUNDED' : 'VALID';
+        return http.Response(
+          '{"order":{"status":"$status","tickets":[{"status":"$ticketStatus"}]}}',
+          200,
+        );
+      }),
+    );
+    addTearDown(api.close);
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          ...GlobalMaterialLocalizations.delegates,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: OrderStatusScreen(api: api, orderId: 'ord1'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Refund order'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(refundRequests, 0);
+
+    await tester.tap(find.text('Refund order'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Refund order'));
+    await tester.pumpAndSettle();
+    expect(refundRequests, 1);
+    expect(find.text('Paid'), findsNothing);
+    expect(find.text('Refunded'), findsOneWidget);
+    expect(find.text('Refund order'), findsNothing);
+  });
+
   testWidgets('locale switcher labels stay localized', (tester) async {
     FlutterSecureStorage.setMockInitialValues({});
     final locales = LocaleController();

@@ -5,6 +5,7 @@ import '../core/format.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/status_badge.dart';
+import 'support.dart';
 import 'ticket_detail.dart';
 
 class OrderStatusScreen extends StatefulWidget {
@@ -41,14 +42,15 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
     try {
       final data = await widget.api.get('/api/orders/${widget.orderId}');
       final order = data['order'];
+      if (!mounted) return;
       if (order is! Map) {
         throw const ApiException(500, 'INVALID_ORDER_RESPONSE');
       }
       setState(() => _order = Map<String, dynamic>.from(order));
     } on ApiException catch (error) {
-      setState(() => _error = error.code);
+      if (mounted) setState(() => _error = error.code);
     } catch (_) {
-      setState(() => _error = 'REQUEST_FAILED');
+      if (mounted) setState(() => _error = 'REQUEST_FAILED');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -102,6 +104,48 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
     }
   }
 
+  Future<void> _refund() async {
+    if (_busy || _order?['status'] != 'PAID') return;
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.refundOrder),
+        content: Text(l10n.refundConfirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.refundOrder),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true || _busy || _order?['status'] != 'PAID') {
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await widget.api.post(
+        '/api/orders/${Uri.encodeComponent(widget.orderId)}/refund',
+        {},
+      );
+      if (mounted) await _load();
+    } on ApiException catch (error) {
+      if (mounted) setState(() => _error = error.code);
+    } catch (_) {
+      if (mounted) setState(() => _error = 'REQUEST_FAILED');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -141,7 +185,10 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                     const SizedBox(height: 8),
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: StatusBadge.order(status, status),
+                      child: StatusBadge.order(
+                        status,
+                        status == 'REFUNDED' ? l10n.ticketStatus(status) : status,
+                      ),
                     ),
                     if (total is num)
                       Padding(
@@ -186,6 +233,27 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                       ),
                     ],
                     if (status == 'PAID') ...[
+                      if (tickets is List &&
+                          tickets.isNotEmpty &&
+                          !tickets.whereType<Map>().any(
+                            (ticket) => ticket['status'] == 'CHECKED_IN',
+                          ))
+                        OutlinedButton(
+                          onPressed: _busy ? null : _refund,
+                          child: Text(l10n.refundOrder),
+                        ),
+                      OutlinedButton(
+                        onPressed: _busy ? null : () async {
+                          final id = await Navigator.push<String>(context, MaterialPageRoute(
+                            builder: (_) => SupportComposer(api: widget.api, orderId: widget.orderId),
+                          ));
+                          if (!context.mounted || id == null) return;
+                          await Navigator.push<void>(context, MaterialPageRoute(
+                            builder: (_) => SupportThread(api: widget.api, id: id),
+                          ));
+                        },
+                        child: const Text('Ask about a refund'),
+                      ),
                       const SizedBox(height: 16),
                       Text(l10n.paymentSucceeded,
                           style: Theme.of(context).textTheme.titleMedium),

@@ -1,4 +1,4 @@
-import 'admin_activations.dart';
+import 'support.dart';
 import 'package:material_ui/material_ui.dart';
 import '../core/session.dart';
 import '../l10n/app_localizations.dart';
