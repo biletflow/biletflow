@@ -18,6 +18,58 @@ class AppLocalizations {
 
   static const _tables = <String, Map<String, String>>{
     'en': {
+      'scannerTitle': 'QR scanner',
+      'loadScanEvents': 'Load available events',
+      'noScanEvents': 'No events are available for scanning.',
+      'selectScanEvent': 'Select an event',
+      'stopCamera': 'Stop camera',
+      'refreshAttendance': 'Refresh attendance',
+      'attendeeSearch': 'Name, email or order reference',
+      'searchAttendees': 'Search attendees',
+      'noMatchingAttendees': 'No matching attendees',
+      'reverse': 'Reverse',
+      'reverseQuestion': 'Reverse check-in?',
+      'reverseCheckIn': 'Reverse check-in',
+      'reason': 'Reason',
+      'cancel': 'Cancel',
+      'threeCharacters': 'Enter at least 3 characters.',
+      'checkInReversed': 'Check-in reversed',
+      'cameraStopFailed': 'Could not stop the camera.',
+      'cameraOpenFailed': 'Could not open the camera. Retry.',
+      'cameraInUse':
+          'Could not open the camera. Close other camera apps and retry.',
+      'cameraDenied': 'Camera access is denied. Allow BiletFlow to use the camera in your phone settings, then retry.',
+      'scanAccessChanged': 'Access changed. Reload your available events.',
+      'scanUnavailable': 'This event or check-in is no longer available.',
+      'scanChanged': 'This check-in has already changed. Search again.',
+      'scanRateLimited': 'Too many requests. Wait a moment and retry.',
+      'scanServerError': 'The server could not complete the request. Retry.',
+      'scanTimeout': 'Request timed out. Check the connection and retry.',
+      'scanRequestFailed':
+          'Could not complete the request. Check the connection and retry.',
+      'admitted': 'Admission confirmed',
+      'alreadyAdmitted': 'Ticket already used',
+      'wrongEvent': 'Ticket for another event',
+      'notATicket': 'This QR code is not a ticket',
+      'invalidTicket': 'Invalid ticket code',
+      'checkedInLabel': 'Checked in',
+      'support': 'Support',
+      'newRequest': 'New request',
+      'noSupportRequests': 'No support requests',
+      'refundRequest': 'Refund request',
+      'newSupportRequest': 'New support request',
+      'subject': 'Subject',
+      'message': 'Message',
+      'sending': 'Sending…',
+      'sendRequest': 'Send request',
+      'supportConversation': 'Support conversation',
+      'reply': 'Reply',
+      'sendReply': 'Send reply',
+      'askRefund': 'Ask about a refund',
+      'supportOpen': 'Open',
+      'supportInProgress': 'In progress',
+      'supportWaiting': 'Waiting for customer',
+      'supportResolved': 'Resolved',
       'appName': 'BiletFlow',
       'language': 'Language',
       'signOut': 'Sign out',
@@ -72,8 +124,7 @@ class AppLocalizations {
       'total': 'Total: {amount}',
       'placeOrder': 'Place order',
       'working': 'Working…',
-      'checkoutNote':
-          'Server totals and inventory are authoritative. Paid orders use the authenticated simulated payment API.',
+      'checkoutNote': 'Server totals and inventory are authoritative. Paid orders use the authenticated simulated payment API.',
       'order': 'Order',
       'refresh': 'Refresh',
       'status': 'Status: {status}',
@@ -95,8 +146,7 @@ class AppLocalizations {
       'sharePdf': 'Share / save PDF',
       'preparingPdf': 'Preparing PDF…',
       'pdfFailed': 'Unable to open PDF',
-      'qrNote':
-          'QR and PDF come from the server with your bearer token. The token is never put in the image URL.',
+      'qrNote': 'QR and PDF come from the server with your bearer token. The token is never put in the image URL.',
       'ticketStatusValid': 'Valid',
       'ticketStatusCheckedIn': 'Checked in',
       'ticketStatusCancelled': 'Cancelled',
@@ -112,6 +162,59 @@ class AppLocalizations {
       'errorAuth': 'Sign in again',
     },
     'ru': {
+      'scannerTitle': 'QR-сканер',
+      'loadScanEvents': 'Загрузить доступные события',
+      'noScanEvents': 'Нет событий для сканирования.',
+      'selectScanEvent': 'Выберите событие',
+      'stopCamera': 'Выключить камеру',
+      'refreshAttendance': 'Обновить посещаемость',
+      'attendeeSearch': 'Имя, email или номер заказа',
+      'searchAttendees': 'Найти участников',
+      'noMatchingAttendees': 'Участники не найдены',
+      'reverse': 'Отменить',
+      'reverseQuestion': 'Отменить регистрацию прохода?',
+      'reverseCheckIn': 'Отменить регистрацию прохода',
+      'reason': 'Причина',
+      'cancel': 'Отмена',
+      'threeCharacters': 'Введите не менее 3 символов.',
+      'checkInReversed': 'Регистрация прохода отменена',
+      'cameraStopFailed': 'Не удалось выключить камеру.',
+      'cameraOpenFailed': 'Не удалось открыть камеру. Повторите попытку.',
+      'cameraInUse': 'Не удалось открыть камеру. Закройте другие приложения с камерой и повторите попытку.',
+      'cameraDenied': 'Доступ к камере запрещён. Разрешите BiletFlow доступ в настройках телефона и повторите попытку.',
+      'scanAccessChanged': 'Доступ изменился. Обновите список событий.',
+      'scanUnavailable': 'Событие или отметка о проходе больше недоступны.',
+      'scanChanged': 'Отметка о проходе изменилась. Повторите поиск.',
+      'scanRateLimited':
+          'Слишком много запросов. Подождите и повторите попытку.',
+      'scanServerError': 'Сервер не смог выполнить запрос. Повторите попытку.',
+      'scanTimeout':
+          'Время ожидания истекло. Проверьте связь и повторите попытку.',
+      'scanRequestFailed':
+          'Не удалось выполнить запрос. Проверьте связь и повторите попытку.',
+      'admitted': 'Проход подтверждён',
+      'alreadyAdmitted': 'Билет уже использован',
+      'wrongEvent': 'Билет на другое событие',
+      'notATicket': 'Этот QR-код не является билетом',
+      'invalidTicket': 'Недействительный код билета',
+      'checkedInLabel': 'Прошли',
+      'support': 'Поддержка',
+      'newRequest': 'Новое обращение',
+      'noSupportRequests': 'Нет обращений',
+      'refundRequest': 'Запрос на возврат',
+      'newSupportRequest': 'Новое обращение в поддержку',
+      'subject': 'Тема',
+      'message': 'Сообщение',
+      'sending': 'Отправляем…',
+      'sendRequest': 'Отправить обращение',
+      'supportConversation': 'Переписка с поддержкой',
+      'reply': 'Ответ',
+      'sendReply': 'Отправить ответ',
+      'askRefund': 'Спросить о возврате',
+      'supportOpen': 'Открыто',
+      'supportInProgress': 'В работе',
+      'supportWaiting': 'Ожидает ответа клиента',
+      'supportResolved': 'Решено',
       'appName': 'BiletFlow',
       'language': 'Язык',
       'signOut': 'Выйти',
@@ -166,8 +269,7 @@ class AppLocalizations {
       'total': 'Итого: {amount}',
       'placeOrder': 'Оформить заказ',
       'working': 'Отправляем…',
-      'checkoutNote':
-          'Итоги и наличие считает сервер. Оплата идёт через авторизованный симулятор без WebView.',
+      'checkoutNote': 'Итоги и наличие считает сервер. Оплата идёт через авторизованный симулятор без WebView.',
       'order': 'Заказ',
       'refresh': 'Обновить',
       'status': 'Статус: {status}',
@@ -178,7 +280,8 @@ class AppLocalizations {
       'abandon': 'Отменить',
       'cancelReservation': 'Отменить бронь',
       'refundOrder': 'Вернуть заказ',
-      'refundConfirmation': 'Все билеты в заказе станут недействительными. Продолжить возврат?',
+      'refundConfirmation':
+          'Все билеты в заказе станут недействительными. Продолжить возврат?',
       'paymentSucceeded': 'Оплата прошла. Билеты готовы.',
       'holdExpired': 'Время брони истекло. Билет не выдан.',
       'orderClosed': 'Заказ закрыт без билетов.',
@@ -189,8 +292,7 @@ class AppLocalizations {
       'sharePdf': 'Поделиться / сохранить PDF',
       'preparingPdf': 'Готовим PDF…',
       'pdfFailed': 'Не удалось открыть PDF',
-      'qrNote':
-          'QR и PDF загружаются с сервера с bearer-токеном. Токен не попадает в URL изображения.',
+      'qrNote': 'QR и PDF загружаются с сервера с bearer-токеном. Токен не попадает в URL изображения.',
       'ticketStatusValid': 'Действителен',
       'ticketStatusCheckedIn': 'Проверен',
       'ticketStatusCancelled': 'Отменён',
@@ -206,6 +308,57 @@ class AppLocalizations {
       'errorAuth': 'Войдите снова',
     },
     'kk': {
+      'scannerTitle': 'QR сканері',
+      'loadScanEvents': 'Қолжетімді іс-шараларды жүктеу',
+      'noScanEvents': 'Сканерлеуге қолжетімді іс-шаралар жоқ.',
+      'selectScanEvent': 'Іс-шараны таңдаңыз',
+      'stopCamera': 'Камераны өшіру',
+      'refreshAttendance': 'Қатысу деректерін жаңарту',
+      'attendeeSearch': 'Аты, электрондық пошта немесе тапсырыс нөмірі',
+      'searchAttendees': 'Қатысушыларды іздеу',
+      'noMatchingAttendees': 'Қатысушылар табылмады',
+      'reverse': 'Болдырмау',
+      'reverseQuestion': 'Кіру тіркеуін болдырмау керек пе?',
+      'reverseCheckIn': 'Кіру тіркеуін болдырмау',
+      'reason': 'Себеп',
+      'cancel': 'Бас тарту',
+      'threeCharacters': 'Кемінде 3 таңба енгізіңіз.',
+      'checkInReversed': 'Кіру тіркеуі болдырылмады',
+      'cameraStopFailed': 'Камераны өшіру мүмкін болмады.',
+      'cameraOpenFailed': 'Камераны ашу мүмкін болмады. Қайталап көріңіз.',
+      'cameraInUse': 'Камераны ашу мүмкін болмады. Камераны пайдаланатын басқа қолданбаларды жауып, қайталап көріңіз.',
+      'cameraDenied': 'Камераға рұқсат берілмеген. Телефон баптауларында BiletFlow қолданбасына рұқсат беріп, қайталап көріңіз.',
+      'scanAccessChanged': 'Рұқсат өзгерді. Іс-шаралар тізімін жаңартыңыз.',
+      'scanUnavailable': 'Іс-шара немесе кіру жазбасы енді қолжетімді емес.',
+      'scanChanged': 'Кіру жазбасы өзгерді. Қайта іздеңіз.',
+      'scanRateLimited': 'Сұраулар тым көп. Біраз күтіп, қайталап көріңіз.',
+      'scanServerError': 'Сервер сұрауды орындай алмады. Қайталап көріңіз.',
+      'scanTimeout':
+          'Күту уақыты аяқталды. Байланысты тексеріп, қайталап көріңіз.',
+      'scanRequestFailed': 'Сұрауды орындау мүмкін болмады. Байланысты тексеріп, қайталап көріңіз.',
+      'admitted': 'Кіру расталды',
+      'alreadyAdmitted': 'Билет бұрын қолданылған',
+      'wrongEvent': 'Билет басқа іс-шараға арналған',
+      'notATicket': 'Бұл QR коды билет емес',
+      'invalidTicket': 'Билет коды жарамсыз',
+      'checkedInLabel': 'Кіргендер',
+      'support': 'Қолдау',
+      'newRequest': 'Жаңа өтініш',
+      'noSupportRequests': 'Өтініштер жоқ',
+      'refundRequest': 'Қайтару өтініші',
+      'newSupportRequest': 'Қолдау қызметіне жаңа өтініш',
+      'subject': 'Тақырып',
+      'message': 'Хабарлама',
+      'sending': 'Жіберілуде…',
+      'sendRequest': 'Өтінішті жіберу',
+      'supportConversation': 'Қолдау қызметімен хат алмасу',
+      'reply': 'Жауап',
+      'sendReply': 'Жауапты жіберу',
+      'askRefund': 'Қайтару туралы сұрау',
+      'supportOpen': 'Ашық',
+      'supportInProgress': 'Қаралуда',
+      'supportWaiting': 'Клиент жауабы күтілуде',
+      'supportResolved': 'Шешілді',
       'appName': 'BiletFlow',
       'language': 'Тіл',
       'signOut': 'Шыгу',
@@ -260,8 +413,7 @@ class AppLocalizations {
       'total': 'Жиыны: {amount}',
       'placeOrder': 'Тапсырыс беру',
       'working': 'Жіберілуде…',
-      'checkoutNote':
-          'Жиынтық пен қорды сервер есептейді. Төлем авторизацияланған симулятор арқылы өтеді.',
+      'checkoutNote': 'Жиынтық пен қорды сервер есептейді. Төлем авторизацияланған симулятор арқылы өтеді.',
       'order': 'Тапсырыс',
       'refresh': 'Жаңарту',
       'status': 'Күйі: {status}',
@@ -283,8 +435,7 @@ class AppLocalizations {
       'sharePdf': 'PDF бөлісу / сақтау',
       'preparingPdf': 'PDF дайындалуда…',
       'pdfFailed': 'PDF ашу мүмкін болмады',
-      'qrNote':
-          'QR мен PDF серверден bearer токенмен жүктеледі. Токен сурет URL-іне енбейді.',
+      'qrNote': 'QR мен PDF серверден bearer токенмен жүктеледі. Токен сурет URL-іне енбейді.',
       'ticketStatusValid': 'Жарамды',
       'ticketStatusCheckedIn': 'Тексерілді',
       'ticketStatusCancelled': 'Тоқтатылды',
@@ -336,6 +487,66 @@ class AppLocalizations {
     _ => value,
   };
   String get scanTicket => _t('scanTicket');
+  String get scannerTitle => _t('scannerTitle');
+  String get loadScanEvents => _t('loadScanEvents');
+  String get noScanEvents => _t('noScanEvents');
+  String get selectScanEvent => _t('selectScanEvent');
+  String get stopCamera => _t('stopCamera');
+  String get refreshAttendance => _t('refreshAttendance');
+  String get attendeeSearch => _t('attendeeSearch');
+  String get searchAttendees => _t('searchAttendees');
+  String get noMatchingAttendees => _t('noMatchingAttendees');
+  String get reverse => _t('reverse');
+  String get reverseQuestion => _t('reverseQuestion');
+  String get reverseCheckIn => _t('reverseCheckIn');
+  String get reason => _t('reason');
+  String get cancel => _t('cancel');
+  String get threeCharacters => _t('threeCharacters');
+  String get checkInReversed => _t('checkInReversed');
+  String get cameraStopFailed => _t('cameraStopFailed');
+  String get cameraOpenFailed => _t('cameraOpenFailed');
+  String get cameraInUse => _t('cameraInUse');
+  String get cameraDenied => _t('cameraDenied');
+  String get scanAccessChanged => _t('scanAccessChanged');
+  String get scanUnavailable => _t('scanUnavailable');
+  String get scanChanged => _t('scanChanged');
+  String get scanRateLimited => _t('scanRateLimited');
+  String get scanServerError => _t('scanServerError');
+  String get scanTimeout => _t('scanTimeout');
+  String get scanRequestFailed => _t('scanRequestFailed');
+  String get checkedInLabel => _t('checkedInLabel');
+  String get support => _t('support');
+  String get newRequest => _t('newRequest');
+  String get noSupportRequests => _t('noSupportRequests');
+  String get refundRequest => _t('refundRequest');
+  String get newSupportRequest => _t('newSupportRequest');
+  String get subject => _t('subject');
+  String get message => _t('message');
+  String get sending => _t('sending');
+  String get sendRequest => _t('sendRequest');
+  String get supportConversation => _t('supportConversation');
+  String get reply => _t('reply');
+  String get sendReply => _t('sendReply');
+  String get askRefund => _t('askRefund');
+
+  String scanResult(String code) => switch (code) {
+    'VALID' => _t('admitted'),
+    'ALREADY_CHECKED_IN' => _t('alreadyAdmitted'),
+    'WRONG_EVENT' => _t('wrongEvent'),
+    'NOT_A_TICKET' => _t('notATicket'),
+    'INVALID' => _t('invalidTicket'),
+    'CANCELLED' || 'REFUNDED' => ticketStatus(code),
+    _ => scanRequestFailed,
+  };
+
+  String supportStatus(String code) => switch (code) {
+    'OPEN' => _t('supportOpen'),
+    'IN_PROGRESS' => _t('supportInProgress'),
+    'WAITING_FOR_CUSTOMER' => _t('supportWaiting'),
+    'RESOLVED' => _t('supportResolved'),
+    _ => code,
+  };
+
   String get email => _t('email');
   String get password => _t('password');
   String get signIn => _t('signIn');
@@ -444,9 +655,9 @@ class _AppLocalizationsDelegate
   const _AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) =>
-      AppLocalizations.supportedLocales
-          .any((item) => item.languageCode == locale.languageCode);
+  bool isSupported(Locale locale) => AppLocalizations.supportedLocales.any(
+    (item) => item.languageCode == locale.languageCode,
+  );
 
   @override
   Future<AppLocalizations> load(Locale locale) =>

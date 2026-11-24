@@ -5,6 +5,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../core/api.dart';
 import '../core/session.dart';
+import '../l10n/app_localizations.dart';
 
 class ScannerScreen extends StatefulWidget {
   final Session session;
@@ -69,7 +70,7 @@ class _ScannerScreenState extends State<ScannerScreen>
     try {
       await camera.stop();
     } catch (_) {
-      if (mounted) setState(() => error = 'Could not stop the camera.');
+      if (mounted) setState(() => error = l10n.cameraStopFailed);
     } finally {
       if (mounted) setState(() => stopping = false);
     }
@@ -110,26 +111,21 @@ class _ScannerScreenState extends State<ScannerScreen>
       }
       setState(
         () => error = switch (failure.status) {
-          401 || 403 => 'Access changed. Reload your available events.',
-          404 => 'This event or check-in is no longer available.',
-          409 => 'This check-in has already changed. Search again.',
-          429 => 'Too many requests. Wait a moment and retry.',
-          >= 500 => 'The server could not complete the request. Retry.',
-          _ => 'Request rejected: ${failure.code}',
+          401 || 403 => l10n.scanAccessChanged,
+          404 => l10n.scanUnavailable,
+          409 => l10n.scanChanged,
+          429 => l10n.scanRateLimited,
+          >= 500 => l10n.scanServerError,
+          _ => l10n.apiError(failure.code),
         },
       );
     } on TimeoutException {
       if (mounted) {
-        setState(
-          () => error = 'Request timed out. Check the connection and retry.',
-        );
+        setState(() => error = l10n.scanTimeout);
       }
     } catch (_) {
       if (mounted) {
-        setState(
-          () => error =
-              'Could not complete the request. Check the connection and retry.',
-        );
+        setState(() => error = l10n.scanRequestFailed);
       }
     } finally {
       if (mounted) setState(() => busy = false);
@@ -177,8 +173,8 @@ class _ScannerScreenState extends State<ScannerScreen>
         setState(() {
           scanning = false;
           error = failure.errorCode == MobileScannerErrorCode.permissionDenied
-              ? 'Camera access is denied. Allow BiletFlow to use the camera in your phone settings, then retry.'
-              : 'Could not open the camera. Close other camera apps and retry.';
+              ? l10n.cameraDenied
+              : l10n.cameraInUse;
         });
       } else if (!scanning ||
           WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed ||
@@ -190,7 +186,7 @@ class _ScannerScreenState extends State<ScannerScreen>
       if (mounted) {
         setState(() {
           scanning = false;
-          error = 'Could not open the camera. Retry.';
+          error = l10n.cameraOpenFailed;
         });
       }
     } finally {
@@ -227,7 +223,7 @@ class _ScannerScreenState extends State<ScannerScreen>
           setState(() {
             result = data;
             attendees = null;
-          stats = null;
+            stats = null;
           });
           await refreshStats();
         }),
@@ -272,7 +268,7 @@ class _ScannerScreenState extends State<ScannerScreen>
         stats = null;
       });
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Check-in reversed')));
+          .showSnackBar(SnackBar(content: Text(l10n.checkInReversed)));
       await refreshStats();
     });
   }
@@ -285,6 +281,8 @@ class _ScannerScreenState extends State<ScannerScreen>
     return '$label · ${strings.formatMediumDate(date)}';
   }
 
+  AppLocalizations get l10n => AppLocalizations.of(context);
+
   Widget resultCard(Map<String, dynamic> data) {
     final colors = Theme.of(context).colorScheme;
     final valid = data['result'] == 'VALID';
@@ -293,7 +291,7 @@ class _ScannerScreenState extends State<ScannerScreen>
       color: valid ? colors.primaryContainer : colors.errorContainer,
       child: ListTile(
         leading: Icon(valid ? Icons.check_circle : Icons.cancel),
-        title: Text('${data['result']} · ${data['message']}'),
+        title: Text(l10n.scanResult('${data['result']}')),
         subtitle: ticket is Map
             ? Text(
                 [
@@ -309,7 +307,7 @@ class _ScannerScreenState extends State<ScannerScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('QR scanner')),
+    appBar: AppBar(title: Text(l10n.scannerTitle)),
     body: SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -318,14 +316,14 @@ class _ScannerScreenState extends State<ScannerScreen>
           if (events == null)
             OutlinedButton(
               onPressed: busy ? null : loadEvents,
-              child: const Text('Load available events'),
+              child: Text(l10n.loadScanEvents),
             )
           else if (events!.isEmpty)
-            const Text('No events are available for scanning.')
+            Text(l10n.noScanEvents)
           else
             DropdownButton<String>(
               isExpanded: true,
-              hint: const Text('Select an event'),
+              hint: Text(l10n.selectScanEvent),
               value: eventId,
               onChanged: locked ? null : selectEvent,
               items: [
@@ -341,7 +339,7 @@ class _ScannerScreenState extends State<ScannerScreen>
             ),
           if (stats case final counts?)
             Text(
-              'Checked in: ${counts['checkedIn']} / ${counts['registered']}',
+              '${l10n.checkedInLabel}: ${counts['checkedIn']} / ${counts['registered']}',
             ),
           if (busy) const LinearProgressIndicator(),
           if (error case final message?)
@@ -365,12 +363,12 @@ class _ScannerScreenState extends State<ScannerScreen>
               onPressed: scanning
                   ? (starting ? null : stopCamera)
                   : (locked ? null : start),
-              child: Text(scanning ? 'Stop camera' : 'Scan ticket'),
+              child: Text(scanning ? l10n.stopCamera : l10n.scanTicket),
             ),
             if (stats == null)
               TextButton(
                 onPressed: locked ? null : () => run(refreshStats),
-                child: const Text('Refresh attendance'),
+                child: Text(l10n.refreshAttendance),
               ),
             const SizedBox(height: 12),
             TextField(
@@ -379,23 +377,23 @@ class _ScannerScreenState extends State<ScannerScreen>
               textInputAction: TextInputAction.search,
               onSubmitted: (_) => findAttendees(),
               decoration: InputDecoration(
-                labelText: 'Name, email or order reference',
+                labelText: l10n.attendeeSearch,
                 suffixIcon: IconButton(
                   onPressed: locked ? null : findAttendees,
-                  tooltip: 'Search attendees',
+                  tooltip: l10n.searchAttendees,
                   icon: const Icon(Icons.search),
                 ),
               ),
             ),
             if (attendees case final rows?)
               if (rows.isEmpty)
-                const ListTile(title: Text('No matching attendees'))
+                ListTile(title: Text(l10n.noMatchingAttendees))
               else
                 for (final attendee in rows)
                   ListTile(
                     title: Text('${attendee['attendeeName']}'),
                     subtitle: Text(
-                      '${attendee['ticketTypeName']} · ${attendee['status']}',
+                      '${attendee['ticketTypeName']} · ${l10n.ticketStatus('${attendee['status']}')}',
                     ),
                     trailing: attendee['checkInRecordId'] is String
                         ? TextButton(
@@ -404,7 +402,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                                 : () => reverse(
                                     attendee['checkInRecordId'] as String,
                                   ),
-                            child: const Text('Reverse'),
+                            child: Text(l10n.reverse),
                           )
                         : null,
                   ),
@@ -423,6 +421,7 @@ class _ReverseDialog extends StatefulWidget {
 }
 
 class _ReverseDialogState extends State<_ReverseDialog> {
+  AppLocalizations get l10n => AppLocalizations.of(context);
   final form = GlobalKey<FormState>();
   final reason = TextEditingController();
 
@@ -434,23 +433,22 @@ class _ReverseDialogState extends State<_ReverseDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Reverse check-in?'),
+    title: Text(l10n.reverseQuestion),
     content: Form(
       key: form,
       child: TextFormField(
         controller: reason,
         autofocus: true,
         maxLength: 500,
-        decoration: const InputDecoration(labelText: 'Reason'),
-        validator: (value) => (value ?? '').trim().length < 3
-            ? 'Enter at least 3 characters.'
-            : null,
+        decoration: InputDecoration(labelText: l10n.reason),
+        validator: (value) =>
+            (value ?? '').trim().length < 3 ? l10n.threeCharacters : null,
       ),
     ),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: Text(l10n.cancel),
       ),
       FilledButton(
         onPressed: () {
@@ -458,7 +456,7 @@ class _ReverseDialogState extends State<_ReverseDialog> {
             Navigator.pop(context, reason.text.trim());
           }
         },
-        child: const Text('Reverse check-in'),
+        child: Text(l10n.reverseCheckIn),
       ),
     ],
   );

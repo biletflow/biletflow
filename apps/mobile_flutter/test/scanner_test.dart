@@ -1,3 +1,5 @@
+import 'package:biletflow_mobile/l10n/app_localizations.dart';
+
 import 'dart:convert';
 
 import 'package:biletflow_mobile/core/api.dart';
@@ -55,7 +57,17 @@ void main() {
     addTearDown(api.close);
     addTearDown(session.dispose);
 
-    await tester.pumpWidget(MaterialApp(home: ScannerScreen(session: session)));
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          ...GlobalMaterialLocalizations.delegates,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ScannerScreen(session: session),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(find.text('Scan ticket'), findsNothing);
     await tester.tap(find.byType(DropdownButton<String>));

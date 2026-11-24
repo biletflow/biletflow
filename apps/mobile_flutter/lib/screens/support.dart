@@ -15,6 +15,7 @@ class SupportScreen extends StatefulWidget {
 }
 
 class _SupportScreenState extends State<SupportScreen> {
+  AppLocalizations get l10n => AppLocalizations.of(context);
   late var cases = widget.api.get(_casesPath);
 
   void reload() => setState(() {
@@ -34,10 +35,10 @@ class _SupportScreenState extends State<SupportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Support')),
+      appBar: AppBar(title: Text(l10n.support)),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add),
-        label: const Text('New request'),
+        label: Text(l10n.newRequest),
         onPressed: () async {
           final id = await Navigator.push<String>(
             context,
@@ -60,7 +61,7 @@ class _SupportScreenState extends State<SupportScreen> {
             );
           }
           if (rows.isEmpty) {
-            return const EmptyState(title: 'No support requests');
+            return EmptyState(title: l10n.noSupportRequests);
           }
           return ListView(
             padding: const EdgeInsets.only(bottom: 88),
@@ -68,7 +69,9 @@ class _SupportScreenState extends State<SupportScreen> {
               for (final row in rows.whereType<Map<String, dynamic>>())
                 ListTile(
                   title: Text('${row['subject']}'),
-                  subtitle: Text('${row['reference']} · ${row['status']}'),
+                  subtitle: Text(
+                    '${row['reference']} · ${l10n.supportStatus('${row['status']}')}',
+                  ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => openCase(row['id'] as String),
                 ),
@@ -90,6 +93,7 @@ class SupportComposer extends StatefulWidget {
 }
 
 class _SupportComposerState extends State<SupportComposer> {
+  AppLocalizations get l10n => AppLocalizations.of(context);
   final form = GlobalKey<FormState>();
   final subject = TextEditingController();
   final body = TextEditingController();
@@ -132,7 +136,7 @@ class _SupportComposerState extends State<SupportComposer> {
       canPop: !saving,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(refund ? 'Refund request' : 'New support request'),
+          title: Text(refund ? l10n.refundRequest : l10n.newSupportRequest),
         ),
         body: Form(
           key: form,
@@ -141,22 +145,26 @@ class _SupportComposerState extends State<SupportComposer> {
             children: [
               TextFormField(
                 controller: subject,
-                decoration: const InputDecoration(labelText: 'Subject'),
+                decoration: InputDecoration(labelText: l10n.subject),
                 maxLength: 200,
-                validator: _threeCharacters,
+                validator: (value) => (value?.trim().length ?? 0) < 3
+                    ? l10n.threeCharacters
+                    : null,
               ),
               TextFormField(
                 controller: body,
-                decoration: const InputDecoration(labelText: 'Message'),
+                decoration: InputDecoration(labelText: l10n.message),
                 minLines: 3,
                 maxLines: 8,
                 maxLength: 5000,
-                validator: _threeCharacters,
+                validator: (value) => (value?.trim().length ?? 0) < 3
+                    ? l10n.threeCharacters
+                    : null,
               ),
               if (error != null) Text(error!),
               FilledButton(
                 onPressed: saving ? null : submit,
-                child: Text(saving ? 'Sending…' : 'Send request'),
+                child: Text(saving ? l10n.sending : l10n.sendRequest),
               ),
             ],
           ),
@@ -165,9 +173,6 @@ class _SupportComposerState extends State<SupportComposer> {
     );
   }
 }
-
-String? _threeCharacters(String? value) =>
-    (value?.trim().length ?? 0) < 3 ? 'Enter at least three characters' : null;
 
 class SupportThread extends StatefulWidget {
   const SupportThread({super.key, required this.api, required this.id});
@@ -179,6 +184,7 @@ class SupportThread extends StatefulWidget {
 }
 
 class _SupportThreadState extends State<SupportThread> {
+  AppLocalizations get l10n => AppLocalizations.of(context);
   final reply = TextEditingController();
   String get path => '$_casesPath/${Uri.encodeComponent(widget.id)}';
   late var thread = widget.api.get(path);
@@ -219,12 +225,12 @@ class _SupportThreadState extends State<SupportThread> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text('Support conversation'),
+      title: Text(l10n.supportConversation),
       actions: [
         IconButton(
           onPressed: sending ? null : reload,
           icon: const Icon(Icons.refresh),
-          tooltip: 'Refresh',
+          tooltip: l10n.refresh,
         ),
       ],
     ),
@@ -249,12 +255,14 @@ class _SupportThreadState extends State<SupportThread> {
               '${record['subject']}',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            Text('${record['reference']} · ${record['status']}'),
+            Text(
+              '${record['reference']} · ${l10n.supportStatus('${record['status']}')}',
+            ),
             for (final message in messages.whereType<Map>())
               ListTile(
                 title: Text('${message['body']}'),
                 subtitle: Text(
-                  '${(message['author'] as Map?)?['name'] ?? 'Support'}',
+                  '${(message['author'] as Map?)?['name'] ?? l10n.support}',
                 ),
               ),
             if (record['status'] != 'RESOLVED') ...[
@@ -262,12 +270,12 @@ class _SupportThreadState extends State<SupportThread> {
                 controller: reply,
                 enabled: !sending,
                 maxLength: 5000,
-                decoration: const InputDecoration(labelText: 'Reply'),
+                decoration: InputDecoration(labelText: l10n.reply),
               ),
               if (error != null) Text(error!),
               FilledButton(
                 onPressed: sending ? null : send,
-                child: const Text('Send reply'),
+                child: Text(l10n.sendReply),
               ),
             ],
           ],
