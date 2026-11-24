@@ -233,6 +233,26 @@ export const suspendSchema = z.object({
   reason: z.string().trim().min(3).max(500),
 });
 
+export const eventReportSchema = z.object({
+  reason: z.string().trim().min(3).max(200),
+  details: z.string().trim().max(2000).optional(),
+});
+
+export const identityVerificationSchema = z.object({
+  documentName: z.string().trim().min(1).max(120).optional(),
+});
+
+export const platformSettingsSchema = z
+  .object({
+    activationFeeKzt: z.number().int().positive().max(1_000_000).optional(),
+    feePercent: z.number().min(0).max(100).optional(),
+    feeFixedKzt: z.number().int().min(0).max(1_000_000).optional(),
+    checkoutHoldMinutes: z.number().int().positive().max(24 * 60).optional(),
+  })
+  .refine((value) => Object.values(value).some((item) => item !== undefined), {
+    message: "At least one setting is required",
+  });
+
 export const eventCancelSchema = z.object({
   reason: z.string().trim().min(3).max(500),
 });
@@ -268,3 +288,6 @@ export type CheckInResult = z.infer<typeof checkInResultSchema>;
 export type EventCancelInput = z.infer<typeof eventCancelSchema>;
 export type ActivationReviewInput = z.infer<typeof activationReviewSchema>;
 export type PaymentWebhookInput = z.infer<typeof paymentWebhookSchema>;
+export type RefundOrderInput = z.infer<typeof refundOrderSchema>;
+export type EventReportInput = z.infer<typeof eventReportSchema>;
+export type PlatformSettingsInput = z.infer<typeof platformSettingsSchema>;

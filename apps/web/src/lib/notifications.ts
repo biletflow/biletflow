@@ -223,3 +223,134 @@ export async function notifyReservationCancelled(input: {
   });
   return { skipped: false };
 }
+
+export async function notifyRefundCompleted(input: {
+  orderId: string;
+  userId: string;
+  reference: string;
+  eventTitle: string;
+  amountKzt: number;
+}) {
+  if (await alreadySent(input.userId, "REFUND_COMPLETED", input.orderId)) {
+    return { skipped: true };
+  }
+  const user = await userEmail(input.userId);
+  if (!user) return { skipped: true };
+  const subject = `BiletFlow refund for ${input.reference}`;
+  const body = [
+    `Order ${input.reference} for "${input.eventTitle}" was refunded.`,
+    `Amount: ₸${input.amountKzt}. This is a simulated refund. No card was charged or credited.`,
+    "The admission tickets on this order are no longer valid.",
+  ].join("\n");
+  await deliver({
+    userId: input.userId,
+    email: user.email,
+    type: "REFUND_COMPLETED",
+    subject,
+    body,
+    payload: {
+      orderId: input.orderId,
+      reference: input.reference,
+      amountKzt: input.amountKzt,
+    },
+  });
+  return { skipped: false };
+}
+
+export async function notifyEventCancelled(input: {
+  orderId: string;
+  userId: string;
+  reference: string;
+  eventTitle: string;
+  reason: string;
+  refunded: boolean;
+}) {
+  if (await alreadySent(input.userId, "EVENT_CANCELLED", input.orderId)) {
+    return { skipped: true };
+  }
+  const user = await userEmail(input.userId);
+  if (!user) return { skipped: true };
+  const subject = `BiletFlow event cancelled: ${input.eventTitle}`;
+  const body = [
+    `"${input.eventTitle}" was cancelled.`,
+    `Order ${input.reference}. Reason: ${input.reason}`,
+    input.refunded
+      ? "A simulated refund was recorded and the tickets are no longer valid."
+      : "The unpaid reservation was released. No payment was taken.",
+  ].join("\n");
+  await deliver({
+    userId: input.userId,
+    email: user.email,
+    type: "EVENT_CANCELLED",
+    subject,
+    body,
+    payload: {
+      orderId: input.orderId,
+      reference: input.reference,
+      refunded: input.refunded,
+    },
+  });
+  return { skipped: false };
+}
+
+export async function notifyCancelledEventOrders(eventId: string) {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { title: true, cancellationReason: true },
+  });
+  if (!event) return;
+  const orders = await prisma.order.findMany({
+    where: { eventId, status: { in: ["REFUNDED", "CANCELLED"] } },
+    select: { id: true, userId: true, reference: true, status: true },
+  });
+  for (const order of orders) {
+    await notifyEventCancelled({
+      orderId: order.id,
+      userId: order.userId,
+      reference: order.reference,
+      eventTitle: event.title,
+      reason: event.cancellationReason ?? "Cancelled",
+      refunded: order.status === "REFUNDED",
+    });
+  }
+}
+
+export async function notifySupportMessage(input: {
+  recipientId: string;
+  caseId: string;
+  messageId: string;
+  reference: string;
+  subject: string;
+}) {
+  const existing = await prisma.notification.findFirst({
+    where: {
+      userId: input.recipientId,
+      type: "SUPPORT_MESSAGE",
+      channel: "EMAIL",
+      payload: { path: ["messageId"], equals: input.messageId },
+    },
+    select: { id: true },
+  });
+  if (existing) return { skipped: true };
+  const user = await userEmail(input.recipientId);
+  if (!user) return { skipped: true };
+  const subject = `BiletFlow support ${input.reference}`;
+  const body = [
+    `There is a new message on support case ${input.reference}.`,
+    `Subject: ${input.subject}`,
+    "Open the case in BiletFlow to reply.",
+  ].join("\n");
+  await deliver({
+    userId: input.recipientId,
+    email: user.email,
+    type: "SUPPORT_MESSAGE",
+    subject,
+    body,
+    payload: {
+      caseId: input.caseId,
+      messageId: input.messageId,
+      reference: input.reference,
+    },
+  });
+  return { skipped: false };
+}
