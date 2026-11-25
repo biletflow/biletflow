@@ -5,6 +5,8 @@ import 'package:material_ui/material_ui.dart';
 import '../core/api.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/empty_state.dart';
+import 'organizer_editor.dart';
+import 'admin_moderation.dart';
 
 class OrganizerReports extends StatefulWidget {
   const OrganizerReports({super.key, required this.api, required this.eventId});
@@ -19,6 +21,23 @@ class _OrganizerReportsState extends State<OrganizerReports> {
   late final id = Uri.encodeComponent(widget.eventId);
   late var attendance = widget.api.get('/api/mobile/events/$id/stats');
   late var campaigns = widget.api.get('/api/organizer/events/$id/campaigns');
+
+  Future<void> createCampaign(bool percent) async {
+    final saved = await Navigator.push<bool>(context, MaterialPageRoute(builder: (_) => OrganizerEditor(
+      title: percent ? 'Percentage discount campaign' : 'Fixed KZT discount campaign',
+      fields: const [
+        (key: 'name', label: 'Campaign name', required: true, number: false),
+        (key: 'discountValue', label: 'Discount value', required: true, number: true),
+        (key: 'maxRedemptions', label: 'Maximum redemptions', required: false, number: true),
+        (key: 'perUserLimit', label: 'Per-user limit', required: true, number: true),
+      ],
+      initial: {'discountType': percent ? 'PERCENT' : 'FIXED_KZT', 'perUserLimit': 1},
+      save: (body) => widget.api.post('/api/organizer/events/$id/campaigns', body),
+    )));
+    if (mounted && saved == true) setState(() {
+      campaigns = widget.api.get('/api/organizer/events/$id/campaigns');
+    });
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -39,6 +58,10 @@ class _OrganizerReportsState extends State<OrganizerReports> {
           ),
         ),
         Text('Campaigns', style: Theme.of(context).textTheme.titleLarge),
+        Wrap(spacing: 8, children: [
+          OutlinedButton(onPressed: () => createCampaign(true), child: Text(adminLabel(context,'New % campaign','Новая кампания %','Жаңа % науқан'))),
+          OutlinedButton(onPressed: () => createCampaign(false), child: Text(adminLabel(context,'New KZT campaign','Новая кампания KZT','Жаңа KZT науқан'))),
+        ]),
         _ReportResult(
           data: campaigns,
           retry: () => setState(() {
