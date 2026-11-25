@@ -3,6 +3,9 @@ import 'package:material_ui/material_ui.dart';
 import '../core/api.dart';
 import '../l10n/app_localizations.dart';
 import 'organizer_reports.dart';
+import 'organizer_overview.dart';
+import 'organizer_activation.dart';
+import 'admin_moderation.dart';
 import 'organizer_editor.dart';
 
 const eventFields = [
@@ -383,6 +386,14 @@ class _EventScreenState extends State<EventScreen> {
             OutlinedButton(
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => OrganizerReports(api: widget.api, eventId: widget.id))),
               child: const Text('Attendance and campaigns'),
+            ),
+            OutlinedButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => OrganizerOverview(api: widget.api, eventId: widget.id))),
+              child: Text(adminLabel(context,'Analytics and history','Аналитика и история','Талдау және тарих')),
+            ),
+            OutlinedButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => OrganizerActivation(api: widget.api, eventId: widget.id))),
+              child: Text(adminLabel(context,'Paid sales activation','Активация платных продаж','Ақылы сатылымды іске қосу')),
             ),
             const SizedBox(height: 20),
             const Text('Ticket types'),
