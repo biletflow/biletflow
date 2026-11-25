@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:material_ui/material_ui.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../core/api.dart';
 import '../l10n/app_localizations.dart';
 
@@ -42,6 +45,29 @@ class _AdminModerationState extends State<AdminModeration> {
     }
   }
 
+  Future<void> exportOrders() async {
+    if (busy) return;
+    setState(() { busy = true; error = null; });
+    try {
+      final bytes = await widget.api.getBytes('/api/admin/exports/orders.csv', accept: 'text/csv');
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/biletflow-orders.csv');
+      await file.writeAsBytes(bytes, flush: true);
+      try {
+        if (!mounted) return;
+        final box = context.findRenderObject() as RenderBox?;
+        await Share.shareXFiles([XFile(file.path, mimeType: 'text/csv')],
+          sharePositionOrigin: box == null ? null : box.localToGlobal(Offset.zero) & box.size);
+      } finally {
+        if (await file.exists()) await file.delete();
+      }
+    } catch (e) {
+      if (mounted) setState(() => error = AppLocalizations.of(context).apiError(e is ApiException ? e.code : ''));
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
   Future<void> suspend(String group, String id) async {
     if (busy) return;
     String reason = '';
@@ -75,6 +101,7 @@ class _AdminModerationState extends State<AdminModeration> {
         decoration: InputDecoration(labelText: adminLabel(context, 'Search users, events, orders or payments', 'Поиск пользователей, событий, заказов и платежей', 'Пайдаланушыларды, іс-шараларды, тапсырыстарды және төлемдерді іздеу'))),
       FilledButton(onPressed: busy ? null : () => load(), child: Text(adminLabel(context, 'Search', 'Поиск', 'Іздеу'))),
       OutlinedButton(onPressed: busy ? null : () => load(reports: true), child: Text(adminLabel(context, 'Reported events', 'Жалобы на события', 'Іс-шараларға шағымдар'))),
+      OutlinedButton(onPressed: busy ? null : exportOrders, child: Text(adminLabel(context, 'Export orders CSV', 'Экспорт заказов CSV', 'Тапсырыстарды CSV экспорттау'))),
       if (busy) const LinearProgressIndicator(),
       if (error != null) Text(error!),
       for (final group in ['users', 'events', 'orders', 'payments', 'reports'])
