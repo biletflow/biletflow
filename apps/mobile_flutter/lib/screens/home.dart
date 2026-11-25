@@ -1,6 +1,8 @@
 import 'support.dart';
 import 'admin_activations.dart';
 import 'admin_moderation.dart';
+import 'admin_settings.dart';
+import 'organizer_settings.dart';
 import 'package:material_ui/material_ui.dart';
 import '../core/session.dart';
 import '../l10n/app_localizations.dart';
@@ -106,6 +108,18 @@ class HomeScreen extends StatelessWidget {
               leading: const Icon(Icons.manage_search),
               title: Text(adminLabel(context, 'Moderation', 'Модерация', 'Модерация')),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminModeration(api: session.api))),
+            )),
+          if (session.role == 'ORGANIZER')
+            Card(child: ListTile(
+              leading: const Icon(Icons.settings),
+              title: Text(adminLabel(context,'Organizer settings','Настройки организатора','Ұйымдастырушы баптаулары')),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => OrganizerSettings(api: session.api))),
+            )),
+          if (session.role == 'PLATFORM_ADMIN')
+            Card(child: ListTile(
+              leading: const Icon(Icons.settings),
+              title: Text(adminLabel(context,'Platform settings','Настройки платформы','Платформа баптаулары')),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminSettings(api: session.api))),
             )),
           if (session.canScan)
             Card(
