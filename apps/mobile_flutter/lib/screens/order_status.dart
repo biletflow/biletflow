@@ -88,7 +88,10 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
       _error = null;
     });
     try {
-      final data = await widget.api.post('/api/orders/${widget.orderId}/cancel', {});
+      final data = await widget.api.post(
+        '/api/orders/${widget.orderId}/cancel',
+        {},
+      );
       final order = data['order'];
       if (order is Map) {
         setState(() => _order = Map<String, dynamic>.from(order));
@@ -170,143 +173,165 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
       body: _loading
           ? const LoadingState()
           : _error != null && order == null
-              ? ErrorState(
-                  message: l10n.apiError(_error!),
-                  onRetry: _load,
-                  retryLabel: l10n.refresh,
-                )
-              : ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Text(
-                      reference.isEmpty ? l10n.order : reference,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: StatusBadge.order(
-                        status,
-                        status == 'REFUNDED' ? l10n.ticketStatus(status) : status,
-                      ),
-                    ),
-                    if (total is num)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          l10n.totalLabel(formatKzt(total, freeLabel: l10n.free)),
-                        ),
-                      ),
-                    if (_error != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          l10n.apiError(_error!),
-                          style: TextStyle(color: Theme.of(context).colorScheme.error),
-                        ),
-                      ),
-                    if (awaiting) ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        l10n.simulatedPayment,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 8),
-                      FilledButton(
-                        onPressed: _busy ? null : () => _simulate('APPROVED'),
-                        child: Text(l10n.approvePayment),
-                      ),
-                      const SizedBox(height: 8),
-                      OutlinedButton(
-                        onPressed: _busy ? null : () => _simulate('DECLINED'),
-                        child: Text(l10n.decline),
-                      ),
-                      const SizedBox(height: 8),
-                      OutlinedButton(
-                        onPressed: _busy ? null : () => _simulate('ABANDONED'),
-                        child: Text(l10n.abandon),
-                      ),
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: _busy ? null : _cancel,
-                        child: Text(l10n.cancelReservation),
-                      ),
-                    ],
-                    if (status == 'PAID') ...[
-                      if (tickets is List &&
-                          tickets.isNotEmpty &&
-                          !tickets.whereType<Map>().any(
-                            (ticket) => ticket['status'] == 'CHECKED_IN',
-                          ))
-                        OutlinedButton(
-                          onPressed: _busy ? null : _refund,
-                          child: Text(l10n.refundOrder),
-                        ),
-                      OutlinedButton(
-                        onPressed: _busy ? null : () async {
-                          final id = await Navigator.push<String>(context, MaterialPageRoute(
-                            builder: (_) => SupportComposer(api: widget.api, orderId: widget.orderId),
-                          ));
-                          if (!context.mounted || id == null) return;
-                          await Navigator.push<void>(context, MaterialPageRoute(
-                            builder: (_) => SupportThread(api: widget.api, id: id),
-                          ));
-                        },
-                        child: const Text('Ask about a refund'),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(l10n.paymentSucceeded,
-                          style: Theme.of(context).textTheme.titleMedium),
-                      const SizedBox(height: 8),
-                      if (tickets is List)
-                        ...tickets.whereType<Map>().map((raw) {
-                          final ticket = Map<String, dynamic>.from(raw);
-                          final id = '${ticket['id'] ?? ''}';
-                          final ticketStatus = '${ticket['status'] ?? ''}';
-                          return Card(
-                            child: ListTile(
-                              title: Text('${ticket['ticketTypeName'] ?? 'Ticket'}'),
-                              subtitle: Text(
-                                [
-                                  '${ticket['attendeeName'] ?? ''}',
-                                  l10n.ticketStatus(ticketStatus),
-                                ].where((part) => part.isNotEmpty).join(' · '),
-                              ),
-                              trailing: id.isEmpty ? null : const Icon(Icons.chevron_right),
-                              onTap: id.isEmpty
-                                  ? null
-                                  : () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => TicketDetailScreen(
-                                            api: widget.api,
-                                            ticketId: id,
-                                            summary: {
-                                              ...ticket,
-                                              'ticketTypeName': ticket['ticketTypeName'],
-                                              'attendeeName': ticket['attendeeName'],
-                                              'status': ticket['status'],
-                                              'event': {
-                                                'title': '${l10n.order} ${order?['reference'] ?? ''}',
-                                              },
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                            ),
-                          );
-                        }),
-                    ],
-                    if (status == 'CANCELLED' ||
-                        status == 'EXPIRED' ||
-                        status == 'FAILED') ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        status == 'EXPIRED' ? l10n.holdExpired : l10n.orderClosed,
-                      ),
-                    ],
-                  ],
+          ? ErrorState(
+              message: l10n.apiError(_error!),
+              onRetry: _load,
+              retryLabel: l10n.refresh,
+            )
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Text(
+                  reference.isEmpty ? l10n.order : reference,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: StatusBadge.order(
+                    status,
+                    status == 'REFUNDED' ? l10n.ticketStatus(status) : status,
+                  ),
+                ),
+                if (total is num)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      l10n.totalLabel(formatKzt(total, freeLabel: l10n.free)),
+                    ),
+                  ),
+                if (_error != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      l10n.apiError(_error!),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ),
+                if (awaiting) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.simulatedPayment,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 8),
+                  FilledButton(
+                    onPressed: _busy ? null : () => _simulate('APPROVED'),
+                    child: Text(l10n.approvePayment),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton(
+                    onPressed: _busy ? null : () => _simulate('DECLINED'),
+                    child: Text(l10n.decline),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton(
+                    onPressed: _busy ? null : () => _simulate('ABANDONED'),
+                    child: Text(l10n.abandon),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: _busy ? null : _cancel,
+                    child: Text(l10n.cancelReservation),
+                  ),
+                ],
+                if (status == 'PAID') ...[
+                  if (tickets is List &&
+                      tickets.isNotEmpty &&
+                      !tickets.whereType<Map>().any(
+                        (ticket) => ticket['status'] == 'CHECKED_IN',
+                      ))
+                    OutlinedButton(
+                      onPressed: _busy ? null : _refund,
+                      child: Text(l10n.refundOrder),
+                    ),
+                  OutlinedButton(
+                    onPressed: _busy
+                        ? null
+                        : () async {
+                            final id = await Navigator.push<String>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SupportComposer(
+                                  api: widget.api,
+                                  orderId: widget.orderId,
+                                ),
+                              ),
+                            );
+                            if (!context.mounted || id == null) return;
+                            await Navigator.push<void>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    SupportThread(api: widget.api, id: id),
+                              ),
+                            );
+                          },
+                    child: Text(l10n.askRefund),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.paymentSucceeded,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  if (tickets is List)
+                    ...tickets.whereType<Map>().map((raw) {
+                      final ticket = Map<String, dynamic>.from(raw);
+                      final id = '${ticket['id'] ?? ''}';
+                      final ticketStatus = '${ticket['status'] ?? ''}';
+                      return Card(
+                        child: ListTile(
+                          title: Text(
+                            '${ticket['ticketTypeName'] ?? 'Ticket'}',
+                          ),
+                          subtitle: Text(
+                            [
+                              '${ticket['attendeeName'] ?? ''}',
+                              l10n.ticketStatus(ticketStatus),
+                            ].where((part) => part.isNotEmpty).join(' · '),
+                          ),
+                          trailing: id.isEmpty
+                              ? null
+                              : const Icon(Icons.chevron_right),
+                          onTap: id.isEmpty
+                              ? null
+                              : () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => TicketDetailScreen(
+                                      api: widget.api,
+                                      ticketId: id,
+                                      summary: {
+                                        ...ticket,
+                                        'ticketTypeName':
+                                            ticket['ticketTypeName'],
+                                        'attendeeName': ticket['attendeeName'],
+                                        'status': ticket['status'],
+                                        'event': {
+                                          'title':
+                                              '${l10n.order} ${order?['reference'] ?? ''}',
+                                        },
+                                      },
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      );
+                    }),
+                ],
+                if (status == 'CANCELLED' ||
+                    status == 'EXPIRED' ||
+                    status == 'FAILED') ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    status == 'EXPIRED' ? l10n.holdExpired : l10n.orderClosed,
+                  ),
+                ],
+              ],
+            ),
     );
   }
 }

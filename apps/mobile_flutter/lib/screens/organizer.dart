@@ -4,39 +4,23 @@ import '../core/api.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/status_badge.dart';
-import 'organizer_reports.dart';
-import '../l10n/app_localizations.dart';
 import 'organizer_editor.dart';
+import 'organizer_reports.dart';
 
-const eventFields = [
-  (key: 'title', label: 'Event title', required: true, number: false),
-  (key: 'description', label: 'Description', required: false, number: false),
-  (
-    key: 'startsAt',
-    label: 'Starts at (ISO date and time)',
-    required: true,
-    number: false,
-  ),
-  (
-    key: 'endsAt',
-    label: 'Ends at (ISO date and time)',
-    required: true,
-    number: false,
-  ),
-  (key: 'capacity', label: 'Capacity', required: false, number: true),
+List<EditorField> _eventFields(AppLocalizations l10n) => [
+  (key: 'title', label: l10n.eventTitle, required: true, number: false),
+  (key: 'description', label: l10n.description, required: false, number: false),
+  (key: 'startsAt', label: l10n.startsAt, required: true, number: false),
+  (key: 'endsAt', label: l10n.endsAt, required: true, number: false),
+  (key: 'capacity', label: l10n.capacity, required: false, number: true),
 ];
 
-const ticketFields = [
-  (key: 'name', label: 'Ticket name', required: true, number: false),
-  (key: 'description', label: 'Description', required: false, number: false),
-  (key: 'priceKzt', label: 'Price in KZT', required: true, number: true),
-  (key: 'quantity', label: 'Quantity', required: true, number: true),
-  (
-    key: 'maxPerOrder',
-    label: 'Maximum per order',
-    required: true,
-    number: true,
-  ),
+List<EditorField> _ticketFields(AppLocalizations l10n) => [
+  (key: 'name', label: l10n.ticketName, required: true, number: false),
+  (key: 'description', label: l10n.description, required: false, number: false),
+  (key: 'priceKzt', label: l10n.priceKzt, required: true, number: true),
+  (key: 'quantity', label: l10n.quantity, required: true, number: true),
+  (key: 'maxPerOrder', label: l10n.maxPerOrder, required: true, number: true),
 ];
 
 Map<String, dynamic> _settings(Map row, List<String> keys) => {
@@ -62,17 +46,39 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
     events = widget.api.get('/api/organizer/events');
   }
 
-  void initState() { super.initState(); events = widget.api.get('/api/organizer/events'); }
-  void refresh() {
-    setState(() {
-      events = widget.api.get('/api/organizer/events');
-    });
+  void refresh() => setState(() {
+    events = widget.api.get('/api/organizer/events');
+  });
+
+  Future<void> createEvent() async {
+    final l10n = AppLocalizations.of(context);
+    final starts = DateTime.now().toUtc().add(const Duration(days: 1));
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => OrganizerEditor(
+          title: l10n.createEvent,
+          fields: _eventFields(l10n),
+          initial: {
+            'startsAt': starts.toIso8601String(),
+            'endsAt': starts.add(const Duration(hours: 2)).toIso8601String(),
+          },
+          save: (body) => widget.api.post('/api/organizer/events', body),
+        ),
+      ),
+    );
+    if (mounted && saved == true) refresh();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: createEvent,
+        icon: const Icon(Icons.add),
+        label: Text(l10n.createEvent),
+      ),
       appBar: AppBar(
         title: Text(l10n.myEvents),
         actions: [
@@ -94,7 +100,9 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
             return _organizerError(l10n, snapshot.error, refresh);
           }
           final ownedEvents = rows.whereType<Map<String, dynamic>>().toList();
-          if (ownedEvents.isEmpty) return EmptyState(title: l10n.noEvents);
+          if (ownedEvents.isEmpty) {
+            return EmptyState(title: l10n.noEvents);
+          }
           final statuses = ownedEvents
               .map((event) => event['status'])
               .whereType<String>()
@@ -107,7 +115,7 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
           );
 
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
             children: [
               Wrap(
                 spacing: 8,
@@ -132,15 +140,18 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
                     subtitle: Text(_eventDate(context, event['startsAt'])),
                     trailing: _eventStatus(l10n, event['status']),
                     onTap: event['id'] is String
-                        ? () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => EventScreen(
-                                api: widget.api,
-                                id: event['id'] as String,
+                        ? () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => EventScreen(
+                                  api: widget.api,
+                                  id: event['id'] as String,
+                                ),
                               ),
-                            ),
-                          )
+                            );
+                            if (mounted) refresh();
+                          }
                         : null,
                   ),
                 ),
@@ -150,92 +161,6 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
       ),
     );
   }
-  void initState() {
-    super.initState();
-    events = widget.api.get('/api/organizer/events');
-  }
-
-  void refresh() => setState(() {
-    events = widget.api.get('/api/organizer/events');
-  });
-  Future<void> createEvent() async {
-    final starts = DateTime.now().toUtc().add(const Duration(days: 1));
-    final saved = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => OrganizerEditor(
-          title: 'Create event',
-          fields: eventFields,
-          initial: {
-            'startsAt': starts.toIso8601String(),
-            'endsAt': starts.add(const Duration(hours: 2)).toIso8601String(),
-          },
-          save: (body) => widget.api.post('/api/organizer/events', body),
-        ),
-      ),
-    );
-    if (mounted && saved == true) refresh();
-  }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    floatingActionButton: FloatingActionButton.extended(
-      onPressed: createEvent,
-      icon: const Icon(Icons.add),
-      label: const Text('Create event'),
-    ),
-    appBar: AppBar(
-      title: const Text('My events'),
-      actions: [
-        IconButton(onPressed: refresh, icon: const Icon(Icons.refresh)),
-      ],
-    ),
-    body: FutureBuilder(
-      future: events,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) return Center(child: Text('${snapshot.error}'));
-        final rows = snapshot.data?['events'];
-        if (rows is! List) {
-          return const Center(child: Text('Unexpected event response'));
-        }
-        if (rows.isEmpty) return const Center(child: Text('No events yet'));
-        return ListView.builder(
-          padding: const EdgeInsets.all(12),
-          itemCount: rows.length,
-          itemBuilder: (context, index) {
-            final row = rows[index];
-            if (row is! Map) return const SizedBox.shrink();
-            return Card(
-              child: ListTile(
-                title: Text('${row['title'] ?? ''}'),
-                subtitle: Text(
-                  '${row['status'] ?? ''} · ${row['startsAt'] ?? ''}',
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: row['id'] is String
-                    ? () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => EventScreen(
-                              api: widget.api,
-                              id: row['id'] as String,
-                            ),
-                          ),
-                        );
-                        if (mounted) refresh();
-                      }
-                    : null,
-              ),
-            );
-          },
-        );
-      },
-    ),
-  );
 }
 
 class EventScreen extends StatefulWidget {
@@ -249,37 +174,33 @@ class EventScreen extends StatefulWidget {
 
 class _EventScreenState extends State<EventScreen> {
   late Future<Map<String, dynamic>> eventFuture;
-  Future<Map<String, dynamic>> loadEvent() =>
-      widget.api.get('/api/organizer/events/${Uri.encodeComponent(widget.id)}');
   bool changing = false;
   String get path => '/api/organizer/events/${Uri.encodeComponent(widget.id)}';
+
+  @override
+  void initState() {
+    super.initState();
+    eventFuture = widget.api.get(path);
+  }
 
   void reload() => setState(() {
     eventFuture = widget.api.get(path);
   });
 
   Future<void> editEvent(Map event) async {
+    final l10n = AppLocalizations.of(context);
     final saved = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (_) => OrganizerEditor(
-          title: 'Edit event',
-          fields: eventFields,
+          title: l10n.editEvent,
+          fields: _eventFields(l10n),
           initial: _settings(event, [
             'title',
             'description',
-            'category',
-            'coverImageUrl',
-            'venueId',
-            'visibility',
-            'seatingMode',
             'startsAt',
             'endsAt',
-            'timezone',
-            'registrationOpensAt',
-            'registrationClosesAt',
             'capacity',
-            'refundPolicy',
           ]),
           save: (body) => widget.api.put(path, body),
         ),
@@ -289,13 +210,14 @@ class _EventScreenState extends State<EventScreen> {
   }
 
   Future<void> editTicket([Map? ticket]) async {
+    final l10n = AppLocalizations.of(context);
     final id = ticket?['id'];
     final saved = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (_) => OrganizerEditor(
-          title: ticket == null ? 'Add ticket type' : 'Edit ticket type',
-          fields: ticketFields,
+          title: ticket == null ? l10n.addTicketType : l10n.editTicketType,
+          fields: _ticketFields(l10n),
           initial: ticket == null
               ? {'priceKzt': 0, 'quantity': 10, 'maxPerOrder': 10}
               : _settings(ticket, [
@@ -304,9 +226,6 @@ class _EventScreenState extends State<EventScreen> {
                   'priceKzt',
                   'quantity',
                   'maxPerOrder',
-                  'salesStartAt',
-                  'salesEndAt',
-                  'isHidden',
                 ]),
           save: (body) => id is String
               ? widget.api.put(
@@ -322,21 +241,20 @@ class _EventScreenState extends State<EventScreen> {
 
   Future<void> deleteTicket(String id) async {
     if (changing) return;
+    final l10n = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete ticket type?'),
-        content: const Text(
-          'Only ticket types without issued tickets or reservations can be deleted.',
-        ),
+        title: Text(l10n.deleteTicketTypeTitle),
+        content: Text(l10n.deleteTicketTypeBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Back'),
+            child: Text(l10n.back),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -352,9 +270,8 @@ class _EventScreenState extends State<EventScreen> {
     } catch (error) {
       if (!mounted) return;
       final message = error is ApiException && error.status == 409
-          ? 'This ticket type has tickets or reservations. Hide it from sales instead.'
-          : AppLocalizations.of(context)
-                .apiError(error is ApiException ? error.code : '');
+          ? l10n.hideTicketType
+          : l10n.apiError(error is ApiException ? error.code : '');
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(message)));
     } finally {
@@ -364,16 +281,17 @@ class _EventScreenState extends State<EventScreen> {
 
   Future<void> eventAction(String action) async {
     if (changing) return;
+    final l10n = AppLocalizations.of(context);
     if (action == 'cancel') {
       final saved = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
           builder: (_) => OrganizerEditor(
-            title: 'Cancel event',
-            fields: const [
+            title: l10n.cancelEvent,
+            fields: [
               (
                 key: 'reason',
-                label: 'Reason for cancellation',
+                label: l10n.cancelReason,
                 required: true,
                 number: false,
               ),
@@ -397,19 +315,14 @@ class _EventScreenState extends State<EventScreen> {
       }
     } catch (failure) {
       if (!mounted) return;
-      final message = AppLocalizations.of(context)
-          .apiError(failure is ApiException ? failure.code : '');
+      final message = l10n.apiError(
+        failure is ApiException ? failure.code : '',
+      );
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(message)));
     } finally {
       if (mounted) setState(() => changing = false);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    eventFuture = loadEvent();
   }
 
   @override
@@ -425,13 +338,11 @@ class _EventScreenState extends State<EventScreen> {
           }
           final event = snapshot.data?['event'];
           if (snapshot.hasError || event is! Map<String, dynamic>) {
-            return _organizerError(l10n, snapshot.error, () {
-              setState(() {
-                eventFuture = loadEvent();
-              });
-            });
+            return _organizerError(l10n, snapshot.error, reload);
           }
           final types = event['ticketTypes'];
+          final status = event['status'];
+          final editable = status == 'DRAFT' || status == 'PUBLISHED';
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -446,30 +357,94 @@ class _EventScreenState extends State<EventScreen> {
               Text(_eventDate(context, event['startsAt'])),
               const SizedBox(height: 12),
               Text('${event['description'] ?? ''}'),
-              if (types is List && types.isNotEmpty) ...[
-                const SizedBox(height: 20),
-                Text(
-                  l10n.ticketTypes,
-                  style: Theme.of(context).textTheme.titleMedium,
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrganizerReports(
+                          api: widget.api,
+                          eventId: widget.id,
+                        ),
+                      ),
+                    ),
+                    child: Text(l10n.attendanceAndCampaigns),
+                  ),
+                  if (editable)
+                    OutlinedButton(
+                      onPressed: changing ? null : () => editEvent(event),
+                      child: Text(l10n.editEvent),
+                    ),
+                  if (status == 'DRAFT')
+                    OutlinedButton(
+                      onPressed: changing ? null : () => eventAction('publish'),
+                      child: Text(l10n.publish),
+                    ),
+                  if (status == 'PUBLISHED')
+                    OutlinedButton(
+                      onPressed: changing
+                          ? null
+                          : () => eventAction('unpublish'),
+                      child: Text(l10n.unpublish),
+                    ),
+                  if (editable)
+                    OutlinedButton(
+                      onPressed: changing ? null : () => eventAction('cancel'),
+                      child: Text(l10n.cancelEvent),
+                    ),
+                  OutlinedButton(
+                    onPressed: changing ? null : () => eventAction('duplicate'),
+                    child: Text(l10n.duplicate),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                l10n.ticketTypes,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              if (editable)
+                TextButton(
+                  onPressed: changing ? null : () => editTicket(),
+                  child: Text(l10n.addTicketType),
                 ),
+              if (types is! List || types.isEmpty)
+                Text(l10n.noTicketTypes)
+              else
                 for (final type in types.whereType<Map<String, dynamic>>())
                   Card(
                     child: ListTile(
                       title: Text('${type['name'] ?? ''}'),
+                      onTap: editable && !changing
+                          ? () => editTicket(type)
+                          : null,
                       subtitle: type['sold'] is int && type['available'] is int
                           ? Text(
-                              l10n.ticketInventory(
-                                type['sold'] as int,
-                                type['available'] as int,
-                              ),
+                              '${l10n.ticketInventory(type['sold'] as int, type['available'] as int)}'
+                              '${type['isHidden'] == true ? ' · ${l10n.hidden}' : ''}',
                             )
                           : null,
-                      trailing: type['priceKzt'] is int
-                          ? Text(l10n.money(type['priceKzt'] as int))
-                          : null,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (type['priceKzt'] is int)
+                            Text(l10n.money(type['priceKzt'] as int)),
+                          if (editable && type['id'] is String)
+                            IconButton(
+                              tooltip: l10n.deleteTicketType,
+                              onPressed: changing
+                                  ? null
+                                  : () => deleteTicket(type['id'] as String),
+                              icon: const Icon(Icons.delete_outline),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
-              ],
             ],
           );
         },
@@ -498,7 +473,11 @@ Widget _organizerError(
 String _eventDate(BuildContext context, Object? value) {
   final date = value is String ? DateTime.tryParse(value)?.toLocal() : null;
   if (date == null) return '';
-  final formats = MaterialLocalizations.of(context);
+  final formats = Localizations.of<MaterialLocalizations>(
+    context,
+    MaterialLocalizations,
+  );
+  if (formats == null) return '';
   return '${formats.formatMediumDate(date)} · ${formats.formatTimeOfDay(TimeOfDay.fromDateTime(date))}';
 }
 
@@ -512,121 +491,5 @@ Widget _eventStatus(AppLocalizations l10n, Object? value) {
       'COMPLETED' => StatusTone.info,
       _ => StatusTone.neutral,
     },
-    eventFuture = widget.api.get(
-      '/api/organizer/events/${Uri.encodeComponent(widget.id)}',
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Event details')), body: FutureBuilder(future: eventFuture, builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-    if (snapshot.hasError) return Center(child: Text('${snapshot.error}'));
-    final event = snapshot.data?['event'];
-    if (event is! Map) return const Center(child: Text('Unexpected event response'));
-    final types = event['ticketTypes'];
-    return ListView(padding: const EdgeInsets.all(16), children: [
-      Text('${event['title'] ?? ''}', style: Theme.of(context).textTheme.headlineSmall),
-      Text('${event['status'] ?? ''}'), const SizedBox(height: 12), Text('${event['description'] ?? ''}'),
-      OutlinedButton(
-        onPressed: () => Navigator.push(context, MaterialPageRoute(
-          builder: (_) => OrganizerReports(api: widget.api, eventId: widget.id),
-        )),
-        child: const Text('Attendance and campaigns'),
-      ),
-      const SizedBox(height: 20), const Text('Ticket types'),
-      if (types is List) for (final type in types) if (type is Map) Card(child: ListTile(title: Text('${type['name']}'), subtitle: Text('${type['sold']} sold · ${type['available']} available'), trailing: Text('${type['priceKzt']} KZT'))),
-    ]);
-  }));
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Event details')),
-    body: FutureBuilder(
-      future: eventFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) return Center(child: Text('${snapshot.error}'));
-        final event = snapshot.data?['event'];
-        if (event is! Map) {
-          return const Center(child: Text('Unexpected event response'));
-        }
-        final types = event['ticketTypes'];
-        final status = event['status'];
-        final editable = status == 'DRAFT' || status == 'PUBLISHED';
-        return ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text(
-              '${event['title'] ?? ''}',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            Text('${event['status'] ?? ''}'),
-            const SizedBox(height: 12),
-            Text('${event['description'] ?? ''}'),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              children: [
-                if (editable)
-                  OutlinedButton(
-                    onPressed: changing ? null : () => editEvent(event),
-                    child: const Text('Edit event'),
-                  ),
-                if (status == 'DRAFT')
-                  OutlinedButton(
-                    onPressed: changing ? null : () => eventAction('publish'),
-                    child: const Text('Publish'),
-                  ),
-                if (status == 'PUBLISHED')
-                  OutlinedButton(
-                    onPressed: changing ? null : () => eventAction('unpublish'),
-                    child: const Text('Unpublish'),
-                  ),
-                if (editable)
-                  OutlinedButton(
-                    onPressed: changing ? null : () => eventAction('cancel'),
-                    child: const Text('Cancel event'),
-                  ),
-                OutlinedButton(
-                  onPressed: changing ? null : () => eventAction('duplicate'),
-                  child: const Text('Duplicate'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text('Ticket types'),
-            if (editable)
-              TextButton(
-                onPressed: changing ? null : () => editTicket(),
-                child: const Text('Add ticket type'),
-              ),
-            if (types is List)
-              for (final type in types)
-                if (type is Map)
-                  Card(
-                    child: ListTile(
-                      title: Text('${type['name']} · ${type['priceKzt']} KZT'),
-                      onTap: editable && !changing
-                          ? () => editTicket(type)
-                          : null,
-                      subtitle: Text(
-                        '${type['sold']} sold · ${type['available']} available'
-                        '${type['isHidden'] == true ? ' · Hidden' : ''}',
-                      ),
-                      trailing: editable && type['id'] is String
-                          ? IconButton(
-                              tooltip: 'Delete ticket type',
-                              onPressed: changing
-                                  ? null
-                                  : () => deleteTicket(type['id'] as String),
-                              icon: const Icon(Icons.delete_outline),
-                            )
-                          : null,
-                    ),
-                  ),
-          ],
-        );
-      },
-    ),
   );
 }

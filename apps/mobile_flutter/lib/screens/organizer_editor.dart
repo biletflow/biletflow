@@ -91,14 +91,16 @@ class _OrganizerEditorState extends State<OrganizerEditor> {
                   validator: (value) {
                     final input = value?.trim() ?? '';
                     if (input.isEmpty) {
-                      return field.required ? 'Required' : null;
+                      final l10n = AppLocalizations.of(context);
+                      return field.required ? l10n.requiredField : null;
                     }
+                    final l10n = AppLocalizations.of(context);
                     if (field.number && int.tryParse(input) == null) {
-                      return 'Enter a whole number';
+                      return l10n.wholeNumber;
                     }
                     if ((field.key == 'startsAt' || field.key == 'endsAt') &&
                         DateTime.tryParse(input) == null) {
-                      return 'Enter a date and time in ISO format';
+                      return l10n.isoDate;
                     }
                     return null;
                   },
@@ -107,7 +109,11 @@ class _OrganizerEditorState extends State<OrganizerEditor> {
             if (error != null) Text(error!),
             FilledButton(
               onPressed: saving ? null : submit,
-              child: Text(saving ? 'Saving…' : 'Save'),
+              child: Text(
+                saving
+                    ? AppLocalizations.of(context).saving
+                    : AppLocalizations.of(context).save,
+              ),
             ),
           ],
         ),

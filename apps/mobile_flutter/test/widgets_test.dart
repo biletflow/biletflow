@@ -1,3 +1,4 @@
+import 'package:biletflow_mobile/l10n/app_localizations.dart';
 import 'package:biletflow_mobile/widgets/empty_state.dart';
 import 'package:biletflow_mobile/widgets/event_card.dart';
 import 'package:biletflow_mobile/widgets/quantity_stepper.dart';
@@ -31,6 +32,9 @@ void main() {
     var value = 1;
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: const [AppLocalizations.delegate],
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: StatefulBuilder(
             builder: (context, setState) => QuantityStepper(
@@ -78,13 +82,11 @@ void main() {
     expect(retried, isTrue);
   });
 
-  testWidgets('StatusBadge uses success tone for VALID tickets', (tester) async {
+  testWidgets('StatusBadge uses success tone for VALID tickets', (
+    tester,
+  ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: StatusBadge.ticket('VALID', 'Valid'),
-        ),
-      ),
+      MaterialApp(home: Scaffold(body: StatusBadge.ticket('VALID', 'Valid'))),
     );
     expect(find.text('Valid'), findsOneWidget);
   });

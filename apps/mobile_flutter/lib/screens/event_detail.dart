@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
+import '../core/format.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/quantity_stepper.dart';
@@ -18,6 +19,7 @@ class EventDetailScreen extends StatefulWidget {
 class _EventDetailScreenState extends State<EventDetailScreen> {
   Map<String, dynamic>? _event;
   final Map<String, int> _quantities = {};
+  final _campaign = TextEditingController();
   String? _error;
   bool _loading = true;
 
@@ -51,11 +53,20 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    _campaign.dispose();
+    super.dispose();
+  }
+
   int _selectedCount() =>
       _quantities.values.fold<int>(0, (sum, value) => sum + value);
 
   void _setQuantity(String id, int next, int maxPerOrder, int available) {
-    final capped = next.clamp(0, maxPerOrder < available ? maxPerOrder : available);
+    final capped = next.clamp(
+      0,
+      maxPerOrder < available ? maxPerOrder : available,
+    );
     setState(() {
       if (capped <= 0) {
         _quantities.remove(id);
@@ -72,7 +83,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final venue = event?['venue'];
     final organizer = event?['organizer'];
     final ticketTypes = event?['ticketTypes'];
-    final title = '${event?['title'] ?? 'Event'}';
+    final title = '${event?['title'] ?? l10n.eventDetails}';
     final soldOut = event?['isSoldOut'] == true;
     final selected = _selectedCount();
 
@@ -81,137 +92,152 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       body: _loading
           ? const LoadingState()
           : _error != null
-              ? ErrorState(
-                  message: l10n.apiError(_error!),
-                  onRetry: _load,
-                  retryLabel: l10n.refresh,
-                )
-              : ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Text(title, style: Theme.of(context).textTheme.headlineSmall),
-                    const SizedBox(height: 8),
-                    if (event?['category'] != null)
-                      Text('${event!['category']}'),
-                    if (event?['startsAt'] != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text('${event!['startsAt']}'),
-                      ),
-                    if (venue is Map)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
+          ? ErrorState(
+              message: l10n.apiError(_error!),
+              onRetry: _load,
+              retryLabel: l10n.refresh,
+            )
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                const SizedBox(height: 8),
+                if (event?['category'] != null) Text('${event!['category']}'),
+                if (event?['startsAt'] != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(formatEventWhen(event!['startsAt'])),
+                  ),
+                if (venue is Map)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      [
+                        '${venue['name'] ?? ''}',
+                        '${venue['address'] ?? ''}',
+                        '${venue['city'] ?? ''}',
+                      ].where((part) => part.isNotEmpty).join(' · '),
+                    ),
+                  ),
+                if (organizer is Map)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(l10n.organizer('${organizer['name'] ?? ''}')),
+                  ),
+                if (event?['description'] != null) ...[
+                  const SizedBox(height: 16),
+                  Text('${event!['description']}'),
+                ],
+                const SizedBox(height: 20),
+                Text(
+                  l10n.tickets,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                if (soldOut)
+                  Text(l10n.soldOut)
+                else if (ticketTypes is! List || ticketTypes.isEmpty)
+                  Text(l10n.noTicketTypes)
+                else
+                  ...ticketTypes.whereType<Map>().map((raw) {
+                    final type = Map<String, dynamic>.from(raw);
+                    final id = '${type['id'] ?? ''}';
+                    if (id.isEmpty) return const SizedBox.shrink();
+                    final price = type['priceKzt'];
+                    final available = type['available'] is num
+                        ? (type['available'] as num).toInt()
+                        : 0;
+                    final maxPerOrder = type['maxPerOrder'] is num
+                        ? (type['maxPerOrder'] as num).toInt()
+                        : available;
+                    final qty = _quantities[id] ?? 0;
+                    final priceLabel = price is num
+                        ? (price == 0 ? l10n.free : '₸${price.round()}')
+                        : '';
+                    final disabled = available <= 0;
+                    return Card(
+                      child: ListTile(
+                        title: Text('${type['name'] ?? ''}'),
+                        subtitle: Text(
                           [
-                            '${venue['name'] ?? ''}',
-                            '${venue['address'] ?? ''}',
-                            '${venue['city'] ?? ''}',
+                            priceLabel,
+                            if (available > 0)
+                              l10n.left(available)
+                            else
+                              l10n.soldOut,
                           ].where((part) => part.isNotEmpty).join(' · '),
                         ),
-                      ),
-                    if (organizer is Map)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(l10n.organizer('${organizer['name'] ?? ''}')),
-                      ),
-                    if (event?['description'] != null) ...[
-                      const SizedBox(height: 16),
-                      Text('${event!['description']}'),
-                    ],
-                    const SizedBox(height: 20),
-                    Text(l10n.tickets, style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    if (soldOut)
-                      Text(l10n.soldOut)
-                    else if (ticketTypes is! List || ticketTypes.isEmpty)
-                      Text(l10n.noTicketTypes)
-                    else
-                      ...ticketTypes.whereType<Map>().map((raw) {
-                        final type = Map<String, dynamic>.from(raw);
-                        final id = '${type['id'] ?? ''}';
-                        if (id.isEmpty) return const SizedBox.shrink();
-                        final price = type['priceKzt'];
-                        final available = type['available'] is num
-                            ? (type['available'] as num).toInt()
-                            : 0;
-                        final maxPerOrder = type['maxPerOrder'] is num
-                            ? (type['maxPerOrder'] as num).toInt()
-                            : available;
-                        final qty = _quantities[id] ?? 0;
-                        final priceLabel = price is num
-                            ? (price == 0 ? l10n.free : '₸${price.round()}')
-                            : '';
-                        final disabled = available <= 0;
-                        return Card(
-                          child: ListTile(
-                            title: Text('${type['name'] ?? ''}'),
-                            subtitle: Text(
-                              [
-                                priceLabel,
-                                if (available > 0) l10n.left(available) else l10n.soldOut,
-                              ].where((part) => part.isNotEmpty).join(' · '),
-                            ),
-                            trailing: disabled
-                                ? null
-                                : QuantityStepper(
-                                    value: qty,
-                                    max: maxPerOrder < available
-                                        ? maxPerOrder
-                                        : available,
-                                    onChanged: (next) => _setQuantity(
-                                      id,
-                                      next,
-                                      maxPerOrder,
-                                      available,
-                                    ),
-                                  ),
-                          ),
-                        );
-                      }),
-                    const SizedBox(height: 16),
-                    FilledButton(
-                      onPressed: selected > 0
-                          ? () {
-                              final eventId = '${event?['id'] ?? ''}';
-                              if (eventId.isEmpty || ticketTypes is! List) return;
-                              final lines = <CheckoutLine>[];
-                              for (final raw in ticketTypes.whereType<Map>()) {
-                                final type = Map<String, dynamic>.from(raw);
-                                final id = '${type['id'] ?? ''}';
-                                final qty = _quantities[id] ?? 0;
-                                if (id.isEmpty || qty <= 0) continue;
-                                final price = type['priceKzt'];
-                                lines.add(
-                                  CheckoutLine(
-                                    ticketTypeId: id,
-                                    name: '${type['name'] ?? 'Ticket'}',
-                                    priceKzt: price is num ? price.toInt() : 0,
-                                    quantity: qty,
-                                  ),
-                                );
-                              }
-                              if (lines.isEmpty) return;
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CheckoutScreen(
-                                    api: widget.api,
-                                    eventId: eventId,
-                                    eventTitle: title,
-                                    lines: lines,
-                                  ),
+                        trailing: disabled
+                            ? null
+                            : QuantityStepper(
+                                value: qty,
+                                max: maxPerOrder < available
+                                    ? maxPerOrder
+                                    : available,
+                                onChanged: (next) => _setQuantity(
+                                  id,
+                                  next,
+                                  maxPerOrder,
+                                  available,
                                 ),
-                              );
-                            }
-                          : null,
-                      child: Text(
-                        selected > 0
-                            ? l10n.continueWithTickets(selected)
-                            : l10n.selectTickets,
+                              ),
                       ),
-                    ),
-                  ],
+                    );
+                  }),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _campaign,
+                  decoration: InputDecoration(labelText: l10n.promoOrCampaign),
                 ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: selected > 0
+                      ? () {
+                          final eventId = '${event?['id'] ?? ''}';
+                          if (eventId.isEmpty || ticketTypes is! List) return;
+                          final lines = <CheckoutLine>[];
+                          for (final raw in ticketTypes.whereType<Map>()) {
+                            final type = Map<String, dynamic>.from(raw);
+                            final id = '${type['id'] ?? ''}';
+                            final qty = _quantities[id] ?? 0;
+                            if (id.isEmpty || qty <= 0) continue;
+                            final price = type['priceKzt'];
+                            lines.add(
+                              CheckoutLine(
+                                ticketTypeId: id,
+                                name: '${type['name'] ?? ''}',
+                                priceKzt: price is num ? price.toInt() : 0,
+                                quantity: qty,
+                              ),
+                            );
+                          }
+                          if (lines.isEmpty) return;
+                          final link = _campaign.text.trim();
+                          final token =
+                              campaignTokenFrom(link) ??
+                              (link.isEmpty ? null : link);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CheckoutScreen(
+                                api: widget.api,
+                                eventId: eventId,
+                                eventTitle: title,
+                                lines: lines,
+                                initialCampaignToken: token,
+                              ),
+                            ),
+                          );
+                        }
+                      : null,
+                  child: Text(
+                    selected > 0
+                        ? l10n.continueWithTickets(selected)
+                        : l10n.selectTickets,
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

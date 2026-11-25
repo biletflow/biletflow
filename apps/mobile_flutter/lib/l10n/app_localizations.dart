@@ -159,6 +159,91 @@ class AppLocalizations {
       'errorInvalid': 'Email or password is incorrect.',
       'errorForbidden': 'This account is suspended.',
       'errorNotFound': 'Not found',
+      'createAccount': 'Create account',
+      'name': 'Name',
+      'nameRequired': 'Enter your name',
+      'passwordHint': 'At least 10 characters',
+      'registering': 'Creating account…',
+      'forgotPassword': 'Forgot password?',
+      'forgotLead': 'We will email a reset link if this account exists.',
+      'sendReset': 'Send reset link',
+      'sendingReset': 'Sending…',
+      'resetSent':
+          'If an account exists for that email, a reset link is on its way.',
+      'resetPassword': 'Choose a new password',
+      'resetLead':
+          'Paste the token from the reset link, then choose a new password.',
+      'newPassword': 'New password',
+      'savePassword': 'Save password',
+      'savingPassword': 'Saving…',
+      'resetToken': 'Reset token',
+      'backToSignIn': 'Back to sign in',
+      'createEvent': 'Create event',
+      'editEvent': 'Edit event',
+      'addTicketType': 'Add ticket type',
+      'editTicketType': 'Edit ticket type',
+      'deleteTicketType': 'Delete ticket type',
+      'deleteTicketTypeTitle': 'Delete ticket type?',
+      'deleteTicketTypeBody': 'Only ticket types without issued tickets or reservations can be deleted.',
+      'back': 'Back',
+      'delete': 'Delete',
+      'hideTicketType': 'This ticket type has tickets or reservations. Hide it from sales instead.',
+      'cancelEvent': 'Cancel event',
+      'cancelReason': 'Reason for cancellation',
+      'publish': 'Publish',
+      'unpublish': 'Unpublish',
+      'duplicate': 'Duplicate',
+      'attendanceAndCampaigns': 'Attendance and campaigns',
+      'eventTitle': 'Event title',
+      'description': 'Description',
+      'startsAt': 'Starts at (ISO date and time)',
+      'endsAt': 'Ends at (ISO date and time)',
+      'capacity': 'Capacity',
+      'ticketName': 'Ticket name',
+      'priceKzt': 'Price in KZT',
+      'quantity': 'Quantity',
+      'maxPerOrder': 'Maximum per order',
+      'requiredField': 'Required',
+      'wholeNumber': 'Enter a whole number',
+      'isoDate': 'Enter a date and time in ISO format',
+      'save': 'Save',
+      'saving': 'Saving…',
+      'eventReports': 'Event reports',
+      'attendance': 'Attendance',
+      'checkedInCount': '{checkedIn} / {registered} checked in',
+      'campaigns': 'Campaigns',
+      'noCampaigns': 'No campaigns',
+      'campaignSubtitle': '{status} · {count} redemptions',
+      'redemptions': 'Redemptions',
+      'editCampaign': 'Edit campaign',
+      'campaignName': 'Campaign name',
+      'campaignQr': 'Campaign QR',
+      'paidOrders': 'Paid orders',
+      'reportTickets': 'Tickets',
+      'grossSales': 'Gross sales',
+      'discounts': 'Discounts',
+      'netSales': 'Net sales',
+      'active': 'Active',
+      'paidSalesReviews': 'Paid-sales reviews',
+      'noPendingReviews': 'No pending reviews',
+      'approveReviewTitle': 'Approve paid-sales review?',
+      'rejectReviewTitle': 'Reject paid-sales review?',
+      'approveReviewBody':
+          "This records approval for the organizer's identity review.",
+      'rejectReviewBody':
+          'This records rejection and disables paid sales for the event.',
+      'approve': 'Approve',
+      'reject': 'Reject',
+      'feePaid': 'Fee paid',
+      'feePending': 'Fee pending',
+      'payoutConnected': 'Payout account connected',
+      'payoutPending': 'Payout account pending',
+      'retry': 'Retry',
+      'decrease': 'Decrease',
+      'increase': 'Increase',
+      'promoOrCampaign': 'Promo code or campaign link',
+      'campaignApplied': 'Campaign applied',
+      'hidden': 'Hidden',
       'errorAuth': 'Sign in again',
     },
     'ru': {
@@ -280,7 +365,8 @@ class AppLocalizations {
       'abandon': 'Отменить',
       'cancelReservation': 'Отменить бронь',
       'refundOrder': 'Вернуть заказ',
-      'refundConfirmation': 'Все билеты в заказе станут недействительными. Продолжить возврат?',
+      'refundConfirmation':
+          'Все билеты в заказе станут недействительными. Продолжить возврат?',
       'paymentSucceeded': 'Оплата прошла. Билеты готовы.',
       'holdExpired': 'Время брони истекло. Билет не выдан.',
       'orderClosed': 'Заказ закрыт без билетов.',
@@ -304,6 +390,92 @@ class AppLocalizations {
       'errorInvalid': 'Неверный email или пароль.',
       'errorForbidden': 'Этот аккаунт заблокирован.',
       'errorNotFound': 'Не найдено',
+      'createAccount': 'Создать аккаунт',
+      'name': 'Имя',
+      'nameRequired': 'Введите имя',
+      'passwordHint': 'Не менее 10 символов',
+      'registering': 'Создаём аккаунт…',
+      'forgotPassword': 'Забыли пароль?',
+      'forgotLead': 'Если такой аккаунт есть, мы отправим ссылку для сброса.',
+      'sendReset': 'Отправить ссылку',
+      'sendingReset': 'Отправляем…',
+      'resetSent':
+          'Если аккаунт с этим email есть, ссылка для сброса уже отправлена.',
+      'resetPassword': 'Новый пароль',
+      'resetLead': 'Вставьте токен из ссылки и задайте новый пароль.',
+      'newPassword': 'Новый пароль',
+      'savePassword': 'Сохранить пароль',
+      'savingPassword': 'Сохраняем…',
+      'resetToken': 'Токен сброса',
+      'backToSignIn': 'Ко входу',
+      'createEvent': 'Создать событие',
+      'editEvent': 'Изменить событие',
+      'addTicketType': 'Добавить тип билета',
+      'editTicketType': 'Изменить тип билета',
+      'deleteTicketType': 'Удалить тип билета',
+      'deleteTicketTypeTitle': 'Удалить тип билета?',
+      'deleteTicketTypeBody':
+          'Удалить можно только тип без выданных билетов и броней.',
+      'back': 'Назад',
+      'delete': 'Удалить',
+      'hideTicketType':
+          'У этого типа есть билеты или брони. Скройте его из продажи.',
+      'cancelEvent': 'Отменить событие',
+      'cancelReason': 'Причина отмены',
+      'publish': 'Опубликовать',
+      'unpublish': 'Снять с публикации',
+      'duplicate': 'Дублировать',
+      'attendanceAndCampaigns': 'Посещаемость и кампании',
+      'eventTitle': 'Название события',
+      'description': 'Описание',
+      'startsAt': 'Начало (дата и время ISO)',
+      'endsAt': 'Окончание (дата и время ISO)',
+      'capacity': 'Вместимость',
+      'ticketName': 'Название билета',
+      'priceKzt': 'Цена в тенге',
+      'quantity': 'Количество',
+      'maxPerOrder': 'Максимум в заказе',
+      'requiredField': 'Обязательное поле',
+      'wholeNumber': 'Введите целое число',
+      'isoDate': 'Введите дату и время в формате ISO',
+      'save': 'Сохранить',
+      'saving': 'Сохраняем…',
+      'eventReports': 'Отчёты события',
+      'attendance': 'Посещаемость',
+      'checkedInCount': 'Прошли: {checkedIn} / {registered}',
+      'campaigns': 'Кампании',
+      'noCampaigns': 'Кампаний нет',
+      'campaignSubtitle': '{status} · погашений: {count}',
+      'redemptions': 'Погашения',
+      'editCampaign': 'Изменить кампанию',
+      'campaignName': 'Название кампании',
+      'campaignQr': 'QR кампании',
+      'paidOrders': 'Оплаченные заказы',
+      'reportTickets': 'Билеты',
+      'grossSales': 'Валовые продажи',
+      'discounts': 'Скидки',
+      'netSales': 'Чистые продажи',
+      'active': 'Активна',
+      'paidSalesReviews': 'Проверка платных продаж',
+      'noPendingReviews': 'Нет заявок на проверку',
+      'approveReviewTitle': 'Одобрить проверку платных продаж?',
+      'rejectReviewTitle': 'Отклонить проверку платных продаж?',
+      'approveReviewBody':
+          'Это фиксирует одобрение проверки личности организатора.',
+      'rejectReviewBody':
+          'Это фиксирует отказ и отключает платные продажи события.',
+      'approve': 'Одобрить',
+      'reject': 'Отклонить',
+      'feePaid': 'Сбор оплачен',
+      'feePending': 'Сбор не оплачен',
+      'payoutConnected': 'Счёт для выплат подключён',
+      'payoutPending': 'Счёт для выплат не подключён',
+      'retry': 'Повторить',
+      'decrease': 'Уменьшить',
+      'increase': 'Увеличить',
+      'promoOrCampaign': 'Промокод или ссылка кампании',
+      'campaignApplied': 'Кампания применена',
+      'hidden': 'Скрыт',
       'errorAuth': 'Войдите снова',
     },
     'kk': {
@@ -447,6 +619,92 @@ class AppLocalizations {
       'errorInvalid': 'Email немесе құпиясөз қате.',
       'errorForbidden': 'Бұл аккаунт бұғатталған.',
       'errorNotFound': 'Табылмады',
+      'createAccount': 'Аккаунт ашу',
+      'name': 'Аты',
+      'nameRequired': 'Атыңызды енгізіңіз',
+      'passwordHint': 'Кемінде 10 таңба',
+      'registering': 'Аккаунт ашылуда…',
+      'forgotPassword': 'Құпиясөзді ұмыттыңыз ба?',
+      'forgotLead': 'Аккаунт болса, қалпына келтіру сілтемесін жібереміз.',
+      'sendReset': 'Сілтеме жіберу',
+      'sendingReset': 'Жіберілуде…',
+      'resetSent':
+          'Бұл email-ге аккаунт болса, қалпына келтіру сілтемесі жіберілді.',
+      'resetPassword': 'Жаңа құпиясөз',
+      'resetLead': 'Сілтемедегі токенді қойып, жаңа құпиясөз қойыңыз.',
+      'newPassword': 'Жаңа құпиясөз',
+      'savePassword': 'Құпиясөзді сақтау',
+      'savingPassword': 'Сақталуда…',
+      'resetToken': 'Қалпына келтіру токені',
+      'backToSignIn': 'Кіруге оралу',
+      'createEvent': 'Іс-шара құру',
+      'editEvent': 'Іс-шараны өзгерту',
+      'addTicketType': 'Билет түрін қосу',
+      'editTicketType': 'Билет түрін өзгерту',
+      'deleteTicketType': 'Билет түрін жою',
+      'deleteTicketTypeTitle': 'Билет түрін жою керек пе?',
+      'deleteTicketTypeBody':
+          'Тек берілген билеті немесе броні жоқ түрді жоюға болады.',
+      'back': 'Артқа',
+      'delete': 'Жою',
+      'hideTicketType':
+          'Бұл түрде билет немесе брон бар. Оны сатудан жасырыңыз.',
+      'cancelEvent': 'Іс-шараны болдырмау',
+      'cancelReason': 'Болдырмау себебі',
+      'publish': 'Жариялау',
+      'unpublish': 'Жариялаудан алу',
+      'duplicate': 'Көшіру',
+      'attendanceAndCampaigns': 'Қатысу және кампаниялар',
+      'eventTitle': 'Іс-шара атауы',
+      'description': 'Сипаттама',
+      'startsAt': 'Басталуы (ISO күні мен уақыты)',
+      'endsAt': 'Аяқталуы (ISO күні мен уақыты)',
+      'capacity': 'Сыйымдылық',
+      'ticketName': 'Билет атауы',
+      'priceKzt': 'Бағасы, теңге',
+      'quantity': 'Саны',
+      'maxPerOrder': 'Тапсырыстағы ең көбі',
+      'requiredField': 'Міндетті өріс',
+      'wholeNumber': 'Бүтін сан енгізіңіз',
+      'isoDate': 'Күн мен уақытты ISO форматында енгізіңіз',
+      'save': 'Сақтау',
+      'saving': 'Сақталуда…',
+      'eventReports': 'Іс-шара есептері',
+      'attendance': 'Қатысу',
+      'checkedInCount': 'Өтті: {checkedIn} / {registered}',
+      'campaigns': 'Кампаниялар',
+      'noCampaigns': 'Кампания жоқ',
+      'campaignSubtitle': '{status} · өтеу: {count}',
+      'redemptions': 'Өтеулер',
+      'editCampaign': 'Кампанияны өзгерту',
+      'campaignName': 'Кампания атауы',
+      'campaignQr': 'Кампания QR',
+      'paidOrders': 'Төленген тапсырыстар',
+      'reportTickets': 'Билеттер',
+      'grossSales': 'Жалпы сатылым',
+      'discounts': 'Жеңілдіктер',
+      'netSales': 'Таза сатылым',
+      'active': 'Белсенді',
+      'paidSalesReviews': 'Ақылы сатуды тексеру',
+      'noPendingReviews': 'Тексеру өтініші жоқ',
+      'approveReviewTitle': 'Ақылы сатуды мақұлдау керек пе?',
+      'rejectReviewTitle': 'Ақылы сатуды қабылдамау керек пе?',
+      'approveReviewBody':
+          'Бұл ұйымдастырушының жеке басын тексеруді мақұлдайды.',
+      'rejectReviewBody':
+          'Бұл бас тартуды жазады және іс-шараның ақылы сатылымын өшіреді.',
+      'approve': 'Мақұлдау',
+      'reject': 'Қабылдамау',
+      'feePaid': 'Алым төленді',
+      'feePending': 'Алым төленбеді',
+      'payoutConnected': 'Төлем шоты қосылған',
+      'payoutPending': 'Төлем шоты қосылмаған',
+      'retry': 'Қайталау',
+      'decrease': 'Азайту',
+      'increase': 'Көбейту',
+      'promoOrCampaign': 'Промокод немесе кампания сілтемесі',
+      'campaignApplied': 'Кампания қолданылды',
+      'hidden': 'Жасырын',
       'errorAuth': 'Қайта кіріңіз',
     },
   };
@@ -645,6 +903,92 @@ class AppLocalizations {
         return code.isEmpty ? _t('errorGeneric') : code;
     }
   }
+
+  String get createAccount => _t('createAccount');
+  String get name => _t('name');
+  String get nameRequired => _t('nameRequired');
+  String get passwordHint => _t('passwordHint');
+  String get registering => _t('registering');
+  String get forgotPassword => _t('forgotPassword');
+  String get forgotLead => _t('forgotLead');
+  String get sendReset => _t('sendReset');
+  String get sendingReset => _t('sendingReset');
+  String get resetSent => _t('resetSent');
+  String get resetPassword => _t('resetPassword');
+  String get resetLead => _t('resetLead');
+  String get newPassword => _t('newPassword');
+  String get savePassword => _t('savePassword');
+  String get savingPassword => _t('savingPassword');
+  String get resetToken => _t('resetToken');
+  String get backToSignIn => _t('backToSignIn');
+  String get createEvent => _t('createEvent');
+  String get editEvent => _t('editEvent');
+  String get addTicketType => _t('addTicketType');
+  String get editTicketType => _t('editTicketType');
+  String get deleteTicketType => _t('deleteTicketType');
+  String get deleteTicketTypeTitle => _t('deleteTicketTypeTitle');
+  String get deleteTicketTypeBody => _t('deleteTicketTypeBody');
+  String get back => _t('back');
+  String get delete => _t('delete');
+  String get hideTicketType => _t('hideTicketType');
+  String get cancelEvent => _t('cancelEvent');
+  String get cancelReason => _t('cancelReason');
+  String get publish => _t('publish');
+  String get unpublish => _t('unpublish');
+  String get duplicate => _t('duplicate');
+  String get attendanceAndCampaigns => _t('attendanceAndCampaigns');
+  String get eventTitle => _t('eventTitle');
+  String get description => _t('description');
+  String get startsAt => _t('startsAt');
+  String get endsAt => _t('endsAt');
+  String get capacity => _t('capacity');
+  String get ticketName => _t('ticketName');
+  String get priceKzt => _t('priceKzt');
+  String get quantity => _t('quantity');
+  String get maxPerOrder => _t('maxPerOrder');
+  String get requiredField => _t('requiredField');
+  String get wholeNumber => _t('wholeNumber');
+  String get isoDate => _t('isoDate');
+  String get save => _t('save');
+  String get saving => _t('saving');
+  String get eventReports => _t('eventReports');
+  String get attendance => _t('attendance');
+  String checkedInCount(Object checkedIn, Object registered) => _fmt(
+    'checkedInCount',
+    {'checkedIn': '$checkedIn', 'registered': '$registered'},
+  );
+  String get campaigns => _t('campaigns');
+  String get noCampaigns => _t('noCampaigns');
+  String campaignSubtitle(Object status, Object count) =>
+      _fmt('campaignSubtitle', {'status': '$status', 'count': '$count'});
+  String get redemptions => _t('redemptions');
+  String get editCampaign => _t('editCampaign');
+  String get campaignName => _t('campaignName');
+  String get campaignQr => _t('campaignQr');
+  String get paidOrders => _t('paidOrders');
+  String get reportTickets => _t('reportTickets');
+  String get grossSales => _t('grossSales');
+  String get discounts => _t('discounts');
+  String get netSales => _t('netSales');
+  String get active => _t('active');
+  String get paidSalesReviews => _t('paidSalesReviews');
+  String get noPendingReviews => _t('noPendingReviews');
+  String get approveReviewTitle => _t('approveReviewTitle');
+  String get rejectReviewTitle => _t('rejectReviewTitle');
+  String get approveReviewBody => _t('approveReviewBody');
+  String get rejectReviewBody => _t('rejectReviewBody');
+  String get approve => _t('approve');
+  String get reject => _t('reject');
+  String get feePaid => _t('feePaid');
+  String get feePending => _t('feePending');
+  String get payoutConnected => _t('payoutConnected');
+  String get payoutPending => _t('payoutPending');
+  String get retry => _t('retry');
+  String get decrease => _t('decrease');
+  String get increase => _t('increase');
+  String get promoOrCampaign => _t('promoOrCampaign');
+  String get campaignApplied => _t('campaignApplied');
+  String get hidden => _t('hidden');
 
   String money(int amount) => amount == 0 ? free : '₸$amount';
 }

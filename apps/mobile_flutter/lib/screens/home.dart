@@ -1,9 +1,12 @@
 import 'support.dart';
+
 import 'package:material_ui/material_ui.dart';
+
 import '../core/session.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/locale_controller.dart';
 import '../widgets/locale_switcher.dart';
+import 'admin_activations.dart';
 import 'events_catalog.dart';
 import 'my_tickets.dart';
 import 'organizer.dart';
@@ -84,19 +87,25 @@ class HomeScreen extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.support_agent),
               title: Text(l10n.support),
-              onTap: () => Navigator.push(context, MaterialPageRoute(
-                builder: (_) => SupportScreen(api: session.api),
-              )),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SupportScreen(api: session.api),
+                ),
+              ),
             ),
           ),
           if (session.role == 'PLATFORM_ADMIN')
             Card(
               child: ListTile(
                 leading: const Icon(Icons.admin_panel_settings),
-                title: const Text('Paid-sales reviews'),
-                onTap: () => Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => AdminActivations(api: session.api),
-                )),
+                title: Text(l10n.paidSalesReviews),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AdminActivations(api: session.api),
+                  ),
+                ),
               ),
             ),
           if (session.canScan)

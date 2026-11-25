@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../l10n/app_localizations.dart';
 import '../theme/biletflow_theme.dart';
 
 class QuantityStepper extends StatelessWidget {
@@ -16,11 +17,12 @@ class QuantityStepper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cappedMax = max < 0 ? 0 : max;
+    final l10n = AppLocalizations.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
-          tooltip: 'Decrease',
+          tooltip: l10n.decrease,
           onPressed: value <= 0 ? null : () => onChanged(value - 1),
           icon: const Icon(Icons.remove_circle_outline),
           color: BiletFlowColors.brand,
@@ -30,13 +32,12 @@ class QuantityStepper extends StatelessWidget {
           child: Text(
             '$value',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
           ),
         ),
         IconButton(
-          tooltip: 'Increase',
+          tooltip: l10n.increase,
           onPressed: value >= cappedMax ? null : () => onChanged(value + 1),
           icon: const Icon(Icons.add_circle_outline),
           color: BiletFlowColors.brand,

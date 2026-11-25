@@ -21,65 +21,68 @@ class _OrganizerReportsState extends State<OrganizerReports> {
   late var campaigns = widget.api.get('/api/organizer/events/$id/campaigns');
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Event reports')),
-    body: ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Text('Attendance', style: Theme.of(context).textTheme.titleLarge),
-        _ReportResult(
-          data: attendance,
-          retry: () => setState(() {
-            attendance = widget.api.get('/api/mobile/events/$id/stats');
-          }),
-          content: (stats) => ListTile(
-            title: Text(
-              '${stats['checkedIn']} / ${stats['registered']} checked in',
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.eventReports)),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text(l10n.attendance, style: Theme.of(context).textTheme.titleLarge),
+          _ReportResult(
+            data: attendance,
+            retry: () => setState(() {
+              attendance = widget.api.get('/api/mobile/events/$id/stats');
+            }),
+            content: (stats) => ListTile(
+              title: Text(
+                l10n.checkedInCount(stats['checkedIn'], stats['registered']),
+              ),
             ),
           ),
-        ),
-        Text('Campaigns', style: Theme.of(context).textTheme.titleLarge),
-        _ReportResult(
-          data: campaigns,
-          retry: () => setState(() {
-            campaigns = widget.api.get('/api/organizer/events/$id/campaigns');
-          }),
-          content: (data) {
-            final rows = data['campaigns'] as List? ?? const [];
-            if (rows.isEmpty) return const EmptyState(title: 'No campaigns');
-            return Column(
-              children: [
-                for (final row in rows.whereType<Map<String, dynamic>>())
-                  ListTile(
-                    title: Text('${row['name']}'),
-                    subtitle: Text(
-                      '${row['status']} · ${row['redeemed']} redemptions',
+          Text(l10n.campaigns, style: Theme.of(context).textTheme.titleLarge),
+          _ReportResult(
+            data: campaigns,
+            retry: () => setState(() {
+              campaigns = widget.api.get('/api/organizer/events/$id/campaigns');
+            }),
+            content: (data) {
+              final rows = data['campaigns'] as List? ?? const [];
+              if (rows.isEmpty) return EmptyState(title: l10n.noCampaigns);
+              return Column(
+                children: [
+                  for (final row in rows.whereType<Map<String, dynamic>>())
+                    ListTile(
+                      title: Text('${row['name']}'),
+                      subtitle: Text(
+                        l10n.campaignSubtitle(row['status'], row['redeemed']),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () async {
+                        final changed = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                _CampaignReport(api: widget.api, campaign: row),
+                          ),
+                        );
+                        if (mounted && changed == true) {
+                          setState(() {
+                            campaigns = widget.api.get(
+                              '/api/organizer/events/$id/campaigns',
+                            );
+                          });
+                        }
+                      },
                     ),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () async {
-                      final changed = await Navigator.push<bool>(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              _CampaignReport(api: widget.api, campaign: row),
-                        ),
-                      );
-                      if (mounted && changed == true) {
-                        setState(() {
-                          campaigns = widget.api.get(
-                            '/api/organizer/events/$id/campaigns',
-                          );
-                        });
-                      }
-                    },
-                  ),
-              ],
-            );
-          },
-        ),
-      ],
-    ),
-  );
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _CampaignReport extends StatefulWidget {
@@ -137,7 +140,7 @@ class _CampaignReportState extends State<_CampaignReport> {
         actions: [
           IconButton(
             onPressed: saving ? null : editCampaign,
-            tooltip: 'Edit campaign',
+            tooltip: l10n.editCampaign,
             icon: const Icon(Icons.edit),
           ),
         ],
@@ -157,21 +160,21 @@ class _CampaignReportState extends State<_CampaignReport> {
               return Column(
                 children: [
                   ListTile(
-                    title: const Text('Paid orders'),
+                    title: Text(l10n.paidOrders),
                     trailing: Text('${row['orders']}'),
                   ),
                   ListTile(
-                    title: const Text('Tickets'),
+                    title: Text(l10n.reportTickets),
                     trailing: Text('${row['tickets']}'),
                   ),
                   ListTile(
-                    title: const Text('Redemptions'),
+                    title: Text(l10n.redemptions),
                     trailing: Text('${row['redemptions']}'),
                   ),
                   for (final (key, label) in [
-                    ('grossKzt', 'Gross sales'),
-                    ('discountKzt', 'Discounts'),
-                    ('netKzt', 'Net sales'),
+                    ('grossKzt', l10n.grossSales),
+                    ('discountKzt', l10n.discounts),
+                    ('netKzt', l10n.netSales),
                   ])
                     ListTile(
                       title: Text(label),
@@ -181,7 +184,7 @@ class _CampaignReportState extends State<_CampaignReport> {
               );
             },
           ),
-          const Text('Campaign QR'),
+          Text(l10n.campaignQr),
           FutureBuilder(
             future: qr,
             builder: (context, snapshot) {
@@ -232,46 +235,48 @@ class _EditCampaignState extends State<_EditCampaign> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Edit campaign'),
-    content: Form(
-      key: form,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextFormField(
-            controller: name,
-            decoration: const InputDecoration(labelText: 'Campaign name'),
-            maxLength: 120,
-            validator: (value) => (value?.trim().length ?? 0) < 2
-                ? 'Enter at least 2 characters'
-                : null,
-          ),
-          SwitchListTile(
-            title: const Text('Active'),
-            value: active,
-            onChanged: (value) => setState(() => active = value),
-          ),
-        ],
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(l10n.editCampaign),
+      content: Form(
+        key: form,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: name,
+              decoration: InputDecoration(labelText: l10n.campaignName),
+              maxLength: 120,
+              validator: (value) =>
+                  (value?.trim().length ?? 0) < 2 ? l10n.nameRequired : null,
+            ),
+            SwitchListTile(
+              title: Text(l10n.active),
+              value: active,
+              onChanged: (value) => setState(() => active = value),
+            ),
+          ],
+        ),
       ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
-      ),
-      FilledButton(
-        onPressed: () {
-          if (!form.currentState!.validate()) return;
-          Navigator.pop(context, <String, dynamic>{
-            'name': name.text.trim(),
-            'status': active ? 'ACTIVE' : 'DISABLED',
-          });
-        },
-        child: const Text('Save'),
-      ),
-    ],
-  );
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            if (!form.currentState!.validate()) return;
+            Navigator.pop(context, <String, dynamic>{
+              'name': name.text.trim(),
+              'status': active ? 'ACTIVE' : 'DISABLED',
+            });
+          },
+          child: Text(l10n.save),
+        ),
+      ],
+    );
+  }
 }
 
 class _ReportResult extends StatelessWidget {
