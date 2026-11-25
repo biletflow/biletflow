@@ -1,5 +1,6 @@
 import 'support.dart';
 import 'admin_activations.dart';
+import 'admin_moderation.dart';
 import 'package:material_ui/material_ui.dart';
 import '../core/session.dart';
 import '../l10n/app_localizations.dart';
@@ -100,6 +101,12 @@ class HomeScreen extends StatelessWidget {
                 )),
               ),
             ),
+          if (session.role == 'PLATFORM_ADMIN')
+            Card(child: ListTile(
+              leading: const Icon(Icons.manage_search),
+              title: Text(adminLabel(context, 'Moderation', 'Модерация', 'Модерация')),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminModeration(api: session.api))),
+            )),
           if (session.canScan)
             Card(
               child: ListTile(
