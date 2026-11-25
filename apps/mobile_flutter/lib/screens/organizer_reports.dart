@@ -34,9 +34,11 @@ class _OrganizerReportsState extends State<OrganizerReports> {
       initial: {'discountType': percent ? 'PERCENT' : 'FIXED_KZT', 'perUserLimit': 1},
       save: (body) => widget.api.post('/api/organizer/events/$id/campaigns', body),
     )));
-    if (mounted && saved == true) setState(() {
-      campaigns = widget.api.get('/api/organizer/events/$id/campaigns');
-    });
+    if (mounted && saved == true) {
+      setState(() {
+        campaigns = widget.api.get('/api/organizer/events/$id/campaigns');
+      });
+    }
   }
 
   @override
