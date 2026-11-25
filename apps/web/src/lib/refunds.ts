@@ -2,9 +2,10 @@ import { prisma, type UserRole } from "@biletflow/db";
 
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
+import { lockEventSales } from "./event-sales";
 import { clientIp } from "./http";
 import { refundInventory } from "./inventory";
-import { notifyRefundCompleted } from "./notifications";
+import { notifyFreeRegistrationCancelled, notifyRefundCompleted } from "./notifications";
 
 type Actor = { id: string; role: UserRole };
 
@@ -30,6 +31,10 @@ export async function refundOrder(
   headers: Headers,
 ) {
   const settled = await prisma.$transaction(async (tx) => {
+    const existing = await tx.order.findUnique({ where: { id: orderId }, select: { eventId: true } });
+    if (!existing) throw new ApiError(404, "NOT_FOUND");
+    await lockEventSales(tx, existing.eventId);
+    await tx.$queryRaw`SELECT "id" FROM "Order" WHERE "id" = ${orderId} FOR UPDATE`;
     const order = await tx.order.findUnique({
       where: { id: orderId },
       include: {
@@ -72,6 +77,7 @@ export async function refundOrder(
     if (order.status !== "PAID") throw new ApiError(409, "CONFLICT");
     if (
       user.role !== "PLATFORM_ADMIN" &&
+      user.id !== order.event.organizerId &&
       !refundWindowOpen(order.event.refundPolicy, order.event.startsAt)
     ) {
       throw new ApiError(409, "CONFLICT");
@@ -80,13 +86,14 @@ export async function refundOrder(
       throw new ApiError(409, "CONFLICT");
     }
 
-    for (const item of order.items) {
-      await refundInventory(tx, item.ticketTypeId, item.quantity);
-    }
-    await tx.ticket.updateMany({
+    const invalidated = await tx.ticket.updateMany({
       where: { orderId: order.id, status: "VALID" },
       data: { status: "REFUNDED", invalidatedAt: new Date() },
     });
+    if (invalidated.count !== order.tickets.length) throw new ApiError(409, "CONFLICT");
+    for (const item of order.items) {
+      await refundInventory(tx, item.ticketTypeId, item.quantity);
+    }
     const payment = order.payments.find((row) => row.status === "SUCCEEDED");
     const refund = payment
       ? await tx.refund.create({
@@ -163,4 +170,57 @@ export async function refundOrder(
       : null,
     duplicate: settled.duplicate,
   };
+}
+
+export async function cancelFreeRegistration(user: Actor, ticketId: string, headers: Headers) {
+  const cancelled = await prisma.$transaction(async (tx) => {
+    const ticket = await tx.ticket.findUnique({
+      where: { id: ticketId },
+      include: {
+        event: { select: { organizerId: true, title: true } },
+        attendee: { select: { email: true } },
+        order: { select: { totalKzt: true, userId: true, reference: true } },
+      },
+    });
+    if (!ticket || (user.role !== "PLATFORM_ADMIN" && user.id !== ticket.event.organizerId)) {
+      throw new ApiError(404, "NOT_FOUND");
+    }
+    if (ticket.order.totalKzt !== 0) throw new ApiError(409, "CONFLICT");
+    await lockEventSales(tx, ticket.eventId);
+    const [order] = await tx.$queryRaw<{ status: string }[]>`
+      SELECT "status" FROM "Order" WHERE "id" = ${ticket.orderId} FOR UPDATE
+    `;
+    if (order?.status !== "PAID" && order?.status !== "CANCELLED") throw new ApiError(409, "CONFLICT");
+    const now = new Date();
+    const { count } = await tx.ticket.updateMany({
+      where: { id: ticketId, status: "VALID", order: { status: "PAID" } },
+      data: { status: "CANCELLED", invalidatedAt: now },
+    });
+    if (!count) {
+      const current = await tx.ticket.findUnique({ where: { id: ticketId }, select: { status: true } });
+      if (current?.status === "CANCELLED") return null;
+      throw new ApiError(409, "CONFLICT");
+    }
+    await refundInventory(tx, ticket.ticketTypeId, 1);
+    const remaining = await tx.ticket.count({
+      where: { orderId: ticket.orderId, status: { in: ["VALID", "CHECKED_IN"] } },
+    });
+    if (remaining === 0) {
+      await tx.order.update({
+        where: { id: ticket.orderId },
+        data: { status: "CANCELLED", cancelledAt: now },
+      });
+    }
+    await audit(tx, {
+      actorUserId: user.id, eventId: ticket.eventId, action: "ticket.registration_cancelled",
+      entityType: "Ticket", entityId: ticketId,
+      description: "Free registration cancelled and ticket invalidated", ipAddress: clientIp(headers),
+    });
+    return {
+      ticketId, userId: ticket.order.userId, reference: ticket.order.reference,
+      email: ticket.attendee.email, eventTitle: ticket.event.title,
+    };
+  });
+  if (cancelled) await notifyFreeRegistrationCancelled(cancelled);
+  return { ticket: { id: ticketId, status: "CANCELLED" }, duplicate: !cancelled };
 }

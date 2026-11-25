@@ -11,10 +11,17 @@ import { GET as search } from "@/app/api/admin/search/route";
 import { GET as getSettings, PUT as putSettings } from "@/app/api/admin/settings/route";
 import { POST as suspendUser } from "@/app/api/admin/users/[id]/suspend/route";
 import { POST as reportEvent } from "@/app/api/events/[slug]/report/route";
+import { GET as history } from "@/app/api/organizer/events/[id]/history/route";
+import { updateSupportStatus } from "@/lib/support";
 import { GET as me } from "@/app/api/me/route";
+import { POST as createOrder } from "@/app/api/orders/route";
+import { POST as cancelRegistration } from "@/app/api/organizer/tickets/[id]/cancel-registration/route";
+import { getPublicEventBySlug, listPublicEvents } from "@/lib/events";
 import { POST as refundOrder } from "@/app/api/orders/[id]/refund/route";
 import { POST as verifyIdentity } from "@/app/api/organizer/verification/route";
 import { POST as mobileLogin } from "@/app/api/mobile/auth/login/route";
+import { startOrderPayment, processPaymentWebhook } from "@/lib/payments";
+import { signWebhookBody } from "@/lib/payments-signature";
 import { refundWindowOpen } from "@/lib/refunds";
 
 describe("refund window", () => {
@@ -55,6 +62,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
     let openOrderId = "";
     let closedOrderId = "";
     let openSlug = "";
+    let closedSlug = "";
 
     function request(path: string, body?: unknown, token = "") {
       const headers = new Headers({ "Content-Type": "application/json" });
@@ -66,10 +74,15 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       });
     }
 
+    let loginAttempt = 0;
+    function attemptLogin(email: string) {
+      const req = request("/api/mobile/auth/login", { email, password });
+      req.headers.set("x-forwarded-for", "127.0.0." + (++loginAttempt));
+      return mobileLogin(req);
+    }
+
     async function login(email: string) {
-      const response = await mobileLogin(
-        request("/api/mobile/auth/login", { email, password }),
-      );
+      const response = await attemptLogin(email);
       expect(response.status).toBe(200);
       return ((await response.json()) as { token: string }).token;
     }
@@ -128,6 +141,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
           title: `Closed night ${suffix}`,
           status: "PUBLISHED",
           refundPolicy: "NO_REFUNDS",
+          paidSalesActive: true,
           startsAt,
           endsAt,
           publishedAt: new Date(),
@@ -136,6 +150,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       openEventId = open.id;
       closedEventId = closed.id;
       openSlug = open.slug;
+      closedSlug = closed.slug;
 
       async function paidOrder(eventId: string, ticketName: string) {
         const ticketType = await prisma.ticketType.create({
@@ -205,6 +220,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       const userIds = Object.values(ids).filter(Boolean);
       const eventIds = [openEventId, closedEventId].filter(Boolean);
       await prisma.notification.deleteMany({ where: { userId: { in: userIds } } });
+      await prisma.supportCase.deleteMany({ where: { eventId: { in: eventIds } } });
       await prisma.eventReport.deleteMany({ where: { eventId: { in: eventIds } } });
       await prisma.refund.deleteMany({ where: { order: { eventId: { in: eventIds } } } });
       await prisma.checkInRecord.deleteMany({ where: { eventId: { in: eventIds } } });
@@ -263,11 +279,30 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
         }),
       ).toBeGreaterThan(0);
 
-      const stranger = await refundOrder(
-        request(`/api/orders/${closedOrderId}/refund`, { reason: "Not mine" }, tokens.organizer),
+      const organizerRefund = await refundOrder(
+        request(`/api/orders/${closedOrderId}/refund`, { reason: "Organizer exception" }, tokens.organizer),
         { params: Promise.resolve({ id: closedOrderId }) },
       );
-      expect(stranger.status).toBe(409);
+      expect(organizerRefund.status).toBe(201);
+      expect(await prisma.refund.count({ where: { orderId: closedOrderId, initiatedById: ids.organizer } })).toBe(1);
+    });
+
+    it("includes support status changes in the event history", async () => {
+      const supportCase = await prisma.supportCase.create({
+        data: { reference: "CASE-" + suffix, subject: "Ticket question", requesterId: ids.attendee,
+          eventId: openEventId, audience: "ATTENDEE_TO_ORGANIZER", category: "EVENT_INFORMATION" },
+      });
+      const organizer = { id: ids.organizer, role: "ORGANIZER" as const, staffAssignments: [] };
+      await updateSupportStatus(organizer, supportCase.id, "RESOLVED");
+      await updateSupportStatus(organizer, supportCase.id, "RESOLVED");
+      const response = await history(
+        request("/api/organizer/events/" + openEventId + "/history?action=support.status_changed", undefined, tokens.organizer),
+        { params: Promise.resolve({ id: openEventId }) },
+      );
+      expect(response.status).toBe(200);
+      const data = await response.json();
+      expect(data.entries).toHaveLength(1);
+      expect(data.entries[0]).toMatchObject({ entityId: supportCase.id, metadata: { status: "RESOLVED" } });
     });
 
     it("lets an admin moderate accounts, events, reports, and settings", async () => {
@@ -281,6 +316,17 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       const foundBody = await found.json();
       expect(foundBody.users.map((user: { id: string }) => user.id)).toContain(ids.attendee);
 
+      const paidType = await prisma.ticketType.findFirstOrThrow({ where: { eventId: closedEventId } });
+      const held = await createOrder(request("/api/orders", {
+        eventId: closedEventId,
+        items: [{ ticketTypeId: paidType.id, quantity: 1 }],
+        attendees: [{ fullName: "Paid Attendee", email: "paid-" + suffix + "@moderation.test" }],
+        clientIdempotencyKey: randomUUID(),
+      }, tokens.attendee));
+      expect(held.status).toBe(201);
+      const holdId = (await held.json()).order.id as string;
+      const holdPayment = await startOrderPayment(ids.attendee, holdId, new Headers());
+
       const suspended = await suspendUser(
         request(`/api/admin/users/${ids.attendee}/suspend`, { reason: "Abuse report" }, tokens.admin),
         { params: Promise.resolve({ id: ids.attendee }) },
@@ -288,6 +334,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       expect(suspended.status).toBe(200);
       const blocked = await me(request("/api/me", undefined, tokens.attendee));
       expect(blocked.status).toBe(403);
+      expect((await attemptLogin(emails.attendee)).status).toBe(403);
       const self = await suspendUser(
         request(`/api/admin/users/${ids.admin}/suspend`, { reason: "Mistake" }, tokens.admin),
         { params: Promise.resolve({ id: ids.admin }) },
@@ -300,6 +347,52 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       );
       expect(sales.status).toBe(200);
       expect((await prisma.event.findUniqueOrThrow({ where: { id: closedEventId } })).paidSalesSuspended).toBe(true);
+
+      const settlement = JSON.stringify({
+        intentId: holdPayment.payment.intentId, outcome: "APPROVED", eventKey: "suspended-" + suffix,
+      });
+      expect(await processPaymentWebhook(settlement, signWebhookBody(settlement))).toMatchObject({ tickets: 0 });
+      expect(await prisma.order.findUnique({ where: { id: holdId } })).toMatchObject({ status: "CANCELLED" });
+      expect(await prisma.ticketType.findUnique({ where: { id: paidType.id } })).toMatchObject({ reserved: 0 });
+      expect(await getPublicEventBySlug(closedSlug)).toBeNull();
+      expect(await listPublicEvents({ query: closedSlug.replace("closed-", "Closed night ") })).toHaveLength(0);
+      const freeType = await prisma.ticketType.create({
+        data: { eventId: closedEventId, name: "Free admission", priceKzt: 0, quantity: 2 },
+      });
+      const restoreUser = await suspendUser(
+        request("/api/admin/users/" + ids.attendee + "/suspend", { reason: "Review complete", suspended: false }, tokens.admin),
+        { params: Promise.resolve({ id: ids.attendee }) },
+      );
+      expect(restoreUser.status).toBe(200);
+      const attendeeToken = await login(emails.attendee);
+      const checkoutInput = {
+        eventId: closedEventId,
+        items: [{ ticketTypeId: freeType.id, quantity: 2 }],
+        attendees: [1, 2].map((n) => ({ fullName: "Free Attendee " + n, email: "free-" + n + "-" + suffix + "@moderation.test" })),
+        clientIdempotencyKey: randomUUID(),
+      };
+      expect((await createOrder(request("/api/orders", checkoutInput, attendeeToken))).status).toBe(409);
+      const restoreEvent = await suspendEvent(
+        request("/api/admin/events/" + closedEventId + "/suspend", { reason: "Review complete", suspended: false }, tokens.admin),
+        { params: Promise.resolve({ id: closedEventId }) },
+      );
+      expect(restoreEvent.status).toBe(200);
+      expect(await getPublicEventBySlug(closedSlug)).toMatchObject({ id: closedEventId });
+      const checkout = await createOrder(request("/api/orders", checkoutInput, attendeeToken));
+      expect(checkout.status).toBe(201);
+      const freeOrder = (await checkout.json()).order;
+      const [first, second] = freeOrder.tickets as { id: string }[];
+      const cancelPath = "/api/organizer/tickets/" + first.id + "/cancel-registration";
+      const cancelContext = { params: Promise.resolve({ id: first.id }) };
+      expect((await cancelRegistration(request(cancelPath, {}, attendeeToken), cancelContext)).status).toBe(403);
+      expect((await cancelRegistration(request(cancelPath, {}, tokens.organizer), cancelContext)).status).toBe(200);
+      const retry = await cancelRegistration(request(cancelPath, {}, tokens.organizer), cancelContext);
+      expect(await retry.json()).toMatchObject({ duplicate: true });
+      expect(await prisma.ticket.findUnique({ where: { id: first.id } })).toMatchObject({ status: "CANCELLED" });
+      expect(await prisma.ticket.findUnique({ where: { id: second.id } })).toMatchObject({ status: "VALID" });
+      expect(await prisma.ticketType.findUnique({ where: { id: freeType.id } })).toMatchObject({ sold: 1, refunded: 1 });
+      expect(await prisma.auditLog.count({ where: { eventId: closedEventId, action: "ticket.registration_cancelled" } })).toBe(1);
+      expect(await prisma.notification.count({ where: { userId: ids.attendee, channel: "EMAIL", payload: { path: ["cancelledTicketId"], equals: first.id } } })).toBe(1);
 
       const reported = await reportEvent(
         request(`/api/events/${openSlug}/report`, { reason: "Misleading title" }, tokens.organizer),

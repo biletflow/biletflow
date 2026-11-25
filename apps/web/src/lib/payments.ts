@@ -5,6 +5,7 @@ import { paymentWebhookSchema } from "@biletflow/shared";
 
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
+import { lockEventSales } from "./event-sales";
 import { clientIp, isUniqueViolation } from "./http";
 import { convertReservation, releaseInventory } from "./inventory";
 import { maybeActivate, presentActivation } from "./activation";
@@ -24,10 +25,10 @@ function intentId() {
 export async function startOrderPayment(userId: string, orderId: string, headers: Headers) {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
-    include: { items: true, payments: true },
+    include: { items: true, payments: true, event: { select: { paidSalesSuspended: true } } },
   });
   if (!order || order.userId !== userId) throw new ApiError(404, "NOT_FOUND");
-  if (order.status !== "AWAITING_PAYMENT") throw new ApiError(409, "CONFLICT");
+  if (order.status !== "AWAITING_PAYMENT" || order.event.paidSalesSuspended) throw new ApiError(409, "CONFLICT");
   if (order.expiresAt && order.expiresAt.getTime() <= Date.now()) {
     await expireOrder(order.id, userId, headers);
     throw new ApiError(409, "HOLD_EXPIRED");
@@ -201,7 +202,8 @@ export async function processPaymentWebhook(raw: string, signature: string | nul
       }
       const order = payment.order;
       if (!order) throw new ApiError(409, "CONFLICT");
-      const failed = outcome !== "APPROVED" || order.status !== "AWAITING_PAYMENT";
+      const sales = await lockEventSales(tx, order.eventId);
+      const failed = outcome !== "APPROVED" || order.status !== "AWAITING_PAYMENT" || sales?.paidSalesSuspended || sales?.status === "CANCELLED";
       const expired = Boolean(order.expiresAt && order.expiresAt.getTime() <= Date.now());
       if (failed || expired) {
         const paymentStatus = outcome === "ABANDONED" ? "ABANDONED" : "FAILED";

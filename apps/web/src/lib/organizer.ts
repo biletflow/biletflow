@@ -131,6 +131,7 @@ export async function cancelEvent(
 ) {
   await requireOwnedEvent(user, eventId);
   return prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT "id" FROM "Event" WHERE "id" = ${eventId} FOR UPDATE`;
     const event = await tx.event.findUnique({ where: { id: eventId } });
     if (!event) throw new ApiError(404, "NOT_FOUND");
     if (event.status === "CANCELLED") throw new ApiError(409, "CONFLICT");
@@ -143,13 +144,18 @@ export async function cancelEvent(
       include: {
         items: true,
         payments: true,
+        tickets: { where: { status: { in: ["VALID", "CHECKED_IN"] } }, select: { ticketTypeId: true } },
       },
     });
 
     for (const order of orders) {
       if (order.status === "PAID") {
-        for (const item of order.items) {
-          await refundInventory(tx, item.ticketTypeId, item.quantity);
+        const quantities = new Map<string, number>();
+        for (const ticket of order.tickets) {
+          quantities.set(ticket.ticketTypeId, (quantities.get(ticket.ticketTypeId) ?? 0) + 1);
+        }
+        for (const [ticketTypeId, quantity] of quantities) {
+          await refundInventory(tx, ticketTypeId, quantity);
         }
         await tx.ticket.updateMany({
           where: { orderId: order.id, status: { in: ["VALID", "CHECKED_IN"] } },

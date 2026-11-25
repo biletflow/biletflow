@@ -9,6 +9,7 @@ import { prisma } from "@biletflow/db";
 const PUBLIC_LIST_WHERE = {
   status: "PUBLISHED",
   visibility: "PUBLIC",
+  paidSalesSuspended: false,
 } as const;
 
 function ticketTypeSelect() {
@@ -143,6 +144,7 @@ export async function getPublicEventBySlug(slug: string) {
   const event = await prisma.event.findFirst({
     where: {
       slug,
+      paidSalesSuspended: false,
       status: { in: ["PUBLISHED", "CANCELLED", "COMPLETED"] },
       visibility: { in: ["PUBLIC", "UNLISTED"] },
     },

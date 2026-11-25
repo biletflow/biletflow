@@ -9,6 +9,7 @@ import {
 
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
+import { lockEventSales } from "./event-sales";
 import { clientIp, isUniqueViolation } from "./http";
 import { redeemCampaign, releaseInventory, reserveInventory, sellInventory } from "./inventory";
 import {
@@ -104,6 +105,8 @@ export async function createOrder(
   const minutes = await holdMinutes();
   try {
     const order = await prisma.$transaction(async (tx) => {
+      const sales = await lockEventSales(tx, input.eventId);
+      if (sales?.paidSalesSuspended) throw new ApiError(409, "CONFLICT");
       const event = await tx.event.findUnique({
         where: { id: input.eventId },
         include: { ticketTypes: true },
@@ -143,7 +146,7 @@ export async function createOrder(
       }
 
       const priced = lines.some((line) => line.ticketType.priceKzt > 0);
-      if (priced && (!event.paidSalesActive || event.paidSalesSuspended)) {
+      if (priced && !event.paidSalesActive) {
         throw new ApiError(409, "CONFLICT");
       }
 

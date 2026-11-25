@@ -230,6 +230,7 @@ export const refundOrderSchema = z.object({
 });
 
 export const suspendSchema = z.object({
+  suspended: z.boolean().default(true),
   reason: z.string().trim().min(3).max(500),
 });
 

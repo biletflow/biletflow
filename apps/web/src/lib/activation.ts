@@ -28,11 +28,19 @@ export async function activationFeeKzt() {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : 15000;
 }
 
-async function payoutConnected(organizerId: string) {
-  const count = await prisma.payoutAccount.count({
-    where: { organizerProfile: { userId: organizerId } },
-  });
-  return count > 0;
+async function activationRequirements(eventId: string, organizerId: string) {
+  const [profile, paidTicketTypes] = await Promise.all([
+    prisma.organizerProfile.findUnique({
+      where: { userId: organizerId },
+      select: { displayName: true, contactEmail: true, _count: { select: { payoutAccounts: true } } },
+    }),
+    prisma.ticketType.count({ where: { eventId, priceKzt: { gt: 0 }, isHidden: false } }),
+  ]);
+  return {
+    profileComplete: Boolean(profile?.displayName.trim() && profile?.contactEmail.trim()),
+    payoutAccountConnected: Boolean(profile?._count.payoutAccounts),
+    hasPaidTicketType: paidTicketTypes > 0,
+  };
 }
 
 export async function ensureActivation(eventId: string, organizerId: string) {
@@ -56,7 +64,8 @@ export async function presentActivation(eventId: string, organizerId: string) {
     where: { id: eventId },
     select: { paidSalesActive: true },
   });
-  const connected = await payoutConnected(organizerId);
+  const requirements = await activationRequirements(eventId, organizerId);
+  const connected = requirements.payoutAccountConnected;
   if (activation.payoutAccountConnected !== connected) {
     await prisma.paidSalesActivation.update({
       where: { id: activation.id },
@@ -69,7 +78,7 @@ export async function presentActivation(eventId: string, organizerId: string) {
     feeKzt: activation.feeKzt,
     feePaid: activation.feePaid,
     identityVerified: activation.identityVerified,
-    payoutAccountConnected: connected,
+    ...requirements,
     termsAccepted: activation.termsAcceptedAt !== null,
     activated: Boolean(activation.activatedAt) && Boolean(event?.paidSalesActive),
   };
@@ -104,7 +113,10 @@ export async function acceptActivationTerms(
 
 export async function startActivationPayment(userId: string, eventId: string, headers: Headers) {
   const activation = await ensureActivation(eventId, userId);
-  if (activation.feePaid) throw new ApiError(409, "CONFLICT");
+  const requirements = await activationRequirements(eventId, userId);
+  if (activation.feePaid || !activation.termsAcceptedAt || !Object.values(requirements).every(Boolean)) {
+    throw new ApiError(409, "CONFLICT");
+  }
   const open = await prisma.payment.findFirst({
     where: { activationId: activation.id, status: "CREATED", purpose: "ACTIVATION_FEE" },
   });

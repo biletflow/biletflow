@@ -1,5 +1,6 @@
 import { prisma } from "@biletflow/db";
 import ActivationReviews from "@/components/admin/activation-reviews";
+import ModerationSearch from "@/components/admin/moderation-search";
 import ModerationReports from "@/components/admin/moderation-reports";
 import { listEventReports } from "@/lib/admin";
 import { ShieldCheck, UserRound } from "lucide-react";
@@ -37,6 +38,7 @@ export default async function AdminPage({
         </div>
 
         <ActivationReviews locale={locale} rows={activations.map((item) => ({ id: item.id, eventTitle: item.event.title, organizerName: item.organizer.name, feePaid: item.feePaid, identityVerified: item.identityVerified }))} />
+        <ModerationSearch locale={locale} />
         <ModerationReports locale={locale} reports={reports} />
         {users.length === 0 ? (
           <div className="border-ink-300 mt-8 rounded-xl border border-dashed bg-white p-12 text-center">

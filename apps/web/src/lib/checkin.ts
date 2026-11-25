@@ -86,10 +86,11 @@ export async function checkIn(
           activeKey: "active",
         },
       });
-      await tx.ticket.update({
-        where: { id: ticket.id },
+      const update = await tx.ticket.updateMany({
+        where: { id: ticket.id, status: "VALID" },
         data: { status: "CHECKED_IN" },
       });
+      if (!update.count) throw new ApiError(409, "TICKET_STATUS_CHANGED");
       await audit(tx, {
         actorUserId: user.id,
         eventId: event.id,
@@ -104,6 +105,12 @@ export async function checkIn(
     });
     return ticketResult("VALID", "Ticket checked in", ticket, record.checkedInAt.toISOString());
   } catch (error) {
+    if (error instanceof ApiError && error.code === "TICKET_STATUS_CHANGED") {
+      const current = await prisma.ticket.findUnique({ where: { id: ticket.id }, select: { status: true } });
+      if (current?.status === "CANCELLED") return ticketResult("CANCELLED", "Ticket is cancelled", ticket);
+      if (current?.status === "REFUNDED") return ticketResult("REFUNDED", "Ticket was refunded", ticket);
+      throw error;
+    }
     if (!isUniqueViolation(error)) throw error;
     const existing = await prisma.checkInRecord.findFirst({
       where: { ticketId: ticket.id, activeKey: "active" },

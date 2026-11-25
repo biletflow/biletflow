@@ -1,7 +1,7 @@
 import { suspendSchema } from "@biletflow/shared";
 
 import { errorResponse } from "@/lib/api-error";
-import { suspendUser } from "@/lib/admin";
+import { setUserSuspension } from "@/lib/admin";
 import { assertParsed, json, readJson } from "@/lib/http";
 import { requireRole } from "@/lib/session";
 
@@ -12,7 +12,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const user = await requireRole(request.headers, ["PLATFORM_ADMIN"]);
     const { id } = await context.params;
     const input = assertParsed(suspendSchema.safeParse(await readJson(request)));
-    return json(await suspendUser(user, id, input.reason, request.headers));
+    return json(await setUserSuspension(user, id, input.suspended, input.reason, request.headers));
   } catch (error) {
     return errorResponse(error);
   }

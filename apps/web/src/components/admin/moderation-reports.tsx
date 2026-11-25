@@ -8,7 +8,7 @@ type Report = {
   reason: string;
   details: string | null;
   createdAt: string;
-  event: { id: string; title: string; slug: string } | null;
+  event: { id: string; title: string; slug: string; paidSalesSuspended: boolean } | null;
 };
 
 export default function ModerationReports({
@@ -22,10 +22,10 @@ export default function ModerationReports({
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
   const labels = locale === "ru"
-    ? { title: "Жалобы на мероприятия", empty: "Открытых жалоб нет", suspend: "Приостановить платные продажи", prompt: "Причина приостановки продаж", failure: "Не удалось приостановить продажи" }
+    ? { title: "Жалобы на мероприятия", empty: "Открытых жалоб нет", suspend: "Заблокировать мероприятие", prompt: "Причина блокировки мероприятия", failure: "Не удалось заблокировать мероприятие" }
     : locale === "kk"
-      ? { title: "Іс-шараларға шағымдар", empty: "Ашық шағымдар жоқ", suspend: "Ақылы сатылымды тоқтату", prompt: "Сатылымды тоқтату себебі", failure: "Сатылымды тоқтату мүмкін болмады" }
-      : { title: "Event moderation reports", empty: "No open reports", suspend: "Suspend paid sales", prompt: "Reason for suspension", failure: "Could not suspend sales" };
+      ? { title: "Іс-шараларға шағымдар", empty: "Ашық шағымдар жоқ", suspend: "Іс-шараны бұғаттау", prompt: "Бұғаттау себебі", failure: "Іс-шараны бұғаттау мүмкін болмады" }
+      : { title: "Event moderation reports", empty: "No open reports", suspend: "Suspend event", prompt: "Reason for suspension", failure: "Could not suspend event" };
 
   async function suspend(eventId: string) {
     const reason = window.prompt(labels.prompt);
@@ -65,7 +65,7 @@ export default function ModerationReports({
           {report.event && (
             <button
               type="button"
-              disabled={busy !== null}
+              disabled={busy !== null || report.event.paidSalesSuspended}
               onClick={() => void suspend(report.event!.id)}
               className="rounded-lg border border-red-300 px-4 py-2 text-red-700 disabled:opacity-50"
             >

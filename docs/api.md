@@ -49,8 +49,8 @@ Every response includes the counters `quantity`, `sold`, `reserved`, `refunded`,
 
 ## Paid sales activation
 
-| `GET` | `/api/organizer/events/:id/activation` | The checklist state: five booleans plus the fee amount |
-| `POST` | `/api/organizer/events/:id/activation/pay-fee` | Creates an `ACTIVATION_FEE` payment intent |
+| `GET` | `/api/organizer/events/:id/activation` | Checklist for profile, payout details, paid ticket type, terms, fee and approval |
+| `POST` | `/api/organizer/events/:id/activation/pay-fee` | Creates an `ACTIVATION_FEE` payment intent after the organizer completes the checklist |
 | `POST` | `/api/organizer/events/:id/activation/simulate` | `{ intentId, outcome }`. Settles that simulated fee without a client webhook secret. `outcome` is `APPROVED`, `DECLINED`, or `ABANDONED` |
 | `POST` | `/api/organizer/events/:id/activation/accept-terms` | |
 | `POST` | `/api/admin/activations/:id/review` | Platform Admin approves or rejects the simulated KYC |
@@ -61,7 +61,8 @@ Every response includes the counters `quantity`, `sold`, `reserved`, `refunded`,
 | `POST` | `/api/orders` | `createOrderSchema`. Reserves inventory atomically, returns the order with `expiresAt`. Free orders return `PAID` immediately with tickets issued |
 | `GET` | `/api/orders/:id` | |
 | `POST` | `/api/orders/:id/cancel` | Releases reservation |
-| `POST` | `/api/orders/:id/refund` | `refundOrderSchema`. Simulated refund when the event refund policy window is still open. Checked-in tickets are refused. Repeating the request does not create a second refund |
+| `POST` | `/api/orders/:id/refund` | `refundOrderSchema`. Simulated paid-order refund. Attendee requests are subject to the event refund policy window. Checked-in tickets are refused. Repeating the request does not create a second refund |
+| `POST` | `/api/organizer/tickets/:id/cancel-registration` | Organizer or platform admin cancels one unused ticket from a free order. |
 | `POST` | `/api/orders/:id/pay` | Creates a payment intent, returns the simulated gateway URL |
 | `POST` | `/api/orders/:id/pay/simulate` | Authenticated mobile/demo settlement (`APPROVED`/`DECLINED`/`ABANDONED`). Signs the webhook server-side; no client secret |
 | `GET` | `/api/orders` | Attendee's own orders |
@@ -130,6 +131,8 @@ All accept `analyticsQuerySchema`. All are scoped to events the caller manages, 
 
 | `GET` | `/api/admin/activations` | Paid-sales reviews waiting for a platform admin |
 | `GET` | `/api/admin/search` | Users, events, orders, payments. Query `q` must be at least two characters |
+| `POST` | `/api/admin/events/:id/suspend` | `{ reason, suspended }`. Hides the event and blocks paid and free checkout. Send `false` to restore. |
+| `POST` | `/api/admin/users/:id/suspend` | `{ reason, suspended }`. Suspends or restores a user account. |
 | `POST` | `/api/admin/users/:id/suspend` | `suspendSchema`. Existing sessions are rejected on the next request |
 | `POST` | `/api/admin/events/:id/suspend` | Sets `paidSalesSuspended`, stopping further paid sales immediately |
 | `GET` | `/api/admin/reports` | Unresolved reported events |

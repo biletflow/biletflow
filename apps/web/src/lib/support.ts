@@ -8,6 +8,7 @@ import {
 import type { z } from "zod";
 
 import { ApiError } from "./api-error";
+import { audit } from "./audit";
 import { notifySupportMessage } from "./notifications";
 
 type SessionUser = {
@@ -348,24 +349,28 @@ export async function updateSupportStatus(
     throw new ApiError(404, "NOT_FOUND");
   }
 
-  await prisma.$transaction([
-    prisma.supportCase.update({
-      where: { id: supportCase.id },
+  await prisma.$transaction(async (tx) => {
+    const now = new Date();
+    const changed = await tx.supportCase.updateMany({
+      where: { id: supportCase.id, status: { not: status } },
+      data: { status, resolvedAt: status === "RESOLVED" ? now : null, lastMessageAt: now },
+    });
+    if (!changed.count) return;
+    await tx.supportMessage.create({
       data: {
-        status,
-        resolvedAt: status === "RESOLVED" ? new Date() : null,
-        lastMessageAt: new Date(),
+        caseId: supportCase.id, authorId: user.id,
+        body: "Status changed to " + status + ".", isSystem: true,
       },
-    }),
-    prisma.supportMessage.create({
-      data: {
-        caseId: supportCase.id,
-        authorId: user.id,
-        body: `Status changed to ${status}.`,
-        isSystem: true,
-      },
-    }),
-  ]);
+    });
+    if (supportCase.eventId) {
+      await audit(tx, {
+        actorUserId: user.id, eventId: supportCase.eventId,
+        action: "support.status_changed", entityType: "SupportCase", entityId: supportCase.id,
+        description: "Support case status changed to " + status,
+        metadata: { status },
+      });
+    }
+  });
 
   return getSupportCaseOrThrow(user, caseId);
 }

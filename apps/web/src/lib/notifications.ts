@@ -224,6 +224,19 @@ export async function notifyReservationCancelled(input: {
   return { skipped: false };
 }
 
+export async function notifyFreeRegistrationCancelled(input: {
+  ticketId: string; userId: string; reference: string; email: string; eventTitle: string;
+}) {
+  await deliver({
+    userId: input.userId,
+    email: input.email,
+    type: "EVENT_CANCELLED",
+    subject: "BiletFlow registration cancelled (" + input.reference + ")",
+    body: "Your registration for " + input.eventTitle + " was cancelled. The ticket is no longer valid.",
+    payload: { cancelledTicketId: input.ticketId, reference: input.reference },
+  });
+}
+
 export async function notifyRefundCompleted(input: {
   orderId: string;
   userId: string;

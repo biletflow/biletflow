@@ -65,31 +65,33 @@ export async function searchAdmin(query: string) {
   return { users, events, orders, payments };
 }
 
-export async function suspendUser(actor: Actor, userId: string, reason: string, headers: Headers) {
+export async function setUserSuspension(actor: Actor, userId: string, suspended: boolean, reason: string, headers: Headers) {
+  const status = suspended ? "SUSPENDED" : "ACTIVE";
   const updated = await prisma.$transaction(async (tx) => {
     const target = await tx.user.findUnique({ where: { id: userId } });
     if (!target) throw new ApiError(404, "NOT_FOUND");
     if (target.id === actor.id) throw new ApiError(409, "CONFLICT");
-    if (target.status === "SUSPENDED") {
+    if (target.status === status) {
       return { id: target.id, status: target.status, duplicate: true };
     }
-    if (target.role === "PLATFORM_ADMIN") {
+    if (suspended && target.role === "PLATFORM_ADMIN") {
       const others = await tx.user.count({
         where: { role: "PLATFORM_ADMIN", status: "ACTIVE", NOT: { id: target.id } },
       });
       if (others < 1) throw new ApiError(409, "CONFLICT");
     }
-    const user = await tx.user.update({
-      where: { id: target.id },
-      data: { status: "SUSPENDED" },
-      select: { id: true, status: true },
+    const { count } = await tx.user.updateMany({
+      where: { id: target.id, status: target.status },
+      data: { status },
     });
+    const user = { id: target.id, status };
+    if (count === 0) return { ...user, duplicate: true };
     await audit(tx, {
       actorUserId: actor.id,
-      action: "user.suspended",
+      action: suspended ? "user.suspended" : "user.restored",
       entityType: "User",
       entityId: user.id,
-      description: "Platform admin suspended the account",
+      description: suspended ? "Platform admin suspended the account" : "Platform admin restored the account",
       metadata: { reason },
       ipAddress: clientIp(headers),
     });
@@ -98,30 +100,29 @@ export async function suspendUser(actor: Actor, userId: string, reason: string, 
   return { user: { id: updated.id, status: updated.status }, duplicate: updated.duplicate };
 }
 
-export async function suspendEventSales(
+export async function setEventSuspension(
   actor: Actor,
   eventId: string,
+  suspended: boolean,
   reason: string,
   headers: Headers,
 ) {
   const updated = await prisma.$transaction(async (tx) => {
     const event = await tx.event.findUnique({ where: { id: eventId } });
     if (!event) throw new ApiError(404, "NOT_FOUND");
-    if (event.paidSalesSuspended) {
-      return { id: event.id, paidSalesSuspended: true, duplicate: true };
-    }
-    const saved = await tx.event.update({
-      where: { id: event.id },
-      data: { paidSalesSuspended: true },
-      select: { id: true, paidSalesSuspended: true },
+    const { count } = await tx.event.updateMany({
+      where: { id: eventId, paidSalesSuspended: !suspended },
+      data: { paidSalesSuspended: suspended },
     });
+    const saved = { id: eventId, paidSalesSuspended: suspended };
+    if (count === 0) return { ...saved, duplicate: true };
     await audit(tx, {
       actorUserId: actor.id,
       eventId: event.id,
-      action: "event.sales_suspended",
+      action: suspended ? "event.sales_suspended" : "event.sales_restored",
       entityType: "Event",
       entityId: event.id,
-      description: "Paid sales suspended by a platform admin",
+      description: suspended ? "Event suspended by a platform admin" : "Event restored by a platform admin",
       metadata: { reason },
       ipAddress: clientIp(headers),
     });
@@ -141,7 +142,7 @@ export async function listEventReports() {
   });
   const events = await prisma.event.findMany({
     where: { id: { in: reports.map((report) => report.eventId) } },
-    select: { id: true, title: true, slug: true },
+    select: { id: true, title: true, slug: true, paidSalesSuspended: true },
   });
   const titles = new Map(events.map((event) => [event.id, event]));
   return reports.map((report) => ({

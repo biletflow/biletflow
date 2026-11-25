@@ -359,6 +359,15 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       expect(earlyReview.status).toBe(200);
       expect((await earlyReview.json()).activation.activated).toBe(false);
 
+      const withoutPayout = await payFee(request("/api/activation/pay-fee", {}, tokens.organizer), {
+        params: Promise.resolve({ id: event.id }),
+      });
+      expect(withoutPayout.status).toBe(409);
+      await createPayoutAccount(
+        { id: ids.organizer, role: "ORGANIZER", email: emails.organizer, name: "Commerce organizer" },
+        { holderName: "Commerce organizer", bankName: "Test bank", ibanLast4: "1234" },
+        new Headers(),
+      );
       const fee = await payFee(request(`/api/organizer/events/${event.id}/activation/pay-fee`, {}, tokens.organizer), {
         params: Promise.resolve({ id: event.id }),
       });
@@ -382,16 +391,6 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
         { params: Promise.resolve({ intentId: feeBody.payment.intentId }) },
       );
       expect(unlocked.status).toBe(200);
-      const afterFee = await activation(
-        request(`/api/organizer/events/${event.id}/activation`, undefined, tokens.organizer),
-        { params: Promise.resolve({ id: event.id }) },
-      );
-      expect((await afterFee.json()).activation.activated).toBe(false);
-      await createPayoutAccount(
-        { id: ids.organizer, role: "ORGANIZER", email: emails.organizer, name: "Commerce organizer" },
-        { holderName: "Commerce organizer", bankName: "Test bank", ibanLast4: "1234" },
-        new Headers(),
-      );
       const nowActive = await activation(
         request(`/api/organizer/events/${event.id}/activation`, undefined, tokens.organizer),
         { params: Promise.resolve({ id: event.id }) },
