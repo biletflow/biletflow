@@ -1,0 +1,53 @@
+name: Flutter CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile_flutter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.50.1"
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  native-build:
+    needs: flutter
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Android
+            runner: ubuntu-latest
+            build: flutter build apk --debug
+          - platform: iOS
+            runner: macos-latest
+            build: flutter build ios --simulator --no-codesign
+    name: ${{ matrix.platform }} build
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        working-directory: apps/mobile_flutter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        if: matrix.platform == 'Android'
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.50.1'
+      - run: flutter pub get
+      - run: ${{ matrix.build }}

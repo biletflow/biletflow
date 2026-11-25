@@ -4,7 +4,10 @@ import '../core/api.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/status_badge.dart';
+import 'admin_moderation.dart';
+import 'organizer_activation.dart';
 import 'organizer_editor.dart';
+import 'organizer_overview.dart';
 import 'organizer_reports.dart';
 
 List<EditorField> _eventFields(AppLocalizations l10n) => [
@@ -373,6 +376,32 @@ class _EventScreenState extends State<EventScreen> {
                       ),
                     ),
                     child: Text(l10n.attendanceAndCampaigns),
+                  ),
+                  OutlinedButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrganizerOverview(
+                          api: widget.api,
+                          eventId: widget.id,
+                        ),
+                      ),
+                    ),
+                    child: Text(adminLabel(context, 'Event overview',
+                        'Обзор мероприятия', 'Іс-шара шолуы')),
+                  ),
+                  OutlinedButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrganizerActivation(
+                          api: widget.api,
+                          eventId: widget.id,
+                        ),
+                      ),
+                    ),
+                    child: Text(adminLabel(context, 'Paid sales activation',
+                        'Активация платных продаж', 'Ақылы сатылымды іске қосу')),
                   ),
                   if (editable)
                     OutlinedButton(

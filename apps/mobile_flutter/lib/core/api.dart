@@ -49,7 +49,9 @@ class ApiClient {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final error = data['error'];
       throw ApiException(response.statusCode,
-          error is Map ? '${error['code'] ?? 'REQUEST_FAILED'}' : 'REQUEST_FAILED');
+          error is Map
+              ? '${error['code'] ?? 'REQUEST_FAILED'}'
+              : '${data['code'] ?? 'REQUEST_FAILED'}');
     }
     return data;
   }

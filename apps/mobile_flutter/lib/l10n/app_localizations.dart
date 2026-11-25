@@ -171,12 +171,16 @@ class AppLocalizations {
       'resetSent':
           'If an account exists for that email, a reset link is on its way.',
       'resetPassword': 'Choose a new password',
-      'resetLead':
-          'Paste the token from the reset link, then choose a new password.',
+      'verifyEmail': 'Verify email',
+      'verificationLead': 'Paste the verification link from your email.',
+      'resendVerification': 'Resend verification email',
+      'verificationSent': 'A verification email is on its way.',
+      'invalidEmailLink': 'Enter a valid link or token from your email.',
+      'resetLead': 'Paste the reset link from your email and choose a new password.',
+      'resetToken': 'Reset link or token',
       'newPassword': 'New password',
       'savePassword': 'Save password',
       'savingPassword': 'Saving…',
-      'resetToken': 'Reset token',
       'backToSignIn': 'Back to sign in',
       'createEvent': 'Create event',
       'editEvent': 'Edit event',
@@ -402,11 +406,16 @@ class AppLocalizations {
       'resetSent':
           'Если аккаунт с этим email есть, ссылка для сброса уже отправлена.',
       'resetPassword': 'Новый пароль',
-      'resetLead': 'Вставьте токен из ссылки и задайте новый пароль.',
+      'verifyEmail': 'Подтвердить email',
+      'verificationLead': 'Вставьте ссылку для подтверждения из письма.',
+      'resendVerification': 'Отправить письмо повторно',
+      'verificationSent': 'Письмо для подтверждения отправлено.',
+      'invalidEmailLink': 'Введите действительную ссылку или токен из письма.',
+      'resetLead': 'Вставьте ссылку из письма и задайте новый пароль.',
+      'resetToken': 'Ссылка или токен сброса',
       'newPassword': 'Новый пароль',
       'savePassword': 'Сохранить пароль',
       'savingPassword': 'Сохраняем…',
-      'resetToken': 'Токен сброса',
       'backToSignIn': 'Ко входу',
       'createEvent': 'Создать событие',
       'editEvent': 'Изменить событие',
@@ -631,11 +640,16 @@ class AppLocalizations {
       'resetSent':
           'Бұл email-ге аккаунт болса, қалпына келтіру сілтемесі жіберілді.',
       'resetPassword': 'Жаңа құпиясөз',
-      'resetLead': 'Сілтемедегі токенді қойып, жаңа құпиясөз қойыңыз.',
+      'verifyEmail': 'Электрондық поштаны растау',
+      'verificationLead': 'Хаттағы растау сілтемесін қойыңыз.',
+      'resendVerification': 'Растау хатын қайта жіберу',
+      'verificationSent': 'Растау хаты жіберілді.',
+      'invalidEmailLink': 'Хаттағы жарамды сілтемені немесе токенді енгізіңіз.',
+      'resetLead': 'Хаттағы сілтемені қойып, жаңа құпиясөз таңдаңыз.',
+      'resetToken': 'Қалпына келтіру сілтемесі немесе токені',
       'newPassword': 'Жаңа құпиясөз',
       'savePassword': 'Құпиясөзді сақтау',
       'savingPassword': 'Сақталуда…',
-      'resetToken': 'Қалпына келтіру токені',
       'backToSignIn': 'Кіруге оралу',
       'createEvent': 'Іс-шара құру',
       'editEvent': 'Іс-шараны өзгерту',
@@ -915,6 +929,11 @@ class AppLocalizations {
   String get sendingReset => _t('sendingReset');
   String get resetSent => _t('resetSent');
   String get resetPassword => _t('resetPassword');
+  String get verifyEmail => _t('verifyEmail');
+  String get verificationLead => _t('verificationLead');
+  String get resendVerification => _t('resendVerification');
+  String get verificationSent => _t('verificationSent');
+  String get invalidEmailLink => _t('invalidEmailLink');
   String get resetLead => _t('resetLead');
   String get newPassword => _t('newPassword');
   String get savePassword => _t('savePassword');
