@@ -17,12 +17,33 @@ jobs:
         with:
           channel: stable
           flutter-version: "3.50.1"
-      - run: flutter pub get
+      - id: dependencies
+        run: flutter pub get
       - run: flutter analyze
-      - run: flutter test
+      - if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: flutter test
+
+  main-baseline:
+    if: github.event_name == 'pull_request' && github.head_ref == 'kamila/flutter-integration-testing'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile_flutter
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.50.1'
+      - id: dependencies
+        run: flutter pub get
+      - run: flutter analyze
+      - if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: flutter test
 
   native-build:
-    needs: flutter
     strategy:
       fail-fast: false
       matrix:
