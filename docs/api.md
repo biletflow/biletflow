@@ -132,9 +132,7 @@ All accept `analyticsQuerySchema`. All are scoped to events the caller manages, 
 | `GET` | `/api/admin/activations` | Paid-sales reviews waiting for a platform admin |
 | `GET` | `/api/admin/search` | Users, events, orders, payments. Query `q` must be at least two characters |
 | `POST` | `/api/admin/events/:id/suspend` | `{ reason, suspended }`. Hides the event and blocks paid and free checkout. Send `false` to restore. |
-| `POST` | `/api/admin/users/:id/suspend` | `{ reason, suspended }`. Suspends or restores a user account. |
-| `POST` | `/api/admin/users/:id/suspend` | `suspendSchema`. Existing sessions are rejected on the next request |
-| `POST` | `/api/admin/events/:id/suspend` | Sets `paidSalesSuspended`, stopping further paid sales immediately |
+| `POST` | `/api/admin/users/:id/suspend` | `{ reason, suspended }`. Suspends or restores a user account. Suspended users cannot sign in or reuse existing sessions. |
 | `GET` | `/api/admin/reports` | Unresolved reported events |
 | `GET` `PUT` | `/api/admin/settings` | `platformSettingsSchema` for the activation fee, platform fee, and checkout hold |
 | `GET` | `/api/admin/exports/orders.csv` | Operational order export. Cells that could be formulas are quoted |
