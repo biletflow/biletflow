@@ -8,8 +8,9 @@ import 'order_status.dart';
 /// Campaign QR codes are event links with a `c` token, not promo text.
 String? campaignTokenFrom(String raw) {
   final value = raw.trim();
-  if (!value.startsWith('http://') && !value.startsWith('https://'))
+  if (!value.startsWith('http://') && !value.startsWith('https://')) {
     return null;
+  }
   final token = Uri.tryParse(value)?.queryParameters['c']?.trim();
   if (token == null || token.isEmpty) return null;
   return token;

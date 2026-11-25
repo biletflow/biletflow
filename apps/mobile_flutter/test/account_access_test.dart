@@ -130,11 +130,25 @@ void main() {
         locale: const Locale('en'),
         localizationsDelegates: const [AppLocalizations.delegate],
         supportedLocales: AppLocalizations.supportedLocales,
-        home: VerifyEmailScreen(session: session),
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => Navigator.push<void>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => VerifyEmailScreen(session: session),
+              ),
+            ),
+            child: const Text('Open verification'),
+          ),
+        ),
       ),
     );
-    await tester.enterText(find.byType(TextFormField),
-      'https://example.test/api/auth/verify-email?token=signed.token&callbackURL=/');
+    await tester.tap(find.text('Open verification'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byType(TextFormField),
+      'https://example.test/api/auth/verify-email?token=signed.token&callbackURL=/',
+    );
     await tester.tap(find.widgetWithText(FilledButton, 'Verify email'));
     await tester.pumpAndSettle();
     expect(calls, ['/api/auth/verify-email', '/api/me']);
