@@ -12,6 +12,8 @@ Self-service event ticketing platform for Kazakhstan. Organizers can create even
 
 The project covers web and mobile applications with a shared backend and database. The mobile application is designed for iOS and Android with role-based functionality. Payments and identity verification are simulated.
 
+See the [mobile SRS scope addendum](docs/srs-mobile-addendum.md) for the clarified full Flutter requirement and acceptance criteria. The addendum describes required scope, not proof that every feature has passed verification.
+
 ## Stack
 
 | Component | Technology |
