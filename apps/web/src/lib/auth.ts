@@ -42,6 +42,28 @@ export const auth = betterAuth({
       });
     },
   },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      try {
+        await sendMail({
+          to: user.email,
+          subject: "BiletFlow email verification",
+          text: [
+            `Hello ${user.name || "there"},`,
+            "",
+            "Confirm your BiletFlow email:",
+            url,
+            "",
+            "This is a simulated academic message.",
+          ].join("\n"),
+        });
+      } catch {
+        // Signup and password reset still succeed when the local mail server is down.
+      }
+    },
+  },
   user: {
     additionalFields: {
       role: {

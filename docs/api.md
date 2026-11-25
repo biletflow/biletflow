@@ -15,6 +15,9 @@ Implemented auth response shapes, role checks, migration notes and audit usage:
 | `POST` | `/api/auth/[...all]` | better-auth handler: sign-up, sign-in, sign-out, verify email, reset password |
 | `GET` | `/api/me` | Current user, role, organizer profile summary |
 | `POST` | `/api/mobile/auth/login` | Returns a bearer token for the scanner app |
+| `POST` | `/api/auth/sign-up/email` | `{ name, email, password, locale }`. Role and status from the client are ignored. A verification email is sent when mail is available; login is not blocked on it |
+| `POST` | `/api/auth/request-password-reset` | `{ email }` |
+| `POST` | `/api/auth/reset-password` | `{ newPassword, token }` |
 
 ## Organizer profile and payouts
 
@@ -48,6 +51,7 @@ Every response includes the counters `quantity`, `sold`, `reserved`, `refunded`,
 
 | `GET` | `/api/organizer/events/:id/activation` | The checklist state: five booleans plus the fee amount |
 | `POST` | `/api/organizer/events/:id/activation/pay-fee` | Creates an `ACTIVATION_FEE` payment intent |
+| `POST` | `/api/organizer/events/:id/activation/simulate` | `{ intentId, outcome }`. Settles that simulated fee without a client webhook secret. `outcome` is `APPROVED`, `DECLINED`, or `ABANDONED` |
 | `POST` | `/api/organizer/events/:id/activation/accept-terms` | |
 | `POST` | `/api/admin/activations/:id/review` | Platform Admin approves or rejects the simulated KYC |
 
@@ -115,7 +119,7 @@ Clients poll `GET /api/support/cases/:id` every 10 seconds while the thread is o
 ## Analytics
 
 | `GET` | `/api/organizer/analytics/summary` | Capacity, sold, remaining, percent sold, gross, discounts, refunds, net |
-| `GET` | `/api/organizer/analytics/sales-over-time` | Buckets by day from `Order.paidAt` |
+| `GET` | `/api/organizer/analytics/sales-over-time` | Daily buckets from `Order.paidAt`. `collectedKzt` is the paid order total |
 | `GET` | `/api/organizer/analytics/by-ticket-type` | |
 | `GET` | `/api/organizer/analytics/campaigns` | Per-campaign redemptions, tickets, revenue |
 | `GET` | `/api/organizer/analytics/attendance` | Checked in, absent, percentage |
