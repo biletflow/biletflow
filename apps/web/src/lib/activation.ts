@@ -221,7 +221,20 @@ export async function maybeActivate(
       where: { organizerProfile: { userId: activation.organizerId } },
     }),
   ]);
-  if (!current?.termsAcceptedAt || accountCount === 0 || current.activatedAt) return;
+  const event = await tx.event.findUnique({
+    where: { id: activation.eventId },
+    select: { paidSalesSuspended: true, status: true },
+  });
+  if (
+    !current?.termsAcceptedAt ||
+    accountCount === 0 ||
+    current.activatedAt ||
+    !event ||
+    event.paidSalesSuspended ||
+    event.status === "CANCELLED"
+  ) {
+    return;
+  }
   if (!activation.activatedAt) {
     await tx.paidSalesActivation.update({
       where: { id: activation.id },

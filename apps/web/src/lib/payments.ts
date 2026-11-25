@@ -7,7 +7,7 @@ import { ApiError } from "./api-error";
 import { audit } from "./audit";
 import { clientIp, isUniqueViolation } from "./http";
 import { convertReservation, releaseInventory } from "./inventory";
-import { maybeActivate } from "./activation";
+import { maybeActivate, presentActivation } from "./activation";
 import { notifyOrderPaid, notifyPaymentFailed } from "./notifications";
 import { getOwnedOrder, presentOrder } from "./checkout";
 import {
@@ -124,6 +124,42 @@ export async function simulateOrderPayment(
   const simulation = await processPaymentWebhook(payload, signWebhookBody(payload));
   const order = await getOwnedOrder(userId, role, orderId);
   return { order: presentOrder(order), simulation, payment: started.payment };
+}
+
+export async function simulateActivationFee(
+  userId: string,
+  role: string,
+  eventId: string,
+  input: { intentId: string; outcome: "APPROVED" | "DECLINED" | "ABANDONED" },
+) {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { id: true, organizerId: true },
+  });
+  if (!event) throw new ApiError(404, "NOT_FOUND");
+  if (role !== "PLATFORM_ADMIN" && event.organizerId !== userId) {
+    throw new ApiError(404, "NOT_FOUND");
+  }
+  const payment = await prisma.payment.findFirst({
+    where: {
+      providerIntentId: input.intentId,
+      purpose: "ACTIVATION_FEE",
+      simulated: true,
+      activation: { eventId: event.id },
+    },
+    select: { id: true },
+  });
+  if (!payment) throw new ApiError(404, "NOT_FOUND");
+  const payload = JSON.stringify({
+    intentId: input.intentId,
+    outcome: input.outcome,
+    eventKey: `${input.intentId}:${input.outcome}`,
+  });
+  const simulation = await processPaymentWebhook(payload, signWebhookBody(payload));
+  return {
+    activation: await presentActivation(event.id, event.organizerId),
+    simulation,
+  };
 }
 
 export async function processPaymentWebhook(raw: string, signature: string | null) {
