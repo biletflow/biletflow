@@ -120,16 +120,18 @@ class _ScannerScreenState extends State<ScannerScreen>
         },
       );
     } on TimeoutException {
-      if (mounted) {
-        setState(() => error = l10n.scanTimeout);
-      }
+      if (mounted) showConnectionError(l10n.scanTimeout);
     } catch (_) {
-      if (mounted) {
-        setState(() => error = l10n.scanRequestFailed);
-      }
+      if (mounted) showConnectionError(l10n.scanRequestFailed);
     } finally {
       if (mounted) setState(() => busy = false);
     }
+  }
+
+  void showConnectionError(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   List<Map<String, dynamic>> readList(Map<String, dynamic> data, String key) =>
@@ -234,12 +236,11 @@ class _ScannerScreenState extends State<ScannerScreen>
 
   Future<void> findAttendees() async {
     if (locked || eventId == null) return;
+    FocusManager.instance.primaryFocus?.unfocus();
     await run(() async {
       final query = search.text.trim();
-      if (query.isEmpty) {
-        setState(() => attendees = null);
-        return;
-      }
+      setState(() => attendees = null);
+      if (query.isEmpty) return;
       final data = await api.get(
         '$eventPath/attendees?q=${Uri.encodeQueryComponent(query)}',
       );
