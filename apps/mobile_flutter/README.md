@@ -44,9 +44,11 @@ CI covers analyze + unit/widget tests on Linux. Native APK/IPA and physical-devi
 ```sh
 flutter doctor -v
 flutter build apk --debug
-flutter build ios --simulator --no-codesign
+flutter build ios --debug --no-codesign
 flutter run -d <android-or-ios-device> --dart-define=BILETFLOW_API_URL=...
 ```
+
+The iOS CI job targets physical-device binaries. The current ML Kit libraries used by `mobile_scanner` lack arm64 support for Apple Silicon iOS 26+ simulators.
 
 Validate permission denial, valid/duplicate scans, wrong event, invalid signatures, campaign codes, canceled/refunded tickets, offline, and backgrounding on each platform you claim.
 

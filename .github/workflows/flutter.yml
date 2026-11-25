@@ -36,7 +36,7 @@ jobs:
             build: flutter build apk --debug
           - platform: iOS
             runner: macos-latest
-            build: flutter build ios --simulator --no-codesign
+            build: flutter build ios --debug --no-codesign
     name: ${{ matrix.platform }} build
     runs-on: ${{ matrix.runner }}
     defaults:
