@@ -407,7 +407,7 @@ class _EventScreenState extends State<EventScreen> {
                 if (type is Map)
                   Card(
                     child: ListTile(
-                      title: Text('${type['name']} · ${type['priceKzt']} KZT'),
+                      title: Text('${type['name']}'),
                       onTap: editable && !changing
                           ? () => editTicket(type)
                           : null,
@@ -416,14 +416,16 @@ class _EventScreenState extends State<EventScreen> {
                         '${type['isHidden'] == true ? ' · Hidden' : ''}',
                       ),
                       trailing: editable && type['id'] is String
-                          ? IconButton(
+                          ? Row(mainAxisSize: MainAxisSize.min, children: [
+                              Text(AppLocalizations.of(context).money(type['priceKzt'] is int ? type['priceKzt'] as int : 0)),
+                              IconButton(
                               tooltip: 'Delete ticket type',
                               onPressed: changing
                                   ? null
                                   : () => deleteTicket(type['id'] as String),
                               icon: const Icon(Icons.delete_outline),
-                            )
-                          : null,
+                            )])
+                          : Text(AppLocalizations.of(context).money(type['priceKzt'] is int ? type['priceKzt'] as int : 0)),
                     ),
                   ),
           ],
