@@ -1,9 +1,11 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../core/api.dart';
 import '../core/session.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/locale_controller.dart';
 import '../widgets/locale_switcher.dart';
+import 'account_access.dart';
 
 class LoginScreen extends StatefulWidget {
   final Session session;
@@ -53,9 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(
-        actions: [LocaleSwitcher(controller: widget.locales)],
-      ),
+      appBar: AppBar(actions: [LocaleSwitcher(controller: widget.locales)]),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -67,11 +67,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(Icons.confirmation_number_outlined,
-                        size: 48, color: Theme.of(context).colorScheme.primary),
-                    Text(l10n.appName,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineLarge),
+                    Icon(
+                      Icons.confirmation_number_outlined,
+                      size: 48,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    Text(
+                      l10n.appName,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
                     const SizedBox(height: 32),
                     TextFormField(
                       controller: email,
@@ -97,11 +102,40 @@ class _LoginScreenState extends State<LoginScreen> {
                         error ??
                             AppLocalizations.of(context)
                                 .apiError(widget.session.error ?? ''),
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                       ),
                     FilledButton(
                       onPressed: busy ? null : submit,
                       child: Text(busy ? l10n.signingIn : l10n.signIn),
+                    ),
+                    TextButton(
+                      onPressed: busy
+                          ? null
+                          : () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ForgotPasswordScreen(
+                                  api: widget.session.api,
+                                ),
+                              ),
+                            ),
+                      child: Text(l10n.forgotPassword),
+                    ),
+                    TextButton(
+                      onPressed: busy
+                          ? null
+                          : () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => RegisterScreen(
+                                  session: widget.session,
+                                  locales: widget.locales,
+                                ),
+                              ),
+                            ),
+                      child: Text(l10n.createAccount),
                     ),
                   ],
                 ),

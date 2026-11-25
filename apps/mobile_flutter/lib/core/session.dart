@@ -94,6 +94,21 @@ class Session extends ChangeNotifier {
     }
   }
 
+  Future<void> register({
+    required String name,
+    required String email,
+    required String password,
+    required String locale,
+  }) async {
+    await api.post('/api/auth/sign-up/email', {
+      'name': name,
+      'email': email,
+      'password': password,
+      'locale': locale,
+    });
+    await login(email, password);
+  }
+
   Future<void> logout() async {
     if (loading) return;
     loading = true;

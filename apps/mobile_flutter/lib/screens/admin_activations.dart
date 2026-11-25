@@ -23,25 +23,21 @@ class _AdminActivationsState extends State<AdminActivations> {
 
   Future<void> review(String id, String decision) async {
     if (reviewing) return;
+    final l10n = AppLocalizations.of(context);
     final approve = decision == 'APPROVE';
-    final action = approve ? 'Approve' : 'Reject';
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('$action paid-sales review?'),
-        content: Text(
-          approve
-              ? 'This records approval for the organizer’s identity review.'
-              : 'This records rejection and disables paid sales for the event.',
-        ),
+        title: Text(approve ? l10n.approveReviewTitle : l10n.rejectReviewTitle),
+        content: Text(approve ? l10n.approveReviewBody : l10n.rejectReviewBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Back'),
+            child: Text(l10n.back),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(action),
+            child: Text(approve ? l10n.approve : l10n.reject),
           ),
         ],
       ),
@@ -65,76 +61,85 @@ class _AdminActivationsState extends State<AdminActivations> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: const Text('Paid-sales reviews'),
-      actions: [
-        IconButton(
-          onPressed: reviewing ? null : reload,
-          icon: const Icon(Icons.refresh),
-          tooltip: 'Refresh',
-        ),
-      ],
-    ),
-    body: FutureBuilder(
-      future: queue,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoadingState();
-        }
-        final rows = snapshot.data?['activations'];
-        if (snapshot.hasError || rows is! List) {
-          return ErrorState(
-            message: AppLocalizations.of(context).apiError(''),
-            onRetry: reload,
-          );
-        }
-        if (rows.isEmpty) return const EmptyState(title: 'No pending reviews');
-        return ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            for (final row in rows.whereType<Map<String, dynamic>>())
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${(row['event'] as Map)['title']}',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      Text('${(row['organizer'] as Map)['name']}'),
-                      Text(row['feePaid'] == true ? 'Fee paid' : 'Fee pending'),
-                      Text(
-                        row['payoutAccountConnected'] == true
-                            ? 'Payout account connected'
-                            : 'Payout account pending',
-                      ),
-                      Wrap(
-                        spacing: 8,
-                        children: [
-                          OutlinedButton(
-                            onPressed: reviewing
-                                ? null
-                                : () => review(row['id'] as String, 'REJECT'),
-                            child: const Text('Reject'),
-                          ),
-                          FilledButton(
-                            onPressed: reviewing
-                                ? null
-                                : () => review(row['id'] as String, 'APPROVE'),
-                            child: const Text('Approve'),
-                          ),
-                        ],
-                      ),
-                    ],
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.paidSalesReviews),
+        actions: [
+          IconButton(
+            onPressed: reviewing ? null : reload,
+            icon: const Icon(Icons.refresh),
+            tooltip: l10n.refresh,
+          ),
+        ],
+      ),
+      body: FutureBuilder(
+        future: queue,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LoadingState();
+          }
+          final rows = snapshot.data?['activations'];
+          if (snapshot.hasError || rows is! List) {
+            return ErrorState(
+              message: l10n.apiError(''),
+              onRetry: reload,
+              retryLabel: l10n.retry,
+            );
+          }
+          if (rows.isEmpty) return EmptyState(title: l10n.noPendingReviews);
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              for (final row in rows.whereType<Map<String, dynamic>>())
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${(row['event'] as Map)['title']}',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text('${(row['organizer'] as Map)['name']}'),
+                        Text(
+                          row['feePaid'] == true
+                              ? l10n.feePaid
+                              : l10n.feePending,
+                        ),
+                        Text(
+                          row['payoutAccountConnected'] == true
+                              ? l10n.payoutConnected
+                              : l10n.payoutPending,
+                        ),
+                        Wrap(
+                          spacing: 8,
+                          children: [
+                            OutlinedButton(
+                              onPressed: reviewing
+                                  ? null
+                                  : () => review(row['id'] as String, 'REJECT'),
+                              child: Text(l10n.reject),
+                            ),
+                            FilledButton(
+                              onPressed: reviewing
+                                  ? null
+                                  : () =>
+                                        review(row['id'] as String, 'APPROVE'),
+                              child: Text(l10n.approve),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-          ],
-        );
-      },
-    ),
-  );
+            ],
+          );
+        },
+      ),
+    );
+  }
 }
