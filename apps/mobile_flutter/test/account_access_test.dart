@@ -81,7 +81,7 @@ void main() {
         expect(request.url.path, '/api/auth/request-password-reset');
         expect(jsonDecode(request.body), {
           'email': 'aida@example.test',
-          'redirectTo': 'https://example.test/en/reset-password',
+          'redirectTo': '/en/reset-password',
         });
         return http.Response('{"status":true}', 200);
       }),
@@ -178,7 +178,7 @@ void main() {
       ),
     );
     await tester.enterText(find.byType(TextFormField).first,
-      'https://example.test/api/auth/reset-password/reset-token?callbackURL=/en/reset-password');
+      'http://localhost:3000/api/auth/reset-password/reset-token?callbackURL=/en/reset-password');
     await tester.enterText(find.byType(TextFormField).last, 'new-password123');
     await tester.tap(find.byType(FilledButton));
     await tester.pumpAndSettle();

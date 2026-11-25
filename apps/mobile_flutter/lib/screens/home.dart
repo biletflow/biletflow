@@ -149,7 +149,7 @@ class HomeScreen extends StatelessWidget {
               title: Text(l10n.account),
               subtitle: Text('${session.user?['email'] ?? ''}'),
               trailing: session.user?['emailVerified'] == false
-                  ? const Icon(Icons.chevron_right)
+                  ? Text(l10n.verifyEmail)
                   : null,
               onTap: session.user?['emailVerified'] == false
                   ? () => Navigator.push(

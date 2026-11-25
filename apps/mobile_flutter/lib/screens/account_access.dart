@@ -152,9 +152,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       await widget.api.post('/api/auth/request-password-reset', {
         'email': email.text.trim(),
-        'redirectTo': widget.api.base.resolve(
-          '/${Localizations.localeOf(context).languageCode}/reset-password',
-        ).toString(),
+        'redirectTo':
+            '/${Localizations.localeOf(context).languageCode}/reset-password',
       });
       if (mounted) setState(() => sent = true);
     } on ApiException catch (failure) {
@@ -263,7 +262,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     });
     try {
       await widget.api.post('/api/auth/reset-password', {
-        'token': _emailToken(widget.api, token.text, reset: true),
+        'token': _emailToken(token.text, reset: true),
         'newPassword': password.text,
       });
       if (mounted) Navigator.popUntil(context, (route) => route.isFirst);
@@ -299,7 +298,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 controller: token,
                 decoration: InputDecoration(labelText: l10n.resetToken),
                 validator: (value) =>
-                    _emailToken(widget.api, value ?? '', reset: true) == null
+                    _emailToken(value ?? '', reset: true) == null
                         ? l10n.invalidEmailLink
                         : null,
               ),
@@ -334,20 +333,26 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 }
 
-String? _emailToken(ApiClient api, String input, {required bool reset}) {
+String? _emailToken(String input, {required bool reset}) {
   final value = input.trim();
   if (RegExp(r'^[A-Za-z0-9._~-]+$').hasMatch(value)) return value;
   final link = Uri.tryParse(value);
-  if (link == null || !link.hasAuthority || link.userInfo.isNotEmpty ||
-      !['http', 'https'].contains(link.scheme) || link.origin != api.base.origin) {
+  if (link == null ||
+      !link.hasAuthority ||
+      link.userInfo.isNotEmpty ||
+      !['http', 'https'].contains(link.scheme)) {
     return null;
   }
-  if (reset && link.path.startsWith('/api/auth/reset-password/') &&
+  // The entered origin is never contacted. Use only the token and let the
+  // configured backend validate it, including when a device uses a LAN alias.
+  if (reset &&
+      link.path.startsWith('/api/auth/reset-password/') &&
       link.pathSegments.length == 4) {
     return link.pathSegments.last;
   }
-  if (reset ? link.path.endsWith('/reset-password') :
-      link.path == '/api/auth/verify-email') {
+  if (reset
+      ? link.path.endsWith('/reset-password')
+      : link.path == '/api/auth/verify-email') {
     final token = link.queryParameters['token'];
     return token == null || token.isEmpty ? null : token;
   }
@@ -391,7 +396,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         return;
       }
       await session.api.get('/api/auth/verify-email', query: {
-        'token': _emailToken(session.api, link.text, reset: false)!,
+        'token': _emailToken(link.text, reset: false)!,
       });
       await session.refresh();
       if (!mounted) return;
@@ -430,7 +435,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 keyboardType: TextInputType.url,
                 decoration: InputDecoration(labelText: l10n.verifyEmail),
                 validator: (value) =>
-                    _emailToken(widget.session.api, value ?? '', reset: false) == null
+                    _emailToken(value ?? '', reset: false) == null
                         ? l10n.invalidEmailLink
                         : null,
               ),
