@@ -1,7 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../core/api.dart';
-import '../core/format.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/status_badge.dart';
@@ -34,7 +33,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
     _load();
   }
 
-  Future<void> _load() async {
+  Future<void> _load({String? actionError}) async {
     setState(() {
       _loading = true;
       _error = null;
@@ -46,7 +45,10 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
       if (order is! Map) {
         throw const ApiException(500, 'INVALID_ORDER_RESPONSE');
       }
-      setState(() => _order = Map<String, dynamic>.from(order));
+      setState(() {
+        _order = Map<String, dynamic>.from(order);
+        _error = actionError;
+      });
     } on ApiException catch (error) {
       if (mounted) setState(() => _error = error.code);
     } catch (_) {
@@ -57,6 +59,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
   }
 
   Future<void> _simulate(String outcome) async {
+    if (_busy) return;
     setState(() {
       _busy = true;
       _error = null;
@@ -67,22 +70,23 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
         {'outcome': outcome},
       );
       final order = data['order'];
+      if (!mounted) return;
       if (order is Map) {
         setState(() => _order = Map<String, dynamic>.from(order));
       } else {
         await _load();
       }
     } on ApiException catch (error) {
-      setState(() => _error = error.code);
-      await _load();
+      if (mounted) await _load(actionError: error.code);
     } catch (_) {
-      setState(() => _error = 'REQUEST_FAILED');
+      if (mounted) setState(() => _error = 'REQUEST_FAILED');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _cancel() async {
+    if (_busy) return;
     setState(() {
       _busy = true;
       _error = null;
@@ -93,15 +97,16 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
         {},
       );
       final order = data['order'];
+      if (!mounted) return;
       if (order is Map) {
         setState(() => _order = Map<String, dynamic>.from(order));
       } else {
         await _load();
       }
     } on ApiException catch (error) {
-      setState(() => _error = error.code);
+      if (mounted) setState(() => _error = error.code);
     } catch (_) {
-      setState(() => _error = 'REQUEST_FAILED');
+      if (mounted) setState(() => _error = 'REQUEST_FAILED');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -114,7 +119,11 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.refundOrder),
-        content: Text(l10n.refundConfirmation),
+        content: Text(
+          (_order?['totalKzt'] as num? ?? 0) > 0
+              ? l10n.testRefund
+              : l10n.refundConfirmation,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -188,17 +197,12 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                 const SizedBox(height: 8),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: StatusBadge.order(
-                    status,
-                    status == 'REFUNDED' ? l10n.ticketStatus(status) : status,
-                  ),
+                  child: StatusBadge.order(status, l10n.orderStatus(status)),
                 ),
                 if (total is num)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      l10n.totalLabel(formatKzt(total, freeLabel: l10n.free)),
-                    ),
+                    child: Text(l10n.totalLabel(l10n.money(total.round()))),
                   ),
                 if (_error != null)
                   Padding(
@@ -238,6 +242,11 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                   ),
                 ],
                 if (status == 'PAID') ...[
+                  if (total is num && total > 0)
+                    Text(
+                      l10n.testTransaction,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   if (tickets is List &&
                       tickets.isNotEmpty &&
                       !tickets.whereType<Map>().any(
@@ -285,7 +294,9 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                       return Card(
                         child: ListTile(
                           title: Text(
-                            '${ticket['ticketTypeName'] ?? 'Ticket'}',
+                            l10n.ticketTypeName(
+                              '${ticket['ticketTypeName'] ?? l10n.tickets}',
+                            ),
                           ),
                           subtitle: Text(
                             [

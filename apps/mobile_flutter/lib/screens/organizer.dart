@@ -13,6 +13,15 @@ import 'organizer_reports.dart';
 List<EditorField> _eventFields(AppLocalizations l10n) => [
   (key: 'title', label: l10n.eventTitle, required: true, number: false),
   (key: 'description', label: l10n.description, required: false, number: false),
+  (key: 'category', label: l10n.category, required: false, number: false),
+  (key: 'visibility', label: l10n.visibility, required: true, number: false),
+  (key: 'venueId', label: 'Venue', required: false, number: false),
+  (
+    key: 'coverImageUrl',
+    label: 'Event cover URL',
+    required: false,
+    number: false,
+  ),
   (key: 'startsAt', label: l10n.startsAt, required: true, number: false),
   (key: 'endsAt', label: l10n.endsAt, required: true, number: false),
   (key: 'capacity', label: l10n.capacity, required: false, number: true),
@@ -62,7 +71,10 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
         builder: (_) => OrganizerEditor(
           title: l10n.createEvent,
           fields: _eventFields(l10n),
+          eventApi: widget.api,
           initial: {
+            'visibility': 'PUBLIC',
+            'timezone': 'Asia/Almaty',
             'startsAt': starts.toIso8601String(),
             'endsAt': starts.add(const Duration(hours: 2)).toIso8601String(),
           },
@@ -198,12 +210,22 @@ class _EventScreenState extends State<EventScreen> {
         builder: (_) => OrganizerEditor(
           title: l10n.editEvent,
           fields: _eventFields(l10n),
+          eventApi: widget.api,
+          ticketTypes:
+              (event['ticketTypes'] as List?)?.whereType<Map>().toList() ?? [],
           initial: _settings(event, [
             'title',
             'description',
             'startsAt',
             'endsAt',
             'capacity',
+            'category',
+            'visibility',
+            'venueId',
+            'coverImageUrl',
+            'timezone',
+            'seatingMode',
+            'refundPolicy',
           ]),
           save: (body) => widget.api.put(path, body),
         ),
@@ -387,8 +409,14 @@ class _EventScreenState extends State<EventScreen> {
                         ),
                       ),
                     ),
-                    child: Text(adminLabel(context, 'Event overview',
-                        'Обзор мероприятия', 'Іс-шара шолуы')),
+                    child: Text(
+                      adminLabel(
+                        context,
+                        'Event overview',
+                        'Обзор мероприятия',
+                        'Іс-шара шолуы',
+                      ),
+                    ),
                   ),
                   OutlinedButton(
                     onPressed: () => Navigator.push(
@@ -400,8 +428,14 @@ class _EventScreenState extends State<EventScreen> {
                         ),
                       ),
                     ),
-                    child: Text(adminLabel(context, 'Paid sales activation',
-                        'Активация платных продаж', 'Ақылы сатылымды іске қосу')),
+                    child: Text(
+                      adminLabel(
+                        context,
+                        'Paid sales activation',
+                        'Активация платных продаж',
+                        'Ақылы сатылымды іске қосу',
+                      ),
+                    ),
                   ),
                   if (editable)
                     OutlinedButton(

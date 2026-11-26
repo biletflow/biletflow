@@ -339,8 +339,18 @@ class _ScannerScreenState extends State<ScannerScreen>
               ],
             ),
           if (stats case final counts?)
-            Text(
-              '${l10n.checkedInLabel}: ${counts['checkedIn']} / ${counts['registered']}',
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.groups_outlined),
+                title: Text(
+                  '${l10n.checkedInLabel}: ${counts['checkedIn']} / ${counts['registered']}',
+                ),
+                trailing: IconButton(
+                  onPressed: locked ? null : () => run(refreshStats),
+                  tooltip: l10n.refreshAttendance,
+                  icon: const Icon(Icons.refresh),
+                ),
+              ),
             ),
           if (busy) const LinearProgressIndicator(),
           if (error case final message?)
@@ -352,6 +362,15 @@ class _ScannerScreenState extends State<ScannerScreen>
               ),
             ),
           if (result case final data?) resultCard(data),
+          if (scanning)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(switch (l10n.locale.languageCode) {
+                'ru' => 'Поместите QR-код билета в кадр.',
+                'kk' => 'Билеттің QR-кодын камера жақтауына келтіріңіз.',
+                _ => 'Position the ticket QR code inside the camera view.',
+              }),
+            ),
           Offstage(
             offstage: !scanning,
             child: AspectRatio(

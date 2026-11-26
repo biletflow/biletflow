@@ -98,6 +98,9 @@ void main() {
         if (request.url.path == '/api/mobile/auth/login') {
           return http.Response('{"token":"test-token"}', 200);
         }
+        if (request.url.path == '/api/events') {
+          return http.Response('{"events":[]}', 200);
+        }
         expect(request.url.path, '/api/me');
         expect(request.headers['authorization'], 'Bearer test-token');
         return http.Response(
@@ -133,6 +136,9 @@ void main() {
       final api = ApiClient(
         'https://example.test',
         client: MockClient((request) async {
+          if (request.url.path == '/api/events') {
+            return http.Response('{"events":[]}', 200);
+          }
           expect(request.url.path, '/api/me');
           expect(request.headers['authorization'], 'Bearer saved-token');
           return http.Response('{"user":{"role":"ATTENDEE"}}', status);
@@ -166,6 +172,9 @@ void main() {
     final api = ApiClient(
       'https://example.test',
       client: MockClient((request) async {
+        if (request.url.path == '/api/events') {
+          return http.Response('{"events":[]}', 200);
+        }
         signOutRequests++;
         expect(request.url.path, '/api/auth/sign-out');
         expect(request.method, 'POST');
@@ -180,7 +189,9 @@ void main() {
     addTearDown(session.dispose);
 
     await tester.pumpWidget(app(session));
-    await tester.tap(find.byTooltip('Sign out'));
+    await tester.tap(find.byIcon(Icons.person_outline).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Sign out'));
     await tester.pumpAndSettle();
 
     expect(signOutRequests, 1);

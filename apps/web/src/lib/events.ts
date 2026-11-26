@@ -159,6 +159,7 @@ export async function getPublicEventBySlug(slug: string) {
       timezone: true,
       capacity: true,
       paidSalesActive: true,
+      paidSalesSuspended: true,
       refundPolicy: true,
       registrationOpensAt: true,
       registrationClosesAt: true,
@@ -177,7 +178,11 @@ export async function getPublicEventBySlug(slug: string) {
   });
 
   if (!event) return null;
-  return { ...event, ...summarise(event) };
+  return {
+    ...event,
+    ...summarise(event),
+    paidSalesActive: event.paidSalesActive && !event.paidSalesSuspended,
+  };
 }
 
 export async function listRelatedEvents(eventId: string, category: string | null) {

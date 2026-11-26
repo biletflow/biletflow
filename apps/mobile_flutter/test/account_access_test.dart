@@ -177,8 +177,10 @@ void main() {
         home: ResetPasswordScreen(api: api),
       ),
     );
-    await tester.enterText(find.byType(TextFormField).first,
-      'http://localhost:3000/api/auth/reset-password/reset-token?callbackURL=/en/reset-password');
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'http://localhost:3000/api/auth/reset-password/reset-token?callbackURL=/en/reset-password',
+    );
     await tester.enterText(find.byType(TextFormField).last, 'new-password123');
     await tester.tap(find.byType(FilledButton));
     await tester.pumpAndSettle();
@@ -188,7 +190,7 @@ void main() {
   testWidgets('checkout sends a campaign token instead of a promo code', (
     tester,
   ) async {
-    String? orderBody;
+    final orderRequests = <Map<String, dynamic>>[];
     final api = ApiClient(
       'https://example.test',
       client: MockClient((request) async {
@@ -207,7 +209,10 @@ void main() {
           );
         }
         if (request.method == 'POST' && request.url.path == '/api/orders') {
-          orderBody = request.body;
+          orderRequests.add(jsonDecode(request.body) as Map<String, dynamic>);
+          if (orderRequests.length == 1) {
+            throw http.ClientException('Connection lost');
+          }
           return http.Response(
             '{"order":{"id":"order-1","status":"AWAITING_PAYMENT"}}',
             201,
@@ -240,7 +245,7 @@ void main() {
           ],
           initialName: 'Aida',
           initialEmail: 'a@example.test',
-          initialCampaignToken: 'https://biletflow.kz/e/jazz?c=abc123',
+          initialCampaignToken: 'abc123',
         ),
       ),
     );
@@ -248,7 +253,19 @@ void main() {
     expect(find.text('Early bird'), findsOneWidget);
     await tester.tap(find.text('Place order'));
     await tester.pumpAndSettle();
-    final body = jsonDecode(orderBody!) as Map<String, dynamic>;
+    expect(
+      find.text('Could not complete that request. Try again.'),
+      findsOneWidget,
+    );
+    await tester.ensureVisible(find.text('Place order'));
+    await tester.tap(find.text('Place order'));
+    await tester.pumpAndSettle();
+    expect(orderRequests, hasLength(2));
+    expect(
+      orderRequests[0]['clientIdempotencyKey'],
+      orderRequests[1]['clientIdempotencyKey'],
+    );
+    final body = orderRequests.last;
     expect(body['campaignToken'], 'abc123');
     expect(body.containsKey('promoCode'), isFalse);
   });

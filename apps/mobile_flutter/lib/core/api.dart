@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 class ApiException implements Exception {
@@ -15,15 +16,22 @@ class ApiClient {
   final http.Client _http;
   String? token;
   ApiClient(String url, {http.Client? client})
-      : base = Uri.parse(url), _http = client ?? http.Client() {
-    if (!base.hasAuthority || !['http', 'https'].contains(base.scheme) ||
-        base.userInfo.isNotEmpty || base.hasQuery || base.hasFragment) {
+    : base = Uri.parse(url),
+      _http = client ?? http.Client() {
+    if (!base.hasAuthority ||
+        !['http', 'https'].contains(base.scheme) ||
+        base.userInfo.isNotEmpty ||
+        base.hasQuery ||
+        base.hasFragment) {
       throw ArgumentError('Provide an HTTP(S) server URL');
     }
   }
 
-  Future<Map<String, dynamic>> request(String method, String path,
-      {Map<String, dynamic>? body}) async {
+  Future<Map<String, dynamic>> request(
+    String method,
+    String path, {
+    Map<String, dynamic>? body,
+  }) async {
     if (!path.startsWith('/api/') || path.startsWith('//')) {
       throw ArgumentError('Expected a local API path');
     }
@@ -33,12 +41,15 @@ class ApiClient {
     }
     final request = http.Request(method, uri)
       ..followRedirects = false
-      ..headers.addAll({'Accept': 'application/json',
+      ..headers.addAll({
+        'Accept': 'application/json',
         if (token != null) 'Authorization': 'Bearer $token',
-        if (body != null) 'Content-Type': 'application/json'});
+        if (body != null) 'Content-Type': 'application/json',
+      });
     if (body != null) request.body = jsonEncode(body);
-    final response = await http.Response.fromStream(await _http.send(request)
-        .timeout(const Duration(seconds: 20))).timeout(const Duration(seconds: 20));
+    final response = await http.Response.fromStream(
+      await _http.send(request).timeout(const Duration(seconds: 20)),
+    ).timeout(const Duration(seconds: 20));
     Map<String, dynamic> data;
     try {
       final value = jsonDecode(response.body);
@@ -48,18 +59,17 @@ class ApiClient {
     }
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final error = data['error'];
-      throw ApiException(response.statusCode,
-          error is Map
-              ? '${error['code'] ?? 'REQUEST_FAILED'}'
-              : '${data['code'] ?? 'REQUEST_FAILED'}');
+      throw ApiException(
+        response.statusCode,
+        error is Map
+            ? '${error['reason'] ?? error['code'] ?? 'REQUEST_FAILED'}'
+            : '${data['code'] ?? 'REQUEST_FAILED'}',
+      );
     }
     return data;
   }
 
-  Future<Map<String, dynamic>> get(
-    String path, {
-    Map<String, String>? query,
-  }) {
+  Future<Map<String, dynamic>> get(String path, {Map<String, String>? query}) {
     if (query == null || query.isEmpty) return request('GET', path);
     final params = <String, String>{
       for (final entry in query.entries)
@@ -95,10 +105,9 @@ class ApiClient {
         'Accept': accept,
         if (token != null) 'Authorization': 'Bearer $token',
       });
-    final response = await http.Response.fromStream(await _http
-            .send(request)
-            .timeout(const Duration(seconds: 30)))
-        .timeout(const Duration(seconds: 30));
+    final response = await http.Response.fromStream(
+      await _http.send(request).timeout(const Duration(seconds: 30)),
+    ).timeout(const Duration(seconds: 30));
     if (response.statusCode < 200 || response.statusCode >= 300) {
       String code = 'REQUEST_FAILED';
       try {

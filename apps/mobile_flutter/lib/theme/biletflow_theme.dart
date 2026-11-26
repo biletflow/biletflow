@@ -7,6 +7,7 @@ abstract final class BiletFlowColors {
   static const brandLight = Color(0xff6040cc);
   static const brandTint = Color(0xffede8ff);
   static const brandUltralight = Color(0xfff7f4ff);
+  static const sky = Color(0xff80d6e9);
 
   static const success = Color(0xff10b981);
   static const successBg = Color(0xffecfdf5);
@@ -23,6 +24,11 @@ abstract final class BiletFlowColors {
   static const ink600 = Color(0xff6b7280);
   static const ink300 = Color(0xffe5e7eb);
   static const ink100 = Color(0xfff9fafb);
+  static const hero = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [brand, brandDark],
+  );
 }
 
 ThemeData biletFlowTheme() {
@@ -36,20 +42,59 @@ ThemeData biletFlowTheme() {
   return ThemeData(
     useMaterial3: true,
     colorScheme: scheme,
-    scaffoldBackgroundColor: BiletFlowColors.brandUltralight,
+    scaffoldBackgroundColor: BiletFlowColors.ink100,
     appBarTheme: const AppBarTheme(
-      backgroundColor: BiletFlowColors.brandUltralight,
+      backgroundColor: Colors.white,
       foregroundColor: BiletFlowColors.ink900,
+      titleTextStyle: TextStyle(
+        color: BiletFlowColors.ink900,
+        fontSize: 19,
+        fontWeight: FontWeight.w700,
+      ),
       elevation: 0,
       scrolledUnderElevation: 0,
     ),
     cardTheme: CardThemeData(
       color: Colors.white,
       elevation: 0,
+      margin: const EdgeInsets.symmetric(vertical: 4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: BiletFlowColors.ink300),
       ),
+    ),
+    textTheme:
+        const TextTheme(
+          headlineLarge: TextStyle(
+            fontSize: 34,
+            height: 1.08,
+            fontWeight: FontWeight.w800,
+          ),
+          headlineSmall: TextStyle(
+            fontSize: 24,
+            height: 1.2,
+            fontWeight: FontWeight.w800,
+          ),
+          titleLarge: TextStyle(
+            fontSize: 20,
+            height: 1.25,
+            fontWeight: FontWeight.w700,
+          ),
+          titleMedium: TextStyle(
+            fontSize: 16,
+            height: 1.25,
+            fontWeight: FontWeight.w700,
+          ),
+          bodyMedium: TextStyle(fontSize: 14, height: 1.45),
+        ).apply(
+          bodyColor: BiletFlowColors.ink900,
+          displayColor: BiletFlowColors.ink900,
+        ),
+    navigationBarTheme: const NavigationBarThemeData(
+      elevation: 0,
+      backgroundColor: Colors.white,
+      indicatorColor: BiletFlowColors.brandTint,
+      labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(

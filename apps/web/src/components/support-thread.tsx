@@ -22,6 +22,7 @@ type SupportCase = {
   messages: Message[];
   event: { id: string; title: string; slug: string } | null;
   order: { id: string; reference: string } | null;
+  assignee: { id: string; name: string; role: string } | null;
 };
 
 const STATUSES = [
@@ -35,11 +36,13 @@ export function SupportThread({
   caseId,
   initialCase,
   canManage,
+  currentUserId,
   locale,
 }: {
   caseId: string;
   initialCase: SupportCase;
   canManage: boolean;
+  currentUserId: string;
   locale: string;
 }) {
   const t = useTranslations("support");
@@ -118,6 +121,28 @@ export function SupportThread({
     }
   }
 
+  async function assignToMe(assigneeId: string | null) {
+    setError(null);
+    setPending(true);
+    try {
+      const response = await fetch(`/api/support/cases/${caseId}/assignee`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assigneeId }),
+      });
+      const payload = (await response.json().catch(() => null)) as { case?: SupportCase } | null;
+      if (!response.ok || !payload?.case) {
+        setError(t("errorGeneric"));
+        return;
+      }
+      setSupportCase(payload.case);
+    } catch {
+      setError(t("errorGeneric"));
+    } finally {
+      setPending(false);
+    }
+  }
+
   return (
     <div className="mt-8 space-y-6">
       <div className="border-ink-300 rounded-xl border bg-white p-5">
@@ -139,6 +164,10 @@ export function SupportThread({
             {t("order")}: {supportCase.order.reference}
           </p>
         ) : null}
+        {canManage ? <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+          <span className="font-semibold text-ink-700">{t("assignee")}: {supportCase.assignee?.name ?? t("unassigned")}</span>
+          {supportCase.assignee?.id === currentUserId ? <button type="button" className="text-brand font-semibold" disabled={pending} onClick={() => assignToMe(null)}>{t("unassign")}</button> : <button type="button" className="text-brand font-semibold" disabled={pending} onClick={() => assignToMe(currentUserId)}>{t("assignToMe")}</button>}
+        </div> : null}
       </div>
 
       <ul className="space-y-3">

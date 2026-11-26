@@ -36,3 +36,19 @@ export async function GET(request: Request) {
     return errorResponse(error);
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const user = await requireUser(request.headers);
+    const body = (await request.json().catch(() => null)) as { id?: string } | null;
+    if (!body?.id) return json({ code: "VALIDATION_FAILED" }, 400);
+    const result = await prisma.notification.updateMany({
+      where: { id: body.id, userId: user.id, channel: "IN_APP" },
+      data: { readAt: new Date() },
+    });
+    if (result.count === 0) return json({ code: "NOT_FOUND" }, 404);
+    return json({ ok: true });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}

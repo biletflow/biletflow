@@ -46,6 +46,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Balcony'), findsOneWidget);
     expect(find.text('3 sold · 9 available'), findsOneWidget);
-    expect(find.text('₸2500'), findsOneWidget);
+    expect(find.text('₸2,500'), findsOneWidget);
   });
 }

@@ -10,7 +10,10 @@ import { labelOf } from "@/lib/labels";
 
 function checkoutErrorKey(code: string) {
   if (code === "HOLD_EXPIRED") return "errorHoldExpired";
-  if (code === "CONFLICT") return "errorConflict";
+  if (code === "SOLD_OUT") return "errorConflict";
+  if (code === "REGISTRATION_CLOSED" || code === "TICKET_SALES_CLOSED")
+    return "errorSalesClosed";
+  if (code === "PAID_SALES_INACTIVE") return "errorPaidSalesInactive";
   if (code === "VALIDATION_FAILED") return "errorValidation";
   if (code === "PROMO_INVALID") return "errorPromo";
   return "errorGeneric";
@@ -46,8 +49,13 @@ export function CheckoutForm({
   const tType = useTranslations("ticketTypes");
   const tAuth = useTranslations("auth");
   const router = useRouter();
-  const idempotencyKey = useRef(crypto.randomUUID());
-  const maxQuantity = Math.min(ticketType.available, ticketType.maxPerOrder ?? 10);
+  const idempotencyKey = useRef<string | null>(null);
+  const submitting = useRef(false);
+  const promoRequest = useRef(0);
+  const maxQuantity = Math.min(
+    ticketType.available,
+    ticketType.maxPerOrder ?? 10,
+  );
   const [quantity, setQuantity] = useState(
     Math.min(Math.max(1, initialQuantity), maxQuantity),
   );
@@ -61,6 +69,7 @@ export function CheckoutForm({
   );
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
 
   const isFree = ticketType.priceKzt === 0;
   const subtotalKzt = ticketType.priceKzt * quantity;
@@ -73,47 +82,64 @@ export function CheckoutForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [campaignToken]);
 
-  async function applyPromo() {
+  async function applyPromo(previewQuantity = quantity) {
+    const request = ++promoRequest.current;
     setError(null);
     const code = promoCode.trim();
     if (!code && !campaignToken) {
+      setPreviewing(false);
       setDiscountKzt(0);
       setPromoLabel(null);
       return;
     }
-    const response = await fetch("/api/promo/preview", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        eventId,
-        ...(code ? { code } : {}),
-        ...(campaignToken ? { campaignToken } : {}),
-        items: [
-          {
-            ticketTypeId: ticketType.id,
-            quantity,
-            unitPriceKzt: ticketType.priceKzt,
-          },
-        ],
-      }),
-    });
-    const body = (await response.json().catch(() => null)) as {
-      totals?: { discountKzt?: number } | null;
-      campaign?: { name?: string };
-      error?: { code?: string };
-    } | null;
-    if (!response.ok) {
+    setPreviewing(true);
+    try {
+      const response = await fetch("/api/promo/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventId,
+          ...(code ? { code } : {}),
+          ...(campaignToken ? { campaignToken } : {}),
+          items: [
+            {
+              ticketTypeId: ticketType.id,
+              quantity: previewQuantity,
+              unitPriceKzt: ticketType.priceKzt,
+            },
+          ],
+        }),
+      });
+      const body = (await response.json().catch(() => null)) as {
+        totals?: { discountKzt?: number } | null;
+        campaign?: { name?: string };
+        error?: { code?: string; reason?: string };
+      } | null;
+      if (request !== promoRequest.current) return;
+      if (!response.ok) {
+        setDiscountKzt(0);
+        setPromoLabel(null);
+        setError(
+          t(checkoutErrorKey(body?.error?.reason ?? body?.error?.code ?? "")),
+        );
+        return;
+      }
+      setDiscountKzt(body?.totals?.discountKzt ?? 0);
+      setPromoLabel(body?.campaign?.name ?? t("promoApplied"));
+    } catch {
+      if (request !== promoRequest.current) return;
       setDiscountKzt(0);
       setPromoLabel(null);
-      setError(t(checkoutErrorKey(body?.error?.code ?? "")));
-      return;
+      setError(t("errorGeneric"));
+    } finally {
+      if (request === promoRequest.current) setPreviewing(false);
     }
-    setDiscountKzt(body?.totals?.discountKzt ?? 0);
-    setPromoLabel(body?.campaign?.name ?? t("promoApplied"));
   }
 
   async function onSubmit(formEvent: React.FormEvent<HTMLFormElement>) {
     formEvent.preventDefault();
+    if (submitting.current || previewing) return;
+    submitting.current = true;
     setError(null);
     setPending(true);
     const attendees = Array.from({ length: quantity }, () => ({
@@ -121,6 +147,7 @@ export function CheckoutForm({
       email: email.trim().toLowerCase(),
     }));
     try {
+      idempotencyKey.current ??= crypto.randomUUID();
       const created = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -138,7 +165,6 @@ export function CheckoutForm({
         error?: { code?: string };
       } | null;
       if (!created.ok || !body?.order) {
-        idempotencyKey.current = crypto.randomUUID();
         setError(t(checkoutErrorKey(body?.error?.code ?? "")));
         return;
       }
@@ -162,9 +188,9 @@ export function CheckoutForm({
       gateway.searchParams.set("locale", locale);
       window.location.assign(gateway.toString());
     } catch {
-      idempotencyKey.current = crypto.randomUUID();
       setError(t("errorGeneric"));
     } finally {
+      submitting.current = false;
       setPending(false);
     }
   }
@@ -186,9 +212,13 @@ export function CheckoutForm({
 
       <div className="border-ink-200 space-y-2 rounded-lg border px-4 py-3 text-sm">
         <div className="flex justify-between gap-3">
-          <span className="text-ink-600">{labelOf(tType, ticketType.name)}</span>
+          <span className="text-ink-600">
+            {labelOf(tType, ticketType.name)}
+          </span>
           <span className="text-ink-900 font-semibold">
-            {isFree ? tEvent("freeTicket") : formatKzt(ticketType.priceKzt, locale)}
+            {isFree
+              ? tEvent("freeTicket")
+              : formatKzt(ticketType.priceKzt, locale)}
           </span>
         </div>
         <label className="flex items-center justify-between gap-3">
@@ -198,13 +228,16 @@ export function CheckoutForm({
             type="number"
             min={1}
             max={maxQuantity}
+            disabled={pending}
             value={quantity}
             onChange={(event) => {
               const next = Number.parseInt(event.target.value, 10);
               if (!Number.isFinite(next)) return;
-              setQuantity(Math.min(maxQuantity, Math.max(1, next)));
+              const clamped = Math.min(maxQuantity, Math.max(1, next));
+              setQuantity(clamped);
               setDiscountKzt(0);
-              if (!campaignToken) setPromoLabel(null);
+              setPromoLabel(null);
+              void applyPromo(clamped);
             }}
             className="border-ink-300 text-ink-900 h-10 w-20 rounded-lg border px-2 text-right text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
           />
@@ -239,18 +272,21 @@ export function CheckoutForm({
                 type="text"
                 autoComplete="off"
                 maxLength={32}
+                disabled={pending}
                 value={promoCode}
                 onChange={(event) => {
+                  promoRequest.current++;
+                  setPreviewing(false);
                   setPromoCode(event.target.value);
                   setDiscountKzt(0);
-                  if (!campaignToken) setPromoLabel(null);
+                  setPromoLabel(null);
                 }}
                 className="border-ink-300 text-ink-900 h-11 flex-1 rounded-lg border px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
               />
               <Button
                 type="button"
                 variant="outline"
-                disabled={pending}
+                disabled={pending || previewing}
                 onClick={() => {
                   void applyPromo();
                 }}
@@ -270,7 +306,9 @@ export function CheckoutForm({
       ) : null}
 
       <label className="block">
-        <span className="text-ink-800 text-sm font-semibold">{tAuth("name")}</span>
+        <span className="text-ink-800 text-sm font-semibold">
+          {tAuth("name")}
+        </span>
         <input
           name="fullName"
           type="text"
@@ -285,7 +323,9 @@ export function CheckoutForm({
       </label>
 
       <label className="block">
-        <span className="text-ink-800 text-sm font-semibold">{tAuth("email")}</span>
+        <span className="text-ink-800 text-sm font-semibold">
+          {tAuth("email")}
+        </span>
         <input
           name="email"
           type="email"
@@ -303,16 +343,18 @@ export function CheckoutForm({
         </p>
       ) : null}
 
+      {!isFree && totalKzt > 0 ? (
+        <p className="text-ink-700 bg-brand-ultralight rounded-lg px-3 py-2 text-sm">
+          {t("testPayment")}
+        </p>
+      ) : null}
+
       <Button
         type="submit"
-        disabled={pending || maxQuantity < 1}
+        disabled={pending || previewing || maxQuantity < 1}
         className="h-11 w-full text-sm font-semibold"
       >
-        {pending
-          ? t("submitting")
-          : isFree
-            ? t("submitFree")
-            : t("submitPaid")}
+        {pending ? t("submitting") : isFree ? t("submitFree") : t("submitPaid")}
       </Button>
 
       <p className="text-center text-sm">

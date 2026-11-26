@@ -2,8 +2,9 @@ import { CalendarDays, MapPin } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { Badge } from "@/components/ui/badge";
+import { EventCover } from "@/components/event-cover";
 import { Link } from "@/i18n/navigation";
-import { categoryGradient, formatEventDateTime, formatKzt } from "@/lib/format";
+import { formatEventDateTime, formatKzt } from "@/lib/format";
 import { labelOf } from "@/lib/labels";
 
 import type { EventListItem } from "@/lib/events";
@@ -15,7 +16,9 @@ export async function EventCard({ event }: { event: EventListItem }) {
   const tCity = await getTranslations("cities");
   const tCategory = await getTranslations("categories");
 
-  const price = event.isFree
+  const price = event.isSoldOut
+    ? tEvent("soldOut")
+    : event.isFree
     ? tEvent("freeTicket")
     : formatKzt(event.minPriceKzt, locale);
 
@@ -24,9 +27,8 @@ export async function EventCard({ event }: { event: EventListItem }) {
       href={`/events/${event.slug}`}
       className="group border-ink-300 focus-visible:ring-brand block overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
     >
-      <div
-        className={`relative h-44 bg-gradient-to-br ${categoryGradient(event.category)}`}
-      >
+      <div className="relative h-44">
+        <EventCover category={event.category} image={event.coverImageUrl} />
         {event.category ? (
           <Badge className="text-brand absolute top-3 left-3 bg-white hover:bg-white">
             {labelOf(tCategory, event.category)}
@@ -70,7 +72,7 @@ export async function EventCard({ event }: { event: EventListItem }) {
                 style={{ width: `${event.percentSold}%` }}
               />
             </div>
-            <p className="text-ink-500 mt-1.5 text-right text-xs">
+            <p className="text-ink-600 mt-1.5 text-right text-xs">
               {t("percentSold", { percent: event.percentSold })}
             </p>
           </div>

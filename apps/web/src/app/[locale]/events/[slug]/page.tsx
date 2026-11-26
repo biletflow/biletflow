@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { TicketSelector, type SelectableTicketType } from "@/components/ticket-selector";
+import { EventCover } from "@/components/event-cover";
 import { Link } from "@/i18n/navigation";
 import { getSessionUser } from "@/lib/auth-guard";
 import { getPublicEventBySlug, listRelatedEvents } from "@/lib/events";
 import {
-  categoryGradient,
   formatEventDate,
   formatEventDateTime,
   formatKzt,
@@ -75,10 +75,11 @@ export default async function EventPage({
   return (
     <>
       <div
-        className={`relative bg-gradient-to-br ${categoryGradient(event.category)} h-64 sm:h-80`}
+        className="relative flex min-h-64 items-end sm:min-h-80"
       >
-        <div className="absolute inset-0 bg-black/25" aria-hidden />
-        <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-8 sm:px-6 lg:px-8">
+        <EventCover category={event.category} image={event.coverImageUrl} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-black/15" aria-hidden />
+        <div className="relative mx-auto flex w-full max-w-7xl flex-col justify-end px-4 py-8 sm:px-6 lg:px-8">
           {event.category ? (
             <span className="text-brand w-fit rounded-md bg-white px-2.5 py-1 text-xs font-bold">
               {labelOf(tCategory, event.category)}

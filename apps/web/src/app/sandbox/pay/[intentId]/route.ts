@@ -22,7 +22,7 @@ const copy = {
     decline: "Decline",
     abandon: "Abandon",
     footnote:
-      "No real money moves. This gateway only exists so the demo can approve, decline, or abandon a payment.",
+      "Test payment. No real funds will be charged.",
     approvedTickets: "Payment approved. Your tickets are ready.",
     approvedTicketsBody: "Open My tickets to show the admission QR at the door.",
     viewTickets: "View tickets",
@@ -51,7 +51,7 @@ const copy = {
     decline: "Отклонить",
     abandon: "Отменить",
     footnote:
-      "Реальных списаний нет. Шлюз нужен только чтобы в демо одобрить, отклонить или отменить оплату.",
+      "Тестовая оплата. Реальные средства не будут списаны.",
     approvedTickets: "Оплата прошла. Билеты готовы.",
     approvedTicketsBody: "Откройте «Мои билеты» и покажите QR на входе.",
     viewTickets: "Мои билеты",
@@ -80,7 +80,7 @@ const copy = {
     decline: "Қабылдамау",
     abandon: "Бас тарту",
     footnote:
-      "Нақты ақша қозғалмайды. Шлюз демода төлемді мақұлдау, қабылдамау немесе тоқтату үшін ғана бар.",
+      "Сынақ төлемі. Нақты қаражат есептен шығарылмайды.",
     approvedTickets: "Төлем өтті. Билеттер дайын.",
     approvedTicketsBody: "«Менің билеттерім» бетін ашып, кіреберісте QR көрсетіңіз.",
     viewTickets: "Менің билеттерім",

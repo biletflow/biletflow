@@ -3,9 +3,12 @@ import 'package:material_ui/material_ui.dart';
 import '../core/api.dart';
 import '../core/format.dart';
 import '../l10n/app_localizations.dart';
+import '../theme/biletflow_theme.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/event_card.dart';
 import '../widgets/quantity_stepper.dart';
 import 'checkout.dart';
+import 'support.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final ApiClient api;
@@ -40,14 +43,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       if (event is! Map) {
         throw const ApiException(500, 'INVALID_EVENT_RESPONSE');
       }
+      if (!mounted) return;
       setState(() {
         _event = Map<String, dynamic>.from(event);
         _quantities.clear();
       });
     } on ApiException catch (error) {
-      setState(() => _error = error.code);
+      if (mounted) setState(() => _error = error.code);
     } catch (_) {
-      setState(() => _error = 'REQUEST_FAILED');
+      if (mounted) setState(() => _error = 'REQUEST_FAILED');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -61,6 +65,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   int _selectedCount() =>
       _quantities.values.fold<int>(0, (sum, value) => sum + value);
+
+  bool _withinWindow(Object? start, Object? end) {
+    final opens = DateTime.tryParse(start?.toString() ?? '');
+    final closes = DateTime.tryParse(end?.toString() ?? '');
+    final now = DateTime.now();
+    return (opens == null || !now.isBefore(opens)) &&
+        (closes == null || !now.isAfter(closes));
+  }
 
   void _setQuantity(String id, int next, int maxPerOrder, int available) {
     final capped = next.clamp(
@@ -84,11 +96,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final organizer = event?['organizer'];
     final ticketTypes = event?['ticketTypes'];
     final title = '${event?['title'] ?? l10n.eventDetails}';
+    final category = event?['category'] as String?;
+    final registrationOpen =
+        event?['status'] == 'PUBLISHED' &&
+        _withinWindow(
+          event?['registrationOpensAt'],
+          event?['registrationClosesAt'],
+        );
     final soldOut = event?['isSoldOut'] == true;
     final selected = _selectedCount();
 
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(l10n.eventDetails)),
       body: _loading
           ? const LoadingState()
           : _error != null
@@ -100,13 +119,35 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    height: 180,
+                    child: EventCover(
+                      category: category,
+                      image: EventCover.resolve(
+                        widget.api.base,
+                        event?['coverImageUrl'],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (category != null)
+                  Text(
+                    l10n.categoryName(category),
+                    style: const TextStyle(
+                      color: BiletFlowColors.brand,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 Text(title, style: Theme.of(context).textTheme.headlineSmall),
-                const SizedBox(height: 8),
-                if (event?['category'] != null) Text('${event!['category']}'),
                 if (event?['startsAt'] != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Text(formatEventWhen(event!['startsAt'])),
+                    child: Text(
+                      formatEventWhen(event!['startsAt'], context: context),
+                    ),
                   ),
                 if (venue is Map)
                   Padding(
@@ -115,7 +156,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       [
                         '${venue['name'] ?? ''}',
                         '${venue['address'] ?? ''}',
-                        '${venue['city'] ?? ''}',
+                        l10n.cityName('${venue['city'] ?? ''}'),
                       ].where((part) => part.isNotEmpty).join(' · '),
                     ),
                   ),
@@ -134,7 +175,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
-                if (soldOut)
+                if (!registrationOpen)
+                  Text(l10n.registrationUnavailable)
+                else if (soldOut)
                   Text(l10n.soldOut)
                 else if (ticketTypes is! List || ticketTypes.isEmpty)
                   Text(l10n.noTicketTypes)
@@ -152,16 +195,30 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         : available;
                     final qty = _quantities[id] ?? 0;
                     final priceLabel = price is num
-                        ? (price == 0 ? l10n.free : '₸${price.round()}')
+                        ? l10n.money(price.round())
                         : '';
-                    final disabled = available <= 0;
+                    final inWindow = _withinWindow(
+                      type['salesStartAt'],
+                      type['salesEndAt'],
+                    );
+                    final paidBlocked =
+                        price is num &&
+                        price > 0 &&
+                        event?['paidSalesActive'] != true;
+                    final disabled = available <= 0 || !inWindow || paidBlocked;
                     return Card(
                       child: ListTile(
-                        title: Text('${type['name'] ?? ''}'),
+                        title: Text(
+                          l10n.ticketTypeName('${type['name'] ?? ''}'),
+                        ),
                         subtitle: Text(
                           [
                             priceLabel,
-                            if (available > 0)
+                            if (paidBlocked)
+                              l10n.paidSalesUnavailable
+                            else if (!inWindow)
+                              l10n.registrationUnavailable
+                            else if (available > 0)
                               l10n.left(available)
                             else
                               l10n.soldOut,
@@ -185,13 +242,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     );
                   }),
                 const SizedBox(height: 16),
-                TextField(
-                  controller: _campaign,
-                  decoration: InputDecoration(labelText: l10n.promoOrCampaign),
-                ),
+                if (registrationOpen && !soldOut)
+                  TextField(
+                    controller: _campaign,
+                    decoration: InputDecoration(
+                      labelText: l10n.promoOrCampaign,
+                    ),
+                  ),
                 const SizedBox(height: 16),
                 FilledButton(
-                  onPressed: selected > 0
+                  onPressed: registrationOpen && selected > 0
                       ? () {
                           final eventId = '${event?['id'] ?? ''}';
                           if (eventId.isEmpty || ticketTypes is! List) return;
@@ -202,6 +262,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             final qty = _quantities[id] ?? 0;
                             if (id.isEmpty || qty <= 0) continue;
                             final price = type['priceKzt'];
+                            if (!_withinWindow(
+                              type['salesStartAt'],
+                              type['salesEndAt'],
+                            )) {
+                              continue;
+                            }
                             lines.add(
                               CheckoutLine(
                                 ticketTypeId: id,
@@ -213,9 +279,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           }
                           if (lines.isEmpty) return;
                           final link = _campaign.text.trim();
-                          final token =
-                              campaignTokenFrom(link) ??
-                              (link.isEmpty ? null : link);
+                          final token = campaignTokenFrom(link);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -225,6 +289,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 eventTitle: title,
                                 lines: lines,
                                 initialCampaignToken: token,
+                                initialPromoCode:
+                                    token == null && link.isNotEmpty
+                                    ? link
+                                    : null,
                               ),
                             ),
                           );
@@ -236,6 +304,30 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         : l10n.selectTickets,
                   ),
                 ),
+                if (event?['id'] is String)
+                  TextButton.icon(
+                    icon: const Icon(Icons.support_agent),
+                    label: Text(l10n.support),
+                    onPressed: () async {
+                      final caseId = await Navigator.push<String>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SupportComposer(
+                            api: widget.api,
+                            eventId: event!['id'] as String,
+                          ),
+                        ),
+                      );
+                      if (!context.mounted || caseId == null) return;
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              SupportThread(api: widget.api, id: caseId),
+                        ),
+                      );
+                    },
+                  ),
               ],
             ),
     );

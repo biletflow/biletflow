@@ -42,7 +42,13 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
         actorUserId: true,
       },
     });
-    return json({ entries });
+    const actions = await prisma.auditLog.findMany({
+      where: { eventId: id },
+      select: { action: true },
+      distinct: ["action"],
+      orderBy: { action: "asc" },
+    });
+    return json({ entries, actions: actions.map((row) => row.action) });
   } catch (error) {
     return errorResponse(error);
   }

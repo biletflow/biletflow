@@ -341,6 +341,10 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
         ),
       );
       expect(blocked.status).toBe(409);
+      expect((await blocked.json()).error).toMatchObject({
+        code: "CONFLICT",
+        reason: "PAID_SALES_INACTIVE",
+      });
 
       const checklist = await activation(
         request(`/api/organizer/events/${event.id}/activation`, undefined, tokens.organizer),
@@ -371,7 +375,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       expect(sandboxHtml).toContain("Approve");
       expect(sandboxHtml).toContain("Decline");
       expect(sandboxHtml).toContain("Abandon");
-      expect(sandboxHtml).toContain("No real money moves");
+      expect(sandboxHtml).toContain("Test payment. No real funds will be charged.");
 
       const unlocked = await sandboxPost(
         new Request(feeBody.url, {

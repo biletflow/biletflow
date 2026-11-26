@@ -117,7 +117,7 @@ export async function createOrder(
         (event.registrationOpensAt && event.registrationOpensAt > now) ||
         (event.registrationClosesAt && event.registrationClosesAt < now)
       ) {
-        throw new ApiError(409, "CONFLICT");
+        throw new ApiError(409, "CONFLICT", "REGISTRATION_CLOSED");
       }
 
       const types = new Map(event.ticketTypes.map((ticketType) => [ticketType.id, ticketType]));
@@ -129,7 +129,7 @@ export async function createOrder(
           (ticketType.salesStartAt && ticketType.salesStartAt > now) ||
           (ticketType.salesEndAt && ticketType.salesEndAt < now)
         ) {
-          throw new ApiError(409, "CONFLICT");
+          throw new ApiError(409, "CONFLICT", "TICKET_SALES_CLOSED");
         }
         return {
           ticketType,
@@ -144,7 +144,7 @@ export async function createOrder(
 
       const priced = lines.some((line) => line.ticketType.priceKzt > 0);
       if (priced && (!event.paidSalesActive || event.paidSalesSuspended)) {
-        throw new ApiError(409, "CONFLICT");
+        throw new ApiError(409, "CONFLICT", "PAID_SALES_INACTIVE");
       }
 
       const promo = await resolvePromo(tx, event.id, userId, input, lines);
