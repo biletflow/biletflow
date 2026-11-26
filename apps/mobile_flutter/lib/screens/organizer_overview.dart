@@ -20,6 +20,12 @@ class OrganizerOverview extends StatefulWidget {
 
 class _OrganizerOverviewState extends State<OrganizerOverview> {
   DateTimeRange? period;
+  DateTime? fromDate;
+  DateTime? toDate;
+  String? draftAction;
+  String? draftType;
+  List<Map> filterTypes = [];
+  List<String> filterActions = [];
   String? action;
   late Future<List<Map<String, dynamic>>> data;
   String? type;
@@ -36,7 +42,11 @@ class _OrganizerOverviewState extends State<OrganizerOverview> {
     ),
     widget.api.get(
       '$path/history',
-      query: {if (action != null) 'action': action!},
+      query: {
+        if (action != null) 'action': action!,
+        if (period case final selected?) 'from': dateKey(selected.start),
+        if (period case final selected?) 'to': dateKey(selected.end),
+      },
     ),
   ]);
 
@@ -46,16 +56,68 @@ class _OrganizerOverviewState extends State<OrganizerOverview> {
     data = load();
   }
 
-  Future<void> choosePeriod() async {
-    final selected = await showDateRangePicker(
+  Future<void> pickFilterDate(bool from) async {
+    final selected = await showDatePicker(
       context: context,
+      initialDate: (from ? fromDate : toDate) ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2200),
-      initialDateRange: period,
     );
+
     if (!mounted || selected == null) return;
-    period = selected;
-    refresh();
+
+    setState(() {
+      if (from) {
+        fromDate = selected;
+      } else {
+        toDate = selected;
+      }
+    });
+  }
+
+  void applyFilters() {
+    final start = fromDate;
+    final end = toDate;
+
+    if (start != null && end != null && end.isBefore(start)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            tr(
+              'End date cannot be before start date.',
+              'Конечная дата не может быть раньше начальной.',
+              'Аяқталу күні басталу күнінен ерте болмауы керек.',
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      period = start == null && end == null
+          ? null
+          : DateTimeRange(
+              start: start ?? DateTime(2000),
+              end: end ?? DateTime(2200),
+            );
+      action = draftAction;
+      type = draftType;
+      data = load();
+    });
+  }
+
+  void clearFilters() {
+    setState(() {
+      fromDate = null;
+      toDate = null;
+      draftAction = null;
+      draftType = null;
+      period = null;
+      action = null;
+      type = null;
+      data = load();
+    });
   }
 
   void refresh() => setState(() => data = load());
@@ -69,18 +131,14 @@ class _OrganizerOverviewState extends State<OrganizerOverview> {
         ? '${formatWholeNumber(v.round(), l10n.locale.languageCode)} KZT'
         : '—';
     final formatter = MaterialLocalizations.of(context);
-    final allDates = tr('All dates', 'Все даты', 'Барлық күн');
+
     final all = tr('All actions', 'Все действия', 'Барлық әрекет');
     final noData = tr(
       'No data for this selection',
       'Нет данных для выбранных параметров',
       'Таңдалған параметрлер бойынша дерек жоқ',
     );
-    final periodLabel = switch (period) {
-      final selected? =>
-        '${formatter.formatShortDate(selected.start)} – ${formatter.formatShortDate(selected.end)}',
-      null => allDates,
-    };
+
     Widget metric(String label, Object? value) => SizedBox(
       width: 155,
       child: Card(
@@ -107,25 +165,109 @@ class _OrganizerOverviewState extends State<OrganizerOverview> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Wrap(
-            spacing: 8,
-            children: [
-              OutlinedButton.icon(
-                onPressed: choosePeriod,
-                icon: const Icon(Icons.date_range_outlined),
-                label: Text(periodLabel),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => pickFilterDate(true),
+                          icon: const Icon(Icons.calendar_today),
+                          label: Text(
+                            fromDate == null
+                                ? tr('From', 'С', 'Бастап')
+                                : formatter.formatShortDate(fromDate!),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => pickFilterDate(false),
+                          icon: const Icon(Icons.calendar_today),
+                          label: Text(
+                            toDate == null
+                                ? tr('To', 'По', 'Дейін')
+                                : formatter.formatShortDate(toDate!),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    key: ValueKey(('type', draftType)),
+                    initialValue: draftType ?? '',
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      labelText: tr('Ticket type', 'Тип билета', 'Билет түрі'),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: '',
+                        child: Text(tr('All', 'Все', 'Барлығы')),
+                      ),
+                      for (final row in filterTypes)
+                        DropdownMenuItem(
+                          value: row['id'].toString(),
+                          child: Text(row['name'].toString()),
+                        ),
+                    ],
+                    onChanged: (value) =>
+                        setState(() => draftType = value == '' ? null : value),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    key: ValueKey(('action', draftAction)),
+                    initialValue: draftAction ?? '',
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      labelText: tr('Action', 'Действие', 'Әрекет'),
+                    ),
+                    items: [
+                      DropdownMenuItem(value: '', child: Text(all)),
+                      for (final item in filterActions)
+                        DropdownMenuItem(
+                          value: item,
+                          child: Text(
+                            item.replaceAll('.', ' ').replaceAll('_', ' '),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                    ],
+                    onChanged: (value) => setState(
+                      () => draftAction = value == '' ? null : value,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton(
+                    onPressed: applyFilters,
+                    child: Text(
+                      tr(
+                        'Apply filters',
+                        'Применить фильтры',
+                        'Сүзгілерді қолдану',
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: clearFilters,
+                    child: Text(
+                      tr(
+                        'Clear filters',
+                        'Сбросить фильтры',
+                        'Сүзгілерді тазарту',
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              if (period != null)
-                TextButton(
-                  onPressed: () {
-                    period = null;
-                    refresh();
-                  },
-                  child: Text(allDates),
-                ),
-            ],
+            ),
           ),
-          FilledButton(onPressed: refresh, child: Text(l10n.refresh)),
           FutureBuilder(
             future: data,
             builder: (context, snapshot) {
@@ -159,9 +301,34 @@ class _OrganizerOverviewState extends State<OrganizerOverview> {
                       ?.whereType<String>()
                       .toList() ??
                   <String>[];
-              final selectedAction = action;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                final nextTypes = types.map((r) => r['id']).join(',');
+                final oldTypes = filterTypes.map((r) => r['id']).join(',');
+                if (nextTypes != oldTypes ||
+                    actions.join(',') != filterActions.join(',')) {
+                  setState(() {
+                    filterTypes = types;
+                    filterActions = actions;
+                  });
+                }
+              });
               final history = (snapshot.data![1]['entries'] as List)
                   .whereType<Map>()
+                  .where((row) {
+                    final range = period;
+                    if (range == null) return true;
+
+                    final date = DateTime.tryParse(row['createdAt'].toString())
+                        ?.toLocal();
+
+                    if (date == null) return false;
+
+                    final day = dateKey(date);
+
+                    return day.compareTo(dateKey(range.start)) >= 0 &&
+                        day.compareTo(dateKey(range.end)) <= 0;
+                  })
                   .toList();
               final peak = days.fold<num>(0, (max, row) {
                 final value = (row['amountKzt'] as num?)?.abs() ?? 0;
@@ -289,23 +456,6 @@ class _OrganizerOverviewState extends State<OrganizerOverview> {
                     ),
                   const Divider(),
                   Text(tr('Ticket types', 'Типы билетов', 'Билет түрлері')),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      ChoiceChip(
-                        label: Text(tr('All', 'Все', 'Барлығы')),
-                        selected: type == null,
-                        onSelected: (_) => setState(() => type = null),
-                      ),
-                      for (final row in types)
-                        ChoiceChip(
-                          label: Text('${row['name']}'),
-                          selected: type == row['id'],
-                          onSelected: (_) =>
-                              setState(() => type = row['id'] as String),
-                        ),
-                    ],
-                  ),
                   for (final row in types.where(
                     (r) => type == null || r['id'] == type,
                   ))
@@ -324,36 +474,6 @@ class _OrganizerOverviewState extends State<OrganizerOverview> {
                   const Divider(),
                   Text(
                     tr('Activity history', 'История действий', 'Әрекет тарихы'),
-                  ),
-                  DropdownButtonFormField<String>(
-                    key: ValueKey(selectedAction),
-                    initialValue: selectedAction ?? '',
-                    decoration: InputDecoration(
-                      labelText: tr(
-                        'Audit action',
-                        'Действие аудита',
-                        'Аудит әрекеті',
-                      ),
-                    ),
-                    isExpanded: true,
-                    items: [
-                      DropdownMenuItem(value: '', child: Text(all)),
-                      for (final item in {
-                        ...actions,
-                        if (selectedAction != null) selectedAction,
-                      })
-                        DropdownMenuItem(
-                          value: item,
-                          child: Text(
-                            item.replaceAll('.', ' · ').replaceAll('_', ' '),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                    ],
-                    onChanged: (next) {
-                      action = next == '' ? null : next;
-                      refresh();
-                    },
                   ),
                   if (history.isEmpty)
                     Padding(

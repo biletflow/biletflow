@@ -3,7 +3,8 @@ export class ApiError extends Error {
     public status: number,
     public code: string,
     public reason?:
-      "REGISTRATION_CLOSED" | "TICKET_SALES_CLOSED" | "PAID_SALES_INACTIVE",
+      "REGISTRATION_CLOSED" | "TICKET_SALES_CLOSED" | "PAID_SALES_INACTIVE"
+      | "REFUND_NOT_ALLOWED" | "REFUND_WINDOW_CLOSED" | "REFUND_WINDOW_24H" | "REFUND_WINDOW_48H" | "REFUND_CHECKED_IN" | "REFUND_UNPAID",
   ) {
     super(code);
   }

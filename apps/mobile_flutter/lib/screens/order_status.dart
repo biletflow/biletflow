@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/status_badge.dart';
 import 'support.dart';
+import '../widgets/refund_policy.dart';
 import 'ticket_detail.dart';
 
 class OrderStatusScreen extends StatefulWidget {
@@ -166,6 +167,10 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
     final reference = '${order?['reference'] ?? ''}';
     final total = order?['totalKzt'];
     final tickets = order?['tickets'];
+    final refundBlocked = refundBlockedReason(
+      order?['refundPolicy'],
+      order?['eventStartsAt'],
+    );
     final awaiting = status == 'AWAITING_PAYMENT' || status == 'PENDING';
 
     return Scaffold(
@@ -242,6 +247,10 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                   ),
                 ],
                 if (status == 'PAID') ...[
+                  RefundPolicyNotice(
+                    policy: order?['refundPolicy'],
+                    startsAt: order?['eventStartsAt'],
+                  ),
                   if (total is num && total > 0)
                     Text(
                       l10n.testTransaction,
@@ -253,7 +262,9 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                         (ticket) => ticket['status'] == 'CHECKED_IN',
                       ))
                     OutlinedButton(
-                      onPressed: _busy ? null : _refund,
+                      onPressed: _busy || refundBlocked != null
+                          ? null
+                          : _refund,
                       child: Text(l10n.refundOrder),
                     ),
                   OutlinedButton(

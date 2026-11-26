@@ -6,6 +6,7 @@ import { formatEventDateTime, formatKzt } from "@/lib/format";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import EventCampaigns from "./event-campaigns";
+import EventStaff from "./event-staff";
 import PaidSalesActivation from "./paid-sales-activation";
 import { canPublish, hasEnoughInventory, validateEventDates } from "@/lib/organizer-editor-validation";
 
@@ -65,6 +66,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
     title: "", description: "", category: "", startsAt: "", endsAt: "",
     visibility: "PUBLIC" as EventData["visibility"], venueId: "", coverImageUrl: "",
   });
+  const [refundPolicy, setRefundPolicy] = useState("NO_REFUNDS");
   const [event, setEvent] = useState<EventData | null>(null);
   const [venues, setVenues] = useState<Venue[]>([]);
   const [city, setCity] = useState<string | null>(null);
@@ -93,6 +95,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
       .then(({ event }: { event: EventData }) => {
         if (!active) return;
         setEvent(event);
+        setRefundPolicy(event.refundPolicy ?? "NO_REFUNDS");
         setForm({
           title: event.title, description: event.description ?? "", category: event.category ?? "",
           startsAt: localDate(event.startsAt, event.timezone), endsAt: localDate(event.endsAt, event.timezone),
@@ -118,7 +121,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
       const payload = {
         ...form, description: form.description || undefined, category: form.category || null, venueId: form.venueId || null, coverImageUrl: form.coverImageUrl || null,
         startsAt: start.toISOString(), endsAt: end.toISOString(),
-        timezone: zone, seatingMode: event?.seatingMode ?? "GENERAL_ADMISSION", refundPolicy: event?.refundPolicy ?? "NO_REFUNDS",
+        timezone: zone, seatingMode: event?.seatingMode ?? "GENERAL_ADMISSION", refundPolicy: refundPolicy,
       };
       const { event: saved } = await request(
         event ? `/api/organizer/events/${event.id}` : "/api/organizer/events",
@@ -155,6 +158,14 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
   }
   async function publish() {
     if (!event) return;
+    if (!event.venueId) {
+      setError(locale === "ru"
+        ? "Выберите площадку и сохраните изменения перед публикацией."
+        : locale === "kk"
+          ? "Жариялау алдында өтетін орынды таңдап, өзгерістерді сақтаңыз."
+          : "Select a venue and save your changes before publishing.");
+      return;
+    }
     if (!canPublish(event.ticketTypes)) { setError(t.required); return; }
     await run(async () => {
       const { event: updated } = await request(`/api/organizer/events/${event.id}/publish`, "POST");
@@ -218,6 +229,14 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
             <label className={labelStyle}>{t.end}<input required type="datetime-local" min={form.startsAt} className={inputStyle} value={form.endsAt} onChange={(e) => setForm({ ...form, endsAt: e.target.value })}/></label>
           </div>
           <label className={labelStyle}>{t.visibility}<select className={inputStyle} value={form.visibility} onChange={(e) => setForm({ ...form, visibility: e.target.value as EventData["visibility"] })}><option value="PUBLIC">{place.public}</option><option value="UNLISTED">{place.unlisted}</option><option value="PRIVATE">{place.private}</option></select></label>
+          <label className={labelStyle}>
+            {locale === "ru" ? "Политика возврата" : locale === "kk" ? "Билетті қайтару шарттары" : "Refund policy"}
+            <select className={inputStyle} value={refundPolicy} onChange={(e) => setRefundPolicy(e.target.value)}>
+              <option value="NO_REFUNDS">{locale === "ru" ? "Без возврата" : locale === "kk" ? "Қайтарылмайды" : "No refunds"}</option>
+              <option value="UNTIL_48H_BEFORE">{locale === "ru" ? "Не позднее чем за 48 часов" : locale === "kk" ? "Кемінде 48 сағат бұрын" : "Until 48 hours before the event"}</option>
+              <option value="UNTIL_24H_BEFORE">{locale === "ru" ? "Не позднее чем за 24 часа" : locale === "kk" ? "Кемінде 24 сағат бұрын" : "Until 24 hours before the event"}</option>
+            </select>
+          </label>
           <button disabled={busy} className="bg-brand rounded-lg px-5 py-3 font-bold text-white disabled:opacity-50">{event ? t.update : t.save}</button>
         </form>}
         {event && <section className="space-y-4 rounded-xl border border-ink-300 bg-white p-6">
@@ -246,6 +265,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
         </section>}
         {event && <PaidSalesActivation eventId={event.id} locale={locale} />}
         {event && <EventCampaigns eventId={event.id} locale={locale} />}
+        {event && <EventStaff eventId={event.id} locale={locale} />}
       </div>
     </div>
   );

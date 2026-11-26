@@ -199,7 +199,7 @@ class _ScannerScreenState extends State<ScannerScreen>
   void detected(BarcodeCapture capture) {
     final selected = eventId;
     if (busy ||
-        starting ||
+        stopping ||
         !scanning ||
         selected == null ||
         ModalRoute.of(context)?.isCurrent != true ||
@@ -207,13 +207,19 @@ class _ScannerScreenState extends State<ScannerScreen>
       return;
     }
     for (final barcode in capture.barcodes) {
+      debugPrint('BiletFlow QR: barcode detected');
       final payload = barcode.rawValue;
       if (payload == null || payload.isEmpty) continue;
       unawaited(
         run(() async {
           setState(() => scanning = false);
-          await camera.stop();
+          try {
+            await camera.stop();
+          } catch (_) {
+            debugPrint('BiletFlow QR: camera stop failed');
+          }
           if (!mounted) return;
+          debugPrint('BiletFlow QR: sending check-in request');
           final data = await api.post('/api/checkin', {
             'eventId': selected,
             'payload': payload,
@@ -413,7 +419,21 @@ class _ScannerScreenState extends State<ScannerScreen>
                   ListTile(
                     title: Text('${attendee['attendeeName']}'),
                     subtitle: Text(
-                      '${attendee['ticketTypeName']} · ${l10n.ticketStatus('${attendee['status']}')}',
+                      [
+                        '${attendee['ticketTypeName']} · ${l10n.ticketStatus('${attendee['status']}')}',
+                        if (attendee['orderReference'] != null)
+                          '${switch (l10n.locale.languageCode) {
+                            'ru' => 'Заказ',
+                            'kk' => 'Тапсырыс',
+                            _ => 'Order',
+                          }}: ${attendee['orderReference']}',
+                        if (attendee['ticketId'] != null)
+                          '${switch (l10n.locale.languageCode) {
+                            'ru' => 'ID билета',
+                            'kk' => 'Билет ID',
+                            _ => 'Ticket ID',
+                          }}: ${attendee['ticketId']}',
+                      ].join('\n'),
                     ),
                     trailing: attendee['checkInRecordId'] is String
                         ? TextButton(

@@ -8,6 +8,7 @@ import '../widgets/empty_state.dart';
 import '../widgets/event_card.dart';
 import '../widgets/quantity_stepper.dart';
 import 'checkout.dart';
+import '../widgets/refund_policy.dart';
 import 'support.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -169,6 +170,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   const SizedBox(height: 16),
                   Text('${event!['description']}'),
                 ],
+                RefundPolicyNotice(
+                  policy: event?['refundPolicy'],
+                  startsAt: event?['startsAt'],
+                ),
                 const SizedBox(height: 20),
                 Text(
                   l10n.tickets,
@@ -287,6 +292,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 api: widget.api,
                                 eventId: eventId,
                                 eventTitle: title,
+                                refundPolicy: event?['refundPolicy']
+                                    ?.toString(),
+                                eventStartsAt: event?['startsAt']?.toString(),
                                 lines: lines,
                                 initialCampaignToken: token,
                                 initialPromoCode:

@@ -1046,6 +1046,52 @@ class AppLocalizations {
   };
 
   String apiError(String code) {
+    final refundErrors = <String, List<String>>{
+      'VENUE_REQUIRED': [
+        'Select a venue and save before publishing.',
+        'Выберите площадку и сохраните изменения перед публикацией.',
+        'Жариялау алдында өтетін орынды таңдап, сақтаңыз.',
+      ],
+      'REFUND_WINDOW_24H': [
+        'Refunds are not available less than 24 hours before the event.',
+        'До начала мероприятия осталось менее 24 часов. Возврат недоступен.',
+        'Іс-шараның басталуына 24 сағаттан аз уақыт қалды. Билетті қайтару мүмкін емес.',
+      ],
+      'REFUND_WINDOW_48H': [
+        'Refunds are not available less than 48 hours before the event.',
+        'До начала мероприятия осталось менее 48 часов. Возврат недоступен.',
+        'Іс-шараның басталуына 48 сағаттан аз уақыт қалды. Билетті қайтару мүмкін емес.',
+      ],
+      'REFUND_NOT_ALLOWED': [
+        'Tickets for this event are non-refundable.',
+        'Билеты на это мероприятие не подлежат возврату.',
+        'Бұл іс-шараның билеттері қайтарылмайды.',
+      ],
+      'REFUND_CHECKED_IN': [
+        'Checked-in tickets cannot be refunded.',
+        'Использованные билеты нельзя вернуть.',
+        'Пайдаланылған билеттерді қайтару мүмкін емес.',
+      ],
+      'REFUND_UNPAID': [
+        'Only paid orders can be refunded.',
+        'Вернуть можно только оплаченный заказ.',
+        'Тек төленген тапсырысты қайтаруға болады.',
+      ],
+      'REFUND_WINDOW_CLOSED': [
+        'The refund period has ended.',
+        'Срок возврата билетов истёк.',
+        'Билеттерді қайтару мерзімі аяқталды.',
+      ],
+    };
+    final refundMessage = refundErrors[code];
+    if (refundMessage != null) {
+      return refundMessage[switch (locale.languageCode) {
+        'ru' => 1,
+        'kk' => 2,
+        _ => 0,
+      }];
+    }
+
     switch (code) {
       case 'VALIDATION_FAILED':
         return _t('errorValidation');

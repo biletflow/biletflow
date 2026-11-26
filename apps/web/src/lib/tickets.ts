@@ -178,6 +178,7 @@ export async function pdfForOwnedTicket(userId: string, ticketId: string) {
     ticketTypeName,
     holderName: ticket.attendee.fullName,
     orderReference: ticket.order.reference,
+    ticketId: ticket.id,
     statusLabel: PDF_STATUS_LABEL[ticket.status] ?? ticket.status,
     showQr,
     qrPng,

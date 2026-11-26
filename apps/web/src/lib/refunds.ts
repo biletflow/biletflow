@@ -69,15 +69,16 @@ export async function refundOrder(
         eventTitle: order.event.title,
       };
     }
-    if (order.status !== "PAID") throw new ApiError(409, "CONFLICT");
+    if (order.status !== "PAID") throw new ApiError(409, "CONFLICT", "REFUND_UNPAID");
     if (
       user.role !== "PLATFORM_ADMIN" &&
       !refundWindowOpen(order.event.refundPolicy, order.event.startsAt)
     ) {
-      throw new ApiError(409, "CONFLICT");
+      throw new ApiError(409, "CONFLICT",
+        order.event.refundPolicy === "NO_REFUNDS" ? "REFUND_NOT_ALLOWED" : order.event.refundPolicy === "UNTIL_48H_BEFORE" ? "REFUND_WINDOW_48H" : "REFUND_WINDOW_24H");
     }
     if (order.tickets.some((ticket) => ticket.status === "CHECKED_IN")) {
-      throw new ApiError(409, "CONFLICT");
+      throw new ApiError(409, "CONFLICT", "REFUND_CHECKED_IN");
     }
 
     for (const item of order.items) {

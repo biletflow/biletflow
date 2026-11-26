@@ -45,6 +45,8 @@ class _OrganizerEditorState extends State<OrganizerEditor> {
     '/api/organizer/venues',
   );
   String? city;
+  late String refundPolicy =
+      widget.initial['refundPolicy'] as String? ?? 'NO_REFUNDS';
   bool saving = false;
   String? error;
 
@@ -244,6 +246,7 @@ class _OrganizerEditorState extends State<OrganizerEditor> {
       error = null;
     });
     try {
+      if (widget.eventApi != null) payload['refundPolicy'] = refundPolicy;
       await widget.save(payload);
       if (mounted) Navigator.pop(context, true);
     } catch (failure) {
@@ -412,6 +415,13 @@ class _OrganizerEditorState extends State<OrganizerEditor> {
       validator: (raw) {
         final input = raw?.trim() ?? '';
         if (input.isEmpty) return field.required ? l10n.requiredField : null;
+        if (key == 'title' && input.length < 3) {
+          return tr(
+            'Event title must contain at least 3 characters.',
+            'Название должно содержать не менее 3 символов.',
+            'Іс-шара атауы кемінде 3 таңбадан тұруы керек.',
+          );
+        }
         if (field.number && int.tryParse(input) == null) {
           return l10n.wholeNumber;
         }
@@ -457,6 +467,54 @@ class _OrganizerEditorState extends State<OrganizerEditor> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: field(item, options, snapshot),
+                    ),
+                  if (widget.eventApi != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: DropdownButtonFormField<String>(
+                        initialValue: refundPolicy,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          labelText: tr(
+                            'Refund policy',
+                            'Политика возврата',
+                            'Билетті қайтару шарттары',
+                          ),
+                        ),
+                        items: [
+                          DropdownMenuItem(
+                            value: 'NO_REFUNDS',
+                            child: Text(
+                              tr('No refunds', 'Без возврата', 'Қайтарылмайды'),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'UNTIL_48H_BEFORE',
+                            child: Text(
+                              tr(
+                                'Until 48 hours before',
+                                'Не позднее чем за 48 часов',
+                                'Кемінде 48 сағат бұрын',
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'UNTIL_24H_BEFORE',
+                            child: Text(
+                              tr(
+                                'Until 24 hours before',
+                                'Не позднее чем за 24 часа',
+                                'Кемінде 24 сағат бұрын',
+                              ),
+                            ),
+                          ),
+                        ],
+                        onChanged: saving
+                            ? null
+                            : (next) => setState(() {
+                                refundPolicy = next ?? 'NO_REFUNDS';
+                              }),
+                      ),
                     ),
                   if (error != null)
                     Text(

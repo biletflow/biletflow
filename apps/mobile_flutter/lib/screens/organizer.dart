@@ -7,6 +7,7 @@ import '../widgets/status_badge.dart';
 import 'admin_moderation.dart';
 import 'organizer_activation.dart';
 import 'organizer_editor.dart';
+import 'event_staff.dart';
 import 'organizer_overview.dart';
 import 'organizer_reports.dart';
 
@@ -437,6 +438,25 @@ class _EventScreenState extends State<EventScreen> {
                       ),
                     ),
                   ),
+                  OutlinedButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EventStaffScreen(
+                          api: widget.api,
+                          eventId: widget.id,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      adminLabel(
+                        context,
+                        'Event administrators',
+                        'Администраторы мероприятия',
+                        'Іс-шара әкімшілері',
+                      ),
+                    ),
+                  ),
                   if (editable)
                     OutlinedButton(
                       onPressed: changing ? null : () => editEvent(event),
@@ -444,7 +464,27 @@ class _EventScreenState extends State<EventScreen> {
                     ),
                   if (status == 'DRAFT')
                     OutlinedButton(
-                      onPressed: changing ? null : () => eventAction('publish'),
+                      onPressed: changing
+                          ? null
+                          : () {
+                              if (event['venueId'] == null ||
+                                  event['venueId'].toString().isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      adminLabel(
+                                        context,
+                                        'Select a venue and save before publishing.',
+                                        'Выберите площадку и сохраните изменения перед публикацией.',
+                                        'Жариялау алдында өтетін орынды таңдап, сақтаңыз.',
+                                      ),
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+                              eventAction('publish');
+                            },
                       child: Text(l10n.publish),
                     ),
                   if (status == 'PUBLISHED')

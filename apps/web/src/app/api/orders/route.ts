@@ -15,6 +15,7 @@ export async function GET(request: Request) {
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
       include: {
+        event: { select: { title: true, startsAt: true, refundPolicy: true } },
         items: true,
         tickets: {
           include: {
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
         },
       },
     });
-    return json({ orders: orders.map(presentOrder) });
+    return json({ orders: orders.map(order => ({ ...presentOrder(order), eventTitle: order.event.title })) });
   } catch (error) {
     return errorResponse(error);
   }

@@ -4,6 +4,7 @@ import '../core/api.dart';
 import '../core/uuid.dart';
 import '../l10n/app_localizations.dart';
 import 'order_status.dart';
+import '../widgets/refund_policy.dart';
 
 /// Campaign QR codes are event links with a `c` token, not promo text.
 String? campaignTokenFrom(String raw) {
@@ -33,6 +34,8 @@ class CheckoutScreen extends StatefulWidget {
   final ApiClient api;
   final String eventId;
   final String eventTitle;
+  final String? refundPolicy;
+  final String? eventStartsAt;
   final List<CheckoutLine> lines;
   final String? initialName;
   final String? initialEmail;
@@ -44,6 +47,8 @@ class CheckoutScreen extends StatefulWidget {
     required this.api,
     required this.eventId,
     required this.eventTitle,
+    this.refundPolicy,
+    this.eventStartsAt,
     required this.lines,
     this.initialName,
     this.initialEmail,
@@ -254,6 +259,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               subtitle: Text('× ${line.quantity}'),
               trailing: Text(l10n.money(line.priceKzt * line.quantity)),
             ),
+          ),
+          RefundPolicyNotice(
+            policy: widget.refundPolicy,
+            startsAt: widget.eventStartsAt,
           ),
           const Divider(),
           TextField(

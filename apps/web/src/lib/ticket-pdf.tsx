@@ -103,6 +103,7 @@ export type TicketPdfPayload = {
   ticketTypeName: string;
   holderName: string;
   orderReference: string;
+  ticketId?: string;
   statusLabel: string;
   showQr: boolean;
   qrPng: Buffer | null;
@@ -138,6 +139,12 @@ export async function renderTicketPdf(data: TicketPdfPayload): Promise<Buffer> {
             <Text style={styles.value}>{data.orderReference}</Text>
           </View>
           <View style={styles.row}>
+            {data.ticketId ? (
+              <View style={{ marginBottom: 10 }}>
+                <Text style={styles.label}>Ticket ID</Text>
+                <Text style={{ fontSize: 10 }}>{data.ticketId}</Text>
+              </View>
+            ) : null}
             <Text style={styles.label}>Status</Text>
             <Text style={styles.value}>{data.statusLabel}</Text>
           </View>

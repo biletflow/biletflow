@@ -1,20 +1,22 @@
 import { NextResponse } from "next/server";
 
-import { routing } from "@/i18n/routing";
-
-/** Campaign QR landing: `/e/:slug?c=token` → localized event page with the token. */
-export function GET(
+/** Campaign QR landing. */
+export async function GET(
   request: Request,
   context: { params: Promise<{ slug: string }> },
 ) {
-  return context.params.then(({ slug }) => {
-    const incoming = new URL(request.url);
-    const target = new URL(
-      `/${routing.defaultLocale}/events/${encodeURIComponent(slug)}`,
-      incoming.origin,
-    );
-    const token = incoming.searchParams.get("c");
-    if (token) target.searchParams.set("c", token);
-    return NextResponse.redirect(target, 307);
+  const { slug } = await context.params;
+  const incoming = new URL(request.url);
+  const params = new URLSearchParams();
+  const token = incoming.searchParams.get("c");
+
+  if (token) params.set("c", token);
+
+  const query = params.toString();
+  const target = `/events/${encodeURIComponent(slug)}${query ? `?${query}` : ""}`;
+
+  return new NextResponse(null, {
+    status: 307,
+    headers: { Location: target },
   });
 }
