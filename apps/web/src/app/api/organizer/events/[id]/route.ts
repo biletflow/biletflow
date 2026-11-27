@@ -37,6 +37,8 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
         ? (raw as Record<string, unknown>)
         : {};
     const event = await prisma.$transaction(async (tx) => {
+      // Use the same event lock as checkout before checking existing orders.
+      await tx.$queryRaw`SELECT "id" FROM "Event" WHERE "id" = ${eventId} FOR UPDATE`;
       const current = await tx.event.findUnique({ where: { id: eventId } });
       if (!current) throw new ApiError(404, "NOT_FOUND");
       if (current.status === "CANCELLED" || current.status === "COMPLETED") {
