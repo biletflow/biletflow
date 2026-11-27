@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { UserRound } from "lucide-react";
 
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -60,8 +61,12 @@ export function SignedInNav({
           {dashboardLabel}
         </Link>
       ) : null}
-      <span className="text-ink-800 max-w-40 truncate text-sm font-semibold">
-        {name}
+      <span
+        className="inline-flex max-w-44 cursor-default select-none items-center gap-2 rounded-full border border-ink-300 bg-slate-100 px-3 py-1.5 text-sm font-medium text-ink-700"
+        title={name}
+      >
+        <UserRound className="size-4 shrink-0" aria-hidden />
+        <span className="truncate">{name}</span>
       </span>
       <button
         type="button"

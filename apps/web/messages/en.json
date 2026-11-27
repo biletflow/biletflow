@@ -15,8 +15,8 @@
     "tickets": "My tickets",
     "support": "Support",
     "notifications": "Notifications",
-    "organizer": "Organizer",
-    "admin": "Admin"
+    "organizer": "Dashboard",
+    "admin": "Admin Dashboard"
   },
   "home": {
     "eyebrow": "Self-service event ticketing in Kazakhstan",
@@ -233,7 +233,9 @@
     "Music": "Music",
     "Community": "Community",
     "Technology": "Technology",
-    "Film": "Film"
+    "Film": "Film",
+    "Business": "Business",
+    "Education": "Education"
   },
   "ticketTypes": {
     "General Admission": "General Admission",
@@ -254,6 +256,6 @@
   },
   "footer": {
     "tagline": "Kazakhstan-focused self-service event ticketing. Create an event, issue tickets, check people in.",
-    "rights": "© {year} BiletFlow. Almaty, Kazakhstan."
+    "rights": "© {year} BiletFlow. Astana, Kazakhstan."
   }
 }

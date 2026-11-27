@@ -31,7 +31,7 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
 
-  return { title: t("title"), description: t("description") };
+  return { title: "BiletFlow", description: t("description") };
 }
 
 export function generateStaticParams() {

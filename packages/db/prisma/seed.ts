@@ -121,7 +121,7 @@ async function main() {
 
   const organizers = [];
   for (const [i, spec] of [
-    { email: "organizer@biletflow.kz", name: "Aigerim Nurlanova", org: "Almaty Jazz Collective" },
+    { email: "organizer@biletflow.kz", name: "Waqar Ahmad", org: "Nazarbayev University" },
     { email: "organizer2@biletflow.kz", name: "Daniyar Seitov", org: "KBTU Student Union" },
     { email: "organizer3@biletflow.kz", name: "Zarina Abenova", org: "Astana Tech Meetups" },
   ].entries()) {

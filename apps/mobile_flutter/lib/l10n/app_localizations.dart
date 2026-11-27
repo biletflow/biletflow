@@ -28,6 +28,8 @@ class AppLocalizations {
       'Community': 'Community',
       'Technology': 'Technology',
       'Film': 'Film',
+      'Business': 'Business',
+      'Education': 'Education',
       'General Admission': 'General Admission',
       'VIP': 'VIP',
       'Free Entry': 'Free Entry',
@@ -44,6 +46,8 @@ class AppLocalizations {
       'Community': 'Сообщество',
       'Technology': 'Технологии',
       'Film': 'Кино',
+      'Business': 'Бизнес',
+      'Education': 'Образование',
       'General Admission': 'Общий вход',
       'VIP': 'VIP',
       'Free Entry': 'Бесплатный вход',
@@ -60,6 +64,8 @@ class AppLocalizations {
       'Community': 'Қауымдастық',
       'Technology': 'Технология',
       'Film': 'Кино',
+      'Business': 'Бизнес',
+      'Education': 'Білім',
       'General Admission': 'Жалпы кіру',
       'VIP': 'VIP',
       'Free Entry': 'Тегін кіру',
@@ -955,6 +961,18 @@ class AppLocalizations {
   String get city => _t('city');
   String get allCities => _t('allCities');
   String get category => _t('category');
+  String get venueField => locale.languageCode == 'ru'
+      ? 'Площадка'
+      : locale.languageCode == 'kk'
+          ? 'Өтетін орын'
+          : 'Venue';
+
+  String get eventCoverUrlField => locale.languageCode == 'ru'
+      ? 'Ссылка на обложку мероприятия'
+      : locale.languageCode == 'kk'
+          ? 'Іс-шара мұқабасының сілтемесі'
+          : 'Event cover URL';
+
   String get visibility => _t('visibility');
   String get preview => _t('preview');
   String get allCategories => _t('allCategories');

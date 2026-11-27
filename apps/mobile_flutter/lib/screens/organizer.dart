@@ -17,10 +17,10 @@ List<EditorField> _eventFields(AppLocalizations l10n) => [
   (key: 'description', label: l10n.description, required: false, number: false),
   (key: 'category', label: l10n.category, required: false, number: false),
   (key: 'visibility', label: l10n.visibility, required: true, number: false),
-  (key: 'venueId', label: 'Venue', required: false, number: false),
+  (key: 'venueId', label: l10n.venueField, required: false, number: false),
   (
     key: 'coverImageUrl',
-    label: 'Event cover URL',
+    label: l10n.eventCoverUrlField,
     required: false,
     number: false,
   ),
