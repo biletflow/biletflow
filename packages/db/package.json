@@ -15,7 +15,8 @@
     "studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
     "typecheck": "tsc --noEmit",
-    "seed:nu": "tsx prisma/seed-nu.ts"
+    "seed:nu": "tsx prisma/seed-nu.ts",
+    "seed:final": "tsx prisma/seed-final.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
