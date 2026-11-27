@@ -14,7 +14,8 @@
     "reset": "prisma migrate reset --force",
     "studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed:nu": "tsx prisma/seed-nu.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
