@@ -4,9 +4,21 @@ import { prisma, type Prisma } from "@biletflow/db";
 
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
-import { clientIp } from "./http";
+import { clientIp, isUniqueViolation } from "./http";
 
-export type EventSeatStatus = "AVAILABLE" | "HELD" | "SOLD";
+export type EventSeatStatus = "AVAILABLE" | "HELD" | "SOLD" | "UNAVAILABLE";
+
+type MapEditor = { id: string; role: "ATTENDEE" | "ORGANIZER" | "PLATFORM_ADMIN" };
+
+/** Platform admin, or the only organizer who has events at this venue. */
+export async function assertCanEditVenueMap(user: MapEditor, venueId: string) {
+  if (user.role === "PLATFORM_ADMIN") return;
+  const other = await prisma.event.findFirst({
+    where: { venueId, organizerId: { not: user.id } },
+    select: { id: true },
+  });
+  if (other) throw new ApiError(403, "FORBIDDEN");
+}
 
 /**
  * A seat is taken by one conditional insert. activeKey stays "active" for one
@@ -16,6 +28,10 @@ export async function holdSeat(
   tx: Prisma.TransactionClient,
   input: { seatId: string; eventId: string; userId: string; orderId: string; expiresAt: Date },
 ) {
+  const locked = await tx.$queryRaw<{ id: string }[]>`
+    SELECT "id" FROM "Seat" WHERE "id" = ${input.seatId} FOR UPDATE
+  `;
+  if (locked.length !== 1) throw new ApiError(409, "SOLD_OUT");
   await tx.$executeRaw`
     UPDATE "SeatHold"
     SET "status" = 'RELEASED'::"SeatHoldStatus",
@@ -113,12 +129,13 @@ async function seatBoard(eventId: string, venueId: string) {
 }
 
 function eventSeatStatus(
-  seatId: string,
+  seat: { id: string; status: string },
   held: Set<string>,
   sold: Set<string>,
 ): EventSeatStatus {
-  if (sold.has(seatId)) return "SOLD";
-  if (held.has(seatId)) return "HELD";
+  if (sold.has(seat.id)) return "SOLD";
+  if (held.has(seat.id)) return "HELD";
+  if (seat.status !== "AVAILABLE") return "UNAVAILABLE";
   return "AVAILABLE";
 }
 
@@ -146,11 +163,7 @@ export async function listFreeSeats(slug: string) {
             id: row.id,
             label: row.label,
             seats: row.seats
-              .filter(
-                (seat) =>
-                  seat.status === "AVAILABLE" &&
-                  eventSeatStatus(seat.id, board.held, board.sold) === "AVAILABLE",
-              )
+              .filter((seat) => eventSeatStatus(seat, board.held, board.sold) === "AVAILABLE")
               .map((seat) => ({
                 id: seat.id,
                 number: seat.number,
@@ -182,7 +195,7 @@ export async function listEventSeats(eventId: string) {
           id: seat.id,
           number: seat.number,
           isAccessible: seat.isAccessible,
-          status: eventSeatStatus(seat.id, board.held, board.sold),
+          status: eventSeatStatus(seat, board.held, board.sold),
         })),
       })),
     })),
@@ -192,7 +205,7 @@ export async function listEventSeats(eventId: string) {
 export async function deleteFreeSeat(
   eventId: string,
   seatId: string,
-  actorId: string,
+  actor: MapEditor,
   headers: Headers,
 ) {
   const event = await prisma.event.findUnique({
@@ -200,13 +213,19 @@ export async function deleteFreeSeat(
     select: { id: true, venueId: true },
   });
   if (!event?.venueId) throw new ApiError(404, "NOT_FOUND");
-  const seat = await prisma.seat.findFirst({
-    where: { id: seatId, row: { section: { venueId: event.venueId } } },
-    select: { id: true },
-  });
-  if (!seat) throw new ApiError(404, "NOT_FOUND");
+  await assertCanEditVenueMap(actor, event.venueId);
 
   await prisma.$transaction(async (tx) => {
+    const locked = await tx.$queryRaw<{ id: string }[]>`
+      SELECT s."id"
+      FROM "Seat" s
+      JOIN "SeatRow" r ON r."id" = s."seatRowId"
+      JOIN "VenueSection" sec ON sec."id" = r."venueSectionId"
+      WHERE s."id" = ${seatId}
+        AND sec."venueId" = ${event.venueId}
+      FOR UPDATE
+    `;
+    if (locked.length !== 1) throw new ApiError(404, "NOT_FOUND");
     const blockingHold = await tx.seatHold.findFirst({
       where: { seatId, activeKey: "active", expiresAt: { gt: new Date() } },
       select: { id: true },
@@ -220,7 +239,7 @@ export async function deleteFreeSeat(
     await tx.ticket.updateMany({ where: { seatId }, data: { seatId: null } });
     await tx.seat.delete({ where: { id: seatId } });
     await audit(tx, {
-      actorUserId: actorId,
+      actorUserId: actor.id,
       eventId,
       action: "seating.seat_deleted",
       entityType: "Seat",
@@ -230,4 +249,57 @@ export async function deleteFreeSeat(
     });
   });
   return { id: seatId };
+}
+
+export async function addSeatsToRow(
+  eventId: string,
+  rowId: string,
+  seats: { number: string; isAccessible: boolean }[],
+  actor: MapEditor,
+  headers: Headers,
+) {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { id: true, venueId: true },
+  });
+  if (!event?.venueId) throw new ApiError(409, "CONFLICT");
+  await assertCanEditVenueMap(actor, event.venueId);
+  const row = await prisma.seatRow.findFirst({
+    where: { id: rowId, section: { venueId: event.venueId } },
+    select: { id: true },
+  });
+  if (!row) throw new ApiError(404, "NOT_FOUND");
+  try {
+    const created = await prisma.$transaction(async (tx) => {
+      const inserted = await tx.seat.createManyAndReturn({
+        data: seats.map((seat) => ({
+          seatRowId: row.id,
+          number: seat.number,
+          isAccessible: seat.isAccessible,
+        })),
+      });
+      await audit(tx, {
+        actorUserId: actor.id,
+        eventId,
+        action: "seating.seats_added",
+        entityType: "SeatRow",
+        entityId: row.id,
+        description: "Seats added to an existing row",
+        metadata: { seats: inserted.length },
+        ipAddress: clientIp(headers),
+      });
+      return inserted;
+    });
+    return {
+      seats: created.map((seat) => ({
+        id: seat.id,
+        number: seat.number,
+        isAccessible: seat.isAccessible,
+        status: "AVAILABLE" as const,
+      })),
+    };
+  } catch (error) {
+    if (isUniqueViolation(error)) throw new ApiError(409, "CONFLICT");
+    throw error;
+  }
 }

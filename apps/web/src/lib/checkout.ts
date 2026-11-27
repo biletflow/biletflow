@@ -72,6 +72,13 @@ export function presentOrder(order: PresentedOrder) {
   };
 }
 
+export async function lockOrder(tx: Prisma.TransactionClient, orderId: string) {
+  const rows = await tx.$queryRaw<{ id: string }[]>`
+    SELECT "id" FROM "Order" WHERE "id" = ${orderId} FOR UPDATE
+  `;
+  return rows.length === 1;
+}
+
 async function holdMinutes() {
   const setting = await prisma.platformSetting.findUnique({
     where: { key: "CHECKOUT_HOLD_MINUTES" },
@@ -177,6 +184,14 @@ export async function createOrder(
       const priced = lines.some((line) => line.ticketType.priceKzt > 0);
       if (priced && (!event.paidSalesActive || event.paidSalesSuspended)) {
         throw new ApiError(409, "CONFLICT");
+      }
+
+      // The order item foreign key locks the seat weakly. Take the row lock first.
+      for (const seatId of [...requestedSeatIds].sort()) {
+        const locked = await tx.$queryRaw<{ id: string }[]>`
+          SELECT "id" FROM "Seat" WHERE "id" = ${seatId} FOR UPDATE
+        `;
+        if (locked.length !== 1) throw new ApiError(409, "SOLD_OUT");
       }
 
       const promo = await resolvePromo(tx, event.id, userId, input, lines);
@@ -398,6 +413,7 @@ export async function getOwnedOrder(userId: string, role: string, orderId: strin
 
 export async function cancelReservation(userId: string, orderId: string, headers: Headers) {
   const order = await prisma.$transaction(async (tx) => {
+    if (!(await lockOrder(tx, orderId))) throw new ApiError(404, "NOT_FOUND");
     const current = await tx.order.findUnique({
       where: { id: orderId },
       include: {

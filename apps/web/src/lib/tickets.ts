@@ -89,6 +89,10 @@ export async function listTicketsForUser(userId: string) {
       orderId: true,
       status: true,
       issuedAt: true,
+      seatId: true,
+      sectionName: true,
+      rowLabel: true,
+      seatNumber: true,
       attendee: { select: { fullName: true, email: true } },
       ticketType: { select: { name: true } },
       event: {

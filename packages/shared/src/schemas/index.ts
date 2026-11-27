@@ -120,17 +120,18 @@ export const venueSectionSchema = z.object({
   priceCategory: z.string().trim().max(40).optional(),
 });
 
+const seatNumberSchema = z.object({
+  number: z.string().trim().min(1).max(20),
+  isAccessible: z.boolean().default(false),
+});
+
 export const seatRowSchema = z.object({
   label: z.string().trim().min(1).max(20),
-  seats: z
-    .array(
-      z.object({
-        number: z.string().trim().min(1).max(20),
-        isAccessible: z.boolean().default(false),
-      }),
-    )
-    .min(1)
-    .max(200),
+  seats: z.array(seatNumberSchema).min(1).max(200),
+});
+
+export const addSeatsSchema = z.object({
+  seats: z.array(seatNumberSchema).min(1).max(200),
 });
 
 export const createOrderSchema = z.object({

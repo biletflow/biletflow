@@ -14,7 +14,7 @@ export async function DELETE(
     const user = await requireRole(request.headers, ["ORGANIZER", "PLATFORM_ADMIN"]);
     const { id, seatId } = await context.params;
     const event = await requireOwnedEvent(user, id);
-    return json(await deleteFreeSeat(event.id, seatId, user.id, request.headers));
+    return json(await deleteFreeSeat(event.id, seatId, user, request.headers));
   } catch (error) {
     return errorResponse(error);
   }

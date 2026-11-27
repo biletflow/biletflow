@@ -5,6 +5,7 @@ import { ApiError, errorResponse } from "@/lib/api-error";
 import { audit } from "@/lib/audit";
 import { assertParsed, clientIp, isUniqueViolation, json, readJson } from "@/lib/http";
 import { requireOwnedEvent } from "@/lib/organizer";
+import { assertCanEditVenueMap } from "@/lib/seats";
 import { requireRole } from "@/lib/session";
 
 export const runtime = "nodejs";
@@ -18,6 +19,7 @@ export async function POST(
     const { id, sectionId } = await context.params;
     const event = await requireOwnedEvent(user, id);
     if (!event.venueId) throw new ApiError(409, "CONFLICT");
+    await assertCanEditVenueMap(user, event.venueId);
     const section = await prisma.venueSection.findFirst({
       where: { id: sectionId, venueId: event.venueId },
       select: { id: true },
