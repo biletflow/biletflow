@@ -17,7 +17,15 @@ export async function issueTickets(
   input: {
     eventId: string;
     orderId: string;
-    items: { id: string; ticketTypeId: string; quantity: number }[];
+    items: {
+      id: string;
+      ticketTypeId: string;
+      quantity: number;
+      seatId?: string | null;
+      sectionName?: string | null;
+      rowLabel?: string | null;
+      seatNumber?: string | null;
+    }[];
     attendees: AttendeeInput[];
     signingKey: string;
   },
@@ -46,6 +54,10 @@ export async function issueTickets(
           ticketTypeId: item.ticketTypeId,
           attendeeId: attendee.id,
           status: "VALID",
+          seatId: item.quantity === 1 ? item.seatId ?? null : null,
+          sectionName: item.quantity === 1 ? item.sectionName ?? null : null,
+          rowLabel: item.quantity === 1 ? item.rowLabel ?? null : null,
+          seatNumber: item.quantity === 1 ? item.seatNumber ?? null : null,
         },
       });
       const ticket = await tx.ticket.update({
@@ -77,6 +89,10 @@ export async function listTicketsForUser(userId: string) {
       orderId: true,
       status: true,
       issuedAt: true,
+      seatId: true,
+      sectionName: true,
+      rowLabel: true,
+      seatNumber: true,
       attendee: { select: { fullName: true, email: true } },
       ticketType: { select: { name: true } },
       event: {

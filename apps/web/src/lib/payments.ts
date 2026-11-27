@@ -7,9 +7,10 @@ import { ApiError } from "./api-error";
 import { audit } from "./audit";
 import { clientIp, isUniqueViolation } from "./http";
 import { convertReservation, releaseInventory } from "./inventory";
+import { convertOrderSeats, releaseOrderSeats } from "./seats";
 import { maybeActivate, presentActivation } from "./activation";
 import { notifyOrderPaid, notifyPaymentFailed } from "./notifications";
-import { getOwnedOrder, presentOrder } from "./checkout";
+import { getOwnedOrder, lockOrder, presentOrder } from "./checkout";
 import {
   sandboxPayUrl,
   signWebhookBody,
@@ -39,6 +40,19 @@ export async function startOrderPayment(userId: string, orderId: string, headers
   }
 
   const payment = await prisma.$transaction(async (tx) => {
+    await lockOrder(tx, order.id);
+    const current = await tx.order.findUnique({
+      where: { id: order.id },
+      select: { status: true, expiresAt: true },
+    });
+    if (!current || current.status !== "AWAITING_PAYMENT") throw new ApiError(409, "CONFLICT");
+    if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) {
+      throw new ApiError(409, "HOLD_EXPIRED");
+    }
+    const existing = await tx.payment.findFirst({
+      where: { orderId: order.id, status: "CREATED", purpose: "TICKET_ORDER" },
+    });
+    if (existing) return existing;
     const created = await tx.payment.create({
       data: {
         purpose: "TICKET_ORDER",
@@ -73,6 +87,7 @@ export async function startOrderPayment(userId: string, orderId: string, headers
 
 async function expireOrder(orderId: string, userId: string, headers: Headers) {
   await prisma.$transaction(async (tx) => {
+    await lockOrder(tx, orderId);
     const current = await tx.order.findUnique({
       where: { id: orderId },
       include: { items: true },
@@ -81,6 +96,7 @@ async function expireOrder(orderId: string, userId: string, headers: Headers) {
     for (const item of current.items) {
       await releaseInventory(tx, item.ticketTypeId, item.quantity);
     }
+    await releaseOrderSeats(tx, orderId);
     await tx.order.update({ where: { id: orderId }, data: { status: "EXPIRED" } });
     await audit(tx, {
       actorUserId: userId,
@@ -181,15 +197,7 @@ export async function processPaymentWebhook(raw: string, signature: string | nul
       });
       const payment = await tx.payment.findUnique({
         where: { providerIntentId },
-        include: {
-          order: {
-            include: {
-              items: true,
-              event: { select: { title: true } },
-            },
-          },
-          activation: true,
-        },
+        include: { activation: true },
       });
       if (!payment) throw new ApiError(404, "NOT_FOUND");
       if (payment.status !== "CREATED" && payment.status !== "PROCESSING") {
@@ -199,7 +207,15 @@ export async function processPaymentWebhook(raw: string, signature: string | nul
         await settleActivation(tx, payment, outcome);
         return { duplicate: false, ignored: false, tickets: 0 as number };
       }
-      const order = payment.order;
+      if (!payment.orderId) throw new ApiError(409, "CONFLICT");
+      await lockOrder(tx, payment.orderId);
+      const order = await tx.order.findUnique({
+        where: { id: payment.orderId },
+        include: {
+          items: true,
+          event: { select: { title: true } },
+        },
+      });
       if (!order) throw new ApiError(409, "CONFLICT");
       const failed = outcome !== "APPROVED" || order.status !== "AWAITING_PAYMENT";
       const expired = Boolean(order.expiresAt && order.expiresAt.getTime() <= Date.now());
@@ -227,6 +243,11 @@ export async function processPaymentWebhook(raw: string, signature: string | nul
         };
       }
 
+      const seated = order.items.filter((item) => item.seatId);
+      if (seated.length > 0) {
+        const converted = await convertOrderSeats(tx, order.id);
+        if (converted !== seated.length) throw new ApiError(409, "CONFLICT");
+      }
       for (const item of order.items) {
         await convertReservation(tx, item.ticketTypeId, item.quantity);
       }
@@ -329,6 +350,7 @@ async function releasePaidHold(
     for (const item of order.items) {
       await releaseInventory(tx, item.ticketTypeId, item.quantity);
     }
+    await releaseOrderSeats(tx, order.id);
     await tx.order.update({
       where: { id: order.id },
       data: {

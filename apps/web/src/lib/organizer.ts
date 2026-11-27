@@ -4,6 +4,7 @@ import { ApiError } from "./api-error";
 import { audit } from "./audit";
 import { clientIp } from "./http";
 import { refundInventory, releaseInventory } from "./inventory";
+import { releaseOrderSeats } from "./seats";
 
 type SessionUser = {
   id: string;
@@ -182,6 +183,7 @@ export async function cancelEvent(
         for (const item of order.items) {
           await releaseInventory(tx, item.ticketTypeId, item.quantity);
         }
+        await releaseOrderSeats(tx, order.id);
         await tx.order.update({
           where: { id: order.id },
           data: { status: "CANCELLED", cancelledAt: new Date() },

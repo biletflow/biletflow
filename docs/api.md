@@ -30,6 +30,7 @@ Implemented auth response shapes, role checks, migration notes and audit usage:
 
 | `GET` | `/api/events` | Public listing. Only `PUBLISHED` + `PUBLIC`. Filters: category, date, query |
 | `GET` | `/api/events/:slug` | Public event page payload including visible ticket types |
+| `GET` | `/api/events/:slug/seats` | Free seats for a published assigned-seating event |
 | `POST` | `/api/events/:slug/report` | `eventReportSchema`. Signed-in user reports a published event |
 | `POST` | `/api/organizer/events` | `eventInputSchema` |
 | `GET` `PUT` | `/api/organizer/events/:id` | `eventInputSchema` |
@@ -42,6 +43,61 @@ Implemented auth response shapes, role checks, migration notes and audit usage:
 ## Ticket types
 
 | `GET` `POST` | `/api/organizer/events/:id/ticket-types` | `ticketTypeInputSchema` |
+| `POST` | `/api/organizer/events/:id/sections` | `venueSectionSchema`. Requires a venue on the event |
+| `POST` | `/api/organizer/events/:id/sections/:sectionId/rows` | `seatRowSchema`. Creates the row and its seats |
+| `POST` | `/api/organizer/events/:id/rows/:rowId/seats` | `addSeatsSchema`. Adds seats to a row that already exists |
+| `GET` | `/api/organizer/events/:id/seats` | Full map for that event |
+| `DELETE` | `/api/organizer/events/:id/seats/:seatId` | Deletes one free seat |
+
+### Seat map
+
+Sections, rows and seats belong to the venue. A live hold belongs to one event, so two events in the same venue can reserve the same physical seat.
+
+Who may change the map: the platform admin, or an organizer when every event at that venue is theirs. If another organizer also uses the venue, map changes return `403`. Reading `GET /api/organizer/events/:id/seats` still requires only ownership of that event.
+
+`GET /api/organizer/events/:id/seats` response:
+
+```json
+{
+  "sections": [
+    {
+      "id": "section-id",
+      "name": "Stalls",
+      "displayOrder": 0,
+      "rows": [
+        {
+          "id": "row-id",
+          "label": "A",
+          "seats": [
+            { "id": "seat-id", "number": "1", "isAccessible": false, "status": "AVAILABLE" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+`status` is `AVAILABLE`, `HELD`, `SOLD`, or `UNAVAILABLE`. `UNAVAILABLE` means `Seat.status` is not `AVAILABLE` and the seat is not currently held or sold for this event. Held and sold win over the physical status. A sold or held seat, including one held or sold by another event in the same venue, cannot be deleted (`409`). Deletion locks the seat row. A checkout that starts at the same time either keeps the seat, or receives `404` or `409` if the seat is already gone.
+
+`POST /api/organizer/events/:id/rows/:rowId/seats` body:
+
+```json
+{ "seats": [{ "number": "14", "isAccessible": false }] }
+```
+
+`201` returns `{ "seats": [{ "id", "number", "isAccessible", "status": "AVAILABLE" }] }`. A repeated number in that row is `409`.
+
+`PUT /api/organizer/events/:id` keeps the current `seatingMode`, `venueId`, `visibility`, `timezone`, and `refundPolicy` when those fields are omitted. Sending a different `seatingMode` or `venueId` after any order, hold, or ticket is `409`.
+
+Public `GET /api/events/:slug/seats` returns only `AVAILABLE` seats for a published assigned-seating event (`PUBLIC` or `UNLISTED`). A general-admission event returns `404`. Its checkout must omit `seatIds`; sending any is `400`.
+
+Assigned checkout item: `{ "ticketTypeId", "quantity", "seatIds" }`. `seatIds.length` must equal `quantity`, ids must be unique, and each seat must belong to the event venue and have physical status `AVAILABLE`. A mismatch is `400`. A missing, foreign, or physically unavailable seat is `404`. A seat already held or sold for this event is `409` with code `SOLD_OUT`. The insert locks the seat row. The order item, the order response, and `GET /api/tickets` include `seatId`, `sectionName`, `rowLabel`, and `seatNumber`. General admission leaves those fields `null`.
+
+Declined, abandoned, expired, and cancelled checkouts release the hold and the reserved inventory together. Payment approval, expiry, and cancellation lock the order row, so two approvals of the same order issue one ticket. A successful refund or event cancellation marks the ticket `REFUNDED` (`invalidatedAt` is set). Check-in then returns `REFUNDED`, and the seat can be sold again. A checked-in ticket cannot be refunded by the organizer (`409`).
+
+Check-in success and `ALREADY_CHECKED_IN` both include `ticket.seatLabel` (`"Stalls A 1"`, or `null` for general admission).
+
 | `PUT` `DELETE` | `/api/organizer/ticket-types/:id` | Delete is refused once tickets are sold; hide instead |
 
 Every response includes the counters `quantity`, `sold`, `reserved`, `refunded`,
@@ -58,7 +114,7 @@ Every response includes the counters `quantity`, `sold`, `reserved`, `refunded`,
 ## Checkout
 
 | `POST` | `/api/promo/preview` | `applyPromoSchema`. Server-calculated discount and new total. Never trusts a client-supplied amount |
-| `POST` | `/api/orders` | `createOrderSchema`. Reserves inventory atomically, returns the order with `expiresAt`. Free orders return `PAID` immediately with tickets issued |
+| `POST` | `/api/orders` | `createOrderSchema`. Reserves inventory atomically, returns the order with `expiresAt`. Free orders return `PAID` immediately with tickets issued. Assigned seating sends `seatIds` whose length matches `quantity`; each seat is held by one conditional insert and copied onto the ticket |
 | `GET` | `/api/orders/:id` | |
 | `POST` | `/api/orders/:id/cancel` | Releases reservation |
 | `POST` | `/api/orders/:id/refund` | `refundOrderSchema`. Simulated refund when the event refund policy window is still open. Checked-in tickets are refused. Repeating the request does not create a second refund |
@@ -115,6 +171,11 @@ by construction.
 | `PUT` | `/api/support/cases/:id/assignee` | Staff only |
 
 Clients poll `GET /api/support/cases/:id` every 10 seconds while the thread is open. No WebSockets.
+
+## Notifications
+
+| `GET` | `/api/notifications` | The signed-in user's latest in-app notifications, including `readAt` |
+| `POST` | `/api/notifications/:id/read` | Sets `readAt` on the caller's own row. A later call keeps the first timestamp. Another user's id is `404` |
 
 ## Analytics
 
