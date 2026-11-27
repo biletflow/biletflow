@@ -86,6 +86,7 @@ export default async function CheckoutPage({
         eventId={event.id}
         eventSlug={event.slug}
         eventTitle={event.title}
+        assignedSeating={event.seatingMode === "ASSIGNED"}
         locale={locale}
         ticketType={{
           id: ticketType.id,

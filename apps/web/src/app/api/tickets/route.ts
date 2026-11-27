@@ -16,6 +16,10 @@ function presentTicket(
     attendeeName: ticket.attendee.fullName,
     attendeeEmail: ticket.attendee.email,
     ticketTypeName: ticket.ticketType.name,
+    seatId: ticket.seatId,
+    sectionName: ticket.sectionName,
+    rowLabel: ticket.rowLabel,
+    seatNumber: ticket.seatNumber,
     event: {
       id: ticket.event.id,
       title: ticket.event.title,

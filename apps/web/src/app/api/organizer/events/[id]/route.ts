@@ -30,12 +30,31 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     const user = await requireRole(request.headers, ["ORGANIZER", "PLATFORM_ADMIN"]);
     const eventId = await idFrom(context);
     await requireOwnedEvent(user, eventId);
-    const input = assertParsed(eventInputSchema.safeParse(await readJson(request)));
+    const raw = await readJson(request);
+    const input = assertParsed(eventInputSchema.safeParse(raw));
+    const record =
+      raw && typeof raw === "object" && !Array.isArray(raw)
+        ? (raw as Record<string, unknown>)
+        : {};
     const event = await prisma.$transaction(async (tx) => {
+      // Use the same event lock as checkout before checking existing orders.
+      await tx.$queryRaw`SELECT "id" FROM "Event" WHERE "id" = ${eventId} FOR UPDATE`;
       const current = await tx.event.findUnique({ where: { id: eventId } });
       if (!current) throw new ApiError(404, "NOT_FOUND");
       if (current.status === "CANCELLED" || current.status === "COMPLETED") {
         throw new ApiError(409, "CONFLICT");
+      }
+      const nextVenueId = "venueId" in record ? input.venueId ?? null : current.venueId;
+      const nextSeatingMode = "seatingMode" in record ? input.seatingMode : current.seatingMode;
+      const layoutChange =
+        nextVenueId !== current.venueId || nextSeatingMode !== current.seatingMode;
+      if (layoutChange) {
+        const [orders, holds, tickets] = await Promise.all([
+          tx.order.count({ where: { eventId } }),
+          tx.seatHold.count({ where: { eventId } }),
+          tx.ticket.count({ where: { eventId } }),
+        ]);
+        if (orders + holds + tickets > 0) throw new ApiError(409, "CONFLICT");
       }
       const updated = await tx.event.update({
         where: { id: eventId },
@@ -44,16 +63,16 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
           description: input.description,
           category: input.category,
           coverImageUrl: input.coverImageUrl,
-          venueId: input.venueId,
-          visibility: input.visibility,
-          seatingMode: input.seatingMode,
+          venueId: nextVenueId,
+          visibility: "visibility" in record ? input.visibility : current.visibility,
+          seatingMode: nextSeatingMode,
           startsAt: input.startsAt,
           endsAt: input.endsAt,
-          timezone: input.timezone,
+          timezone: "timezone" in record ? input.timezone : current.timezone,
           registrationOpensAt: input.registrationOpensAt,
           registrationClosesAt: input.registrationClosesAt,
           capacity: input.capacity,
-          refundPolicy: input.refundPolicy,
+          refundPolicy: "refundPolicy" in record ? input.refundPolicy : current.refundPolicy,
           calendarSequence:
             current.status === "PUBLISHED" ? { increment: 1 } : current.calendarSequence,
         },

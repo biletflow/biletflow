@@ -399,7 +399,7 @@ model SeatHold {
   expiresAt DateTime
   createdAt DateTime       @default(now())
 
-  // Same trick as CheckInRecord.activeKey: only one live hold per seat.
+  // One live hold per seat on a single event. Another event in the same venue can hold it too.
   activeKey String @default("active")
 
   seat  Seat   @relation(fields: [seatId], references: [id], onDelete: Cascade)
@@ -407,7 +407,7 @@ model SeatHold {
   user  User?  @relation(fields: [userId], references: [id])
   order Order? @relation(fields: [orderId], references: [id])
 
-  @@unique([seatId, activeKey])
+  @@unique([seatId, eventId, activeKey])
   @@index([eventId, status])
   @@index([expiresAt])
 }

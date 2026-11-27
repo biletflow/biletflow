@@ -7,12 +7,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import EventCampaigns from "./event-campaigns";
 import EventStaff from "./event-staff";
+import OrganizerSeatMap from "./seat-map";
 import PaidSalesActivation from "./paid-sales-activation";
 import { canPublish, hasEnoughInventory, validateEventDates } from "@/lib/organizer-editor-validation";
 
 type EventData = {
   id: string; title: string; description: string | null; category: string | null;
-  venueId: string | null; coverImageUrl: string | null; timezone: string; seatingMode: string; refundPolicy: string;
+  venueId: string | null; coverImageUrl: string | null; timezone: string; seatingMode: "GENERAL_ADMISSION" | "ASSIGNED"; refundPolicy: string;
   startsAt: string; endsAt: string; visibility: "PUBLIC" | "UNLISTED" | "PRIVATE";
   status: string;
   ticketTypes: { id: string; name: string; description?: string | null; quantity: number; sold: number; reserved: number; available: number; priceKzt: number; maxPerOrder: number; isHidden: boolean }[];
@@ -60,11 +61,12 @@ async function request(url: string, method: string, body?: unknown) {
 }
 export default function EventEditor({ locale, eventId }: { locale: string; eventId?: string }) {
   const t = copy[locale as keyof typeof copy] ?? copy.en;
+  const seating = locale === "ru" ? { mode: "Тип рассадки", ga: "Свободная рассадка", assigned: "Места по номерам", required: "Выберите площадку.", save: "Сохраните настройки рассадки." } : locale === "kk" ? { mode: "Отыру түрі", ga: "Еркін орындар", assigned: "Нөмірленген орындар", required: "Өтетін орынды таңдаңыз.", save: "Отыру параметрлерін сақтаңыз." } : { mode: "Seating mode", ga: "General admission", assigned: "Assigned seating", required: "Select a venue for assigned seating.", save: "Save seating settings to manage the map." };
   const place = locationCopy[locale as keyof typeof locationCopy] ?? locationCopy.en;
   const router = useRouter();
   const [form, setForm] = useState({
     title: "", description: "", category: "", startsAt: "", endsAt: "",
-    visibility: "PUBLIC" as EventData["visibility"], venueId: "", coverImageUrl: "",
+    visibility: "PUBLIC" as EventData["visibility"], venueId: "", coverImageUrl: "", seatingMode: "GENERAL_ADMISSION" as EventData["seatingMode"],
   });
   const [refundPolicy, setRefundPolicy] = useState("NO_REFUNDS");
   const [event, setEvent] = useState<EventData | null>(null);
@@ -100,7 +102,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
           title: event.title, description: event.description ?? "", category: event.category ?? "",
           startsAt: localDate(event.startsAt, event.timezone), endsAt: localDate(event.endsAt, event.timezone),
           venueId: event.venueId ?? "", coverImageUrl: event.coverImageUrl ?? "",
-          visibility: event.visibility,
+          visibility: event.visibility, seatingMode: event.seatingMode,
         });
       }).catch((e: Error) => { if (active) setError(e.message); });
     return () => { active = false; };
@@ -113,6 +115,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
   }
   async function save(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (form.seatingMode === "ASSIGNED" && !form.venueId) { setError(seating.required); return; }
     if (validateEventDates(form.startsAt, form.endsAt)) { setError(t.dates); return; }
     const start = eventInstant(form.startsAt, zone, event?.startsAt);
     const end = eventInstant(form.endsAt, zone, event?.endsAt);
@@ -121,7 +124,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
       const payload = {
         ...form, description: form.description || undefined, category: form.category || null, venueId: form.venueId || null, coverImageUrl: form.coverImageUrl || null,
         startsAt: start.toISOString(), endsAt: end.toISOString(),
-        timezone: zone, seatingMode: event?.seatingMode ?? "GENERAL_ADMISSION", refundPolicy: refundPolicy,
+        timezone: zone, seatingMode: form.seatingMode, refundPolicy: refundPolicy,
       };
       const { event: saved } = await request(
         event ? `/api/organizer/events/${event.id}` : "/api/organizer/events",
@@ -221,6 +224,7 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
             <label className={labelStyle}>{place.city}<select className={inputStyle} value={selectedCity} onChange={(e) => setCity(e.target.value)}><option value="">{place.all}</option>{[...new Set(venues.map((item) => item.city))].map((item) => <option key={item}>{item}</option>)}</select></label>
             <label className={labelStyle}>{place.venue}<select className={inputStyle} value={form.venueId} disabled={venueError} onChange={(e) => setForm({ ...form, venueId: e.target.value })}><option value="">{place.none}</option>{form.venueId && !venue && <option value={form.venueId}>{place.venue}</option>}{venues.filter((item) => !selectedCity || item.city === selectedCity || item.id === form.venueId).map((item) => <option key={item.id} value={item.id}>{item.name} · {item.address}</option>)}</select></label>
           </div>
+          <label className={labelStyle}>{seating.mode}<select className={inputStyle} value={form.seatingMode} disabled={busy} onChange={(event) => setForm({ ...form, seatingMode: event.target.value as EventData["seatingMode"] })}><option value="GENERAL_ADMISSION">{seating.ga}</option><option value="ASSIGNED">{seating.assigned}</option></select></label>
           {venueError && <p role="status">{place.venueError}</p>}
           <label className={labelStyle}>{place.cover}<input type="url" pattern={form.coverImageUrl === event?.coverImageUrl ? undefined : "https://.+"} className={inputStyle} value={form.coverImageUrl} onChange={(e) => setForm({ ...form, coverImageUrl: e.target.value })}/></label>
           <p className="text-sm text-ink-600">{zone}</p>
@@ -263,6 +267,8 @@ export default function EventEditor({ locale, eventId }: { locale: string; event
           </form>
           {event.status === "DRAFT" && <button type="button" disabled={busy || !canPublish(event.ticketTypes)} onClick={publish} className="bg-brand rounded-lg px-5 py-3 font-bold text-white disabled:opacity-50">{t.publish}</button>}
         </section>}
+        {form.seatingMode === "ASSIGNED" && (!event || event.seatingMode !== form.seatingMode || event.venueId !== form.venueId) && <p>{seating.save}</p>}
+        {event?.seatingMode === "ASSIGNED" && event.venueId && form.seatingMode === event.seatingMode && form.venueId === event.venueId && <OrganizerSeatMap key={event.id + event.venueId} eventId={event.id} locale={locale} editable={!["CANCELLED", "COMPLETED"].includes(event.status) && !busy} />}
         {event && <PaidSalesActivation eventId={event.id} locale={locale} />}
         {event && <EventCampaigns eventId={event.id} locale={locale} />}
         {event && <EventStaff eventId={event.id} locale={locale} />}
