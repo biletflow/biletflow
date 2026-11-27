@@ -67,14 +67,13 @@ export function CheckoutForm({
   const [seatError, setSeatError] = useState(false);
   const [seatConflict, setSeatConflict] = useState(false);
   const quantity = assignedSeating ? selected.length : generalQuantity;
-  const refreshSeats = useCallback(async (signal?: AbortSignal) => {
-    setSeatLoading(true);
-    setSeatError(false);
+  const loadSeats = useCallback(async (signal?: AbortSignal) => {
     try {
       const response = await fetch("/api/events/" + encodeURIComponent(eventSlug) + "/seats", { cache: "no-store", signal });
       if (!response.ok) throw new Error("seat map");
       const data = await response.json() as { sections: SeatSection[] };
       if (signal?.aborted) return;
+      setSeatError(false);
       setSections(data.sections);
       setSelected((previous) => retainAvailableSeats(previous, data.sections, maxQuantity));
     } catch {
@@ -86,9 +85,15 @@ export function CheckoutForm({
   useEffect(() => {
     if (!assignedSeating) return;
     const controller = new AbortController();
-    void refreshSeats(controller.signal);
+    void loadSeats(controller.signal);
     return () => controller.abort();
-  }, [assignedSeating, refreshSeats]);
+  }, [assignedSeating, loadSeats]);
+
+  async function refreshSeats() {
+    setSeatLoading(true);
+    setSeatError(false);
+    await loadSeats();
+  }
   const [fullName, setFullName] = useState(attendee.fullName);
   const [email, setEmail] = useState(attendee.email);
   const [promoCode, setPromoCode] = useState("");
