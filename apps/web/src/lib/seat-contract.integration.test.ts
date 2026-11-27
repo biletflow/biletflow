@@ -559,6 +559,51 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")("assigned seating cont
     expect(await prisma.ticket.count({ where: { orderId: freeOrder.order.id } })).toBe(1);
   });
 
+  it("serializes a seating-mode change against the first checkout", async () => {
+    const fresh = await prisma.event.create({
+      data: {
+        organizerId: ids.owner,
+        venueId,
+        slug: `layout-race-${suffix}`,
+        title: `Layout race ${suffix}`,
+        status: "PUBLISHED",
+        seatingMode: "ASSIGNED",
+        startsAt: new Date(Date.now() + 12 * 86_400_000),
+        endsAt: new Date(Date.now() + 13 * 86_400_000),
+        ticketTypes: { create: { name: "Free seat", priceKzt: 0, quantity: 10 } },
+      },
+      include: { ticketTypes: true },
+    });
+    const [changed, booked] = await Promise.all([
+      updateEvent(
+        request(`/api/organizer/events/${fresh.id}`, {
+          title: fresh.title,
+          startsAt: fresh.startsAt.toISOString(),
+          endsAt: fresh.endsAt.toISOString(),
+          seatingMode: "GENERAL_ADMISSION",
+        }, tokens.owner, "PUT"),
+        { params: Promise.resolve({ id: fresh.id }) },
+      ),
+      createOrder(request("/api/orders", {
+        eventId: fresh.id,
+        items: [{ ticketTypeId: fresh.ticketTypes[0]!.id, quantity: 1, seatIds: [seatIds["2"]!] }],
+        attendees: [{ fullName: "Dana Sultanova", email: `layout-race-${suffix}@seat-contract.test` }],
+        clientIdempotencyKey: randomUUID(),
+      }, tokens.buyer)),
+    ]);
+    const saved = await prisma.event.findUniqueOrThrow({ where: { id: fresh.id } });
+    if (booked.status === 201) {
+      expect(changed.status).toBe(409);
+      expect(saved.seatingMode).toBe("ASSIGNED");
+      expect(await prisma.ticket.count({ where: { eventId: fresh.id, seatId: seatIds["2"]! } })).toBe(1);
+    } else {
+      expect(changed.status).toBe(200);
+      expect(booked.status).toBe(400);
+      expect(saved.seatingMode).toBe("GENERAL_ADMISSION");
+      expect(await prisma.order.count({ where: { eventId: fresh.id } })).toBe(0);
+    }
+  });
+
   it("refuses a seating-mode change after an order exists", async () => {
     const current = await getEvent(request(`/api/organizer/events/${eventId}`, undefined, tokens.owner), {
       params: Promise.resolve({ id: eventId }),
