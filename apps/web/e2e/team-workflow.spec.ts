@@ -181,7 +181,7 @@ test("platform admin sees seeded users without credentials", async ({
   const table = page.getByRole("table");
   await expect(table).toContainText("scanner@biletflow.kz");
   await expect(table).toContainText("organizer@biletflow.kz");
-  await expect(table).toContainText("PLATFORM_ADMIN");
+  await expect(table.getByRole("row").filter({hasText:"admin@biletflow.kz"}).getByRole("cell",{name:"Platform admin",exact:true})).toBeVisible();
   await expect(table).not.toContainText(password!);
 });
 
