@@ -6,6 +6,7 @@ import '../widgets/empty_state.dart';
 import '../widgets/status_badge.dart';
 import 'organizer_editor.dart';
 import 'organizer_reports.dart';
+import 'organizer_seats.dart';
 
 List<EditorField> _eventFields(AppLocalizations l10n) => [
   (key: 'title', label: l10n.eventTitle, required: true, number: false),
@@ -402,6 +403,7 @@ class _EventScreenState extends State<EventScreen> {
                   ),
                 ],
               ),
+              OrganizerSeating(api: widget.api, event: event, editable: editable && !changing, onChanged: reload),
               const SizedBox(height: 20),
               Text(
                 l10n.ticketTypes,
