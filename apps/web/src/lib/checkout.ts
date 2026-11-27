@@ -120,6 +120,8 @@ export async function createOrder(
   const minutes = await holdMinutes();
   try {
     const order = await prisma.$transaction(async (tx) => {
+      // Serialize checkout with organizer changes to venue and seating mode.
+      await tx.$queryRaw`SELECT "id" FROM "Event" WHERE "id" = ${input.eventId} FOR UPDATE`;
       const event = await tx.event.findUnique({
         where: { id: input.eventId },
         include: { ticketTypes: true },
