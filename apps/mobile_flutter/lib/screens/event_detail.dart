@@ -8,6 +8,7 @@ import '../widgets/empty_state.dart';
 import '../widgets/event_card.dart';
 import '../widgets/quantity_stepper.dart';
 import 'checkout.dart';
+import 'attendee_seats.dart';
 import '../widgets/refund_policy.dart';
 import 'support.dart';
 
@@ -106,6 +107,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         );
     final soldOut = event?['isSoldOut'] == true;
     final selected = _selectedCount();
+    final assigned = event?['seatingMode'] == 'ASSIGNED';
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.eventDetails)),
@@ -231,6 +233,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         ),
                         trailing: disabled
                             ? null
+                            : assigned
+                            ? OutlinedButton(
+                                onPressed: () async {
+                                  final link = _campaign.text.trim();
+                                  final token = campaignTokenFrom(link);
+                                  final seats = await Navigator.push<SeatSelection>(context, MaterialPageRoute(builder: (_) => AttendeeSeats(api: widget.api, slug: widget.slug, limit: maxPerOrder < available ? maxPerOrder : available, priceKzt: price is num ? price.toInt() : 0)));
+                                  if (!context.mounted || seats == null) return;
+                                  await Navigator.push(context, MaterialPageRoute(builder: (_) => CheckoutScreen(api: widget.api, eventId: '${event?['id']}', eventTitle: title, refundPolicy: event?['refundPolicy']?.toString(), eventStartsAt: event?['startsAt']?.toString(), lines: [CheckoutLine(ticketTypeId: id, name: '${type['name'] ?? ''}', priceKzt: price is num ? price.toInt() : 0, quantity: seats.ids.length, seatIds: seats.ids, seatLabels: seats.labels)], initialCampaignToken: token, initialPromoCode: token == null && link.isNotEmpty ? link : null)));
+                                  if (mounted) await _load();
+                                },
+                                child: Text(seatLabel(context, 'Choose seats', 'Выбрать места', 'Орын таңдау')),
+                              )
                             : QuantityStepper(
                                 value: qty,
                                 max: maxPerOrder < available
@@ -255,7 +269,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                   ),
                 const SizedBox(height: 16),
-                FilledButton(
+                if (!assigned) FilledButton(
                   onPressed: registrationOpen && selected > 0
                       ? () {
                           final eventId = '${event?['id'] ?? ''}';

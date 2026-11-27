@@ -27,8 +27,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Future<void> markRead(String id) async {
-    await widget.api.request('PATCH', '/api/notifications', body: {'id': id});
-    if (mounted) setState(() => notifications = load());
+    try {
+      await widget.api.post('/api/notifications/${Uri.encodeComponent(id)}/read', {});
+      if (mounted) setState(() => notifications = load());
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(label('Could not mark notification as read', 'Не удалось отметить уведомление прочитанным', 'Хабарламаны оқылған деп белгілеу мүмкін болмады'))));
+      }
+    }
   }
 
   @override
@@ -55,7 +61,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: ListTile(
                 leading: Icon(read ? Icons.notifications_none : Icons.notifications_active),
                 title: Text('${row['subject'] ?? ''}'),
-                subtitle: Text('${row['body'] ?? ''}'),
+                subtitle: Text([ '${row['body'] ?? ''}', if (DateTime.tryParse('${row['createdAt']}') case final date?) MaterialLocalizations.of(context).formatMediumDate(date.toLocal()) + ' ' + MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(date.toLocal())), ].join('\n')),
                 isThreeLine: true,
                 onTap: read ? null : () => markRead('${row['id']}'),
               ),

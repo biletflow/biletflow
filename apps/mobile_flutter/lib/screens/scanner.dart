@@ -212,12 +212,15 @@ class _ScannerScreenState extends State<ScannerScreen>
       if (payload == null || payload.isEmpty) continue;
       unawaited(
         run(() async {
-          setState(() => scanning = false);
-          try {
-            await camera.stop();
-          } catch (_) {
+          setState(() {
+            scanning = false;
+            stopping = true;
+          });
+          unawaited(camera.stop().timeout(const Duration(seconds: 3)).catchError((Object _) {
             debugPrint('BiletFlow QR: camera stop failed');
-          }
+          }).whenComplete(() {
+            if (mounted) setState(() => stopping = false);
+          }));
           if (!mounted) return;
           debugPrint('BiletFlow QR: sending check-in request');
           final data = await api.post('/api/checkin', {

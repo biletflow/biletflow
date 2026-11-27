@@ -22,11 +22,15 @@ class CheckoutLine {
   final String name;
   final int priceKzt;
   final int quantity;
+  final List<String> seatIds;
+  final List<String> seatLabels;
   const CheckoutLine({
     required this.ticketTypeId,
     required this.name,
     required this.priceKzt,
     required this.quantity,
+    this.seatIds = const [],
+    this.seatLabels = const [],
   });
 }
 
@@ -208,7 +212,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'eventId': widget.eventId,
         'items': [
           for (final line in widget.lines)
-            {'ticketTypeId': line.ticketTypeId, 'quantity': line.quantity},
+            {
+              'ticketTypeId': line.ticketTypeId,
+              'quantity': line.quantity,
+              if (line.seatIds.isNotEmpty) 'seatIds': line.seatIds,
+            },
         ],
         'attendees': attendees,
         if (offer.code != null) 'promoCode': offer.code,
@@ -256,7 +264,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             (line) => ListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.ticketTypeName(line.name)),
-              subtitle: Text('× ${line.quantity}'),
+              subtitle: Text(line.seatLabels.isEmpty ? '× ${line.quantity}' : line.seatLabels.join('\n')),
               trailing: Text(l10n.money(line.priceKzt * line.quantity)),
             ),
           ),
