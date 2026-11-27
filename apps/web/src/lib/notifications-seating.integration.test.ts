@@ -8,6 +8,8 @@ import { POST as mobileLogin } from "@/app/api/mobile/auth/login/route";
 import { POST as markRead } from "@/app/api/notifications/[id]/read/route";
 import { POST as createOrder } from "@/app/api/orders/route";
 import { POST as simulatePay } from "@/app/api/orders/[id]/pay/simulate/route";
+import { DELETE as deleteSeat } from "@/app/api/organizer/events/[id]/seats/[seatId]/route";
+import { GET as organizerSeats } from "@/app/api/organizer/events/[id]/seats/route";
 import { POST as createSection } from "@/app/api/organizer/events/[id]/sections/route";
 import { POST as createRow } from "@/app/api/organizer/events/[id]/sections/[sectionId]/rows/route";
 
@@ -28,11 +30,11 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
     let slug = "";
     let notificationId = "";
 
-    function request(path: string, body?: unknown, token = "") {
+    function request(path: string, body?: unknown, token = "", method?: string) {
       const headers = new Headers({ "Content-Type": "application/json" });
       if (token) headers.set("Authorization", `Bearer ${token}`);
       return new Request(new URL(path, "http://localhost:3000"), {
-        method: body === undefined ? "GET" : "POST",
+        method: method ?? (body === undefined ? "GET" : "POST"),
         headers,
         body: body === undefined ? undefined : JSON.stringify(body),
       });
@@ -224,6 +226,98 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       expect(ticket.seatNumber).toBe("1");
       expect(ticket.rowLabel).toBe("A");
       expect(ticket.sectionName).toBe("Stalls");
+    });
+
+    it("lets a second event hold the same seat and only deletes a free one", async () => {
+      const section = await prisma.venueSection.findFirstOrThrow({ where: { venueId } });
+      const row = await prisma.seatRow.findFirstOrThrow({
+        where: { venueSectionId: section.id },
+        include: { seats: true },
+      });
+      const shared = row.seats.find((seat) => seat.number === "2");
+      expect(shared).toBeTruthy();
+      const second = await prisma.event.create({
+        data: {
+          organizerId: ids.organizer,
+          venueId,
+          slug: `seats-b-${suffix}`,
+          title: `Seats B ${suffix}`,
+          status: "PUBLISHED",
+          seatingMode: "ASSIGNED",
+          paidSalesActive: true,
+          startsAt: new Date(Date.now() + 3 * 86_400_000),
+          endsAt: new Date(Date.now() + 4 * 86_400_000),
+          ticketTypes: { create: { name: "Seat", priceKzt: 2000, quantity: 10 } },
+        },
+        include: { ticketTypes: true },
+      });
+      const firstType = await prisma.ticketType.findFirstOrThrow({ where: { eventId } });
+      const orderFor = (targetEventId: string, ticketTypeId: string, email: string) => ({
+        eventId: targetEventId,
+        items: [{ ticketTypeId, quantity: 1, seatIds: [shared!.id] }],
+        attendees: [{ fullName: "Dana Sultanova", email }],
+        clientIdempotencyKey: randomUUID(),
+      });
+
+      const firstHold = await createOrder(
+        request("/api/orders", orderFor(eventId, firstType.id, `hold-a-${suffix}@seats.test`), tokens.buyer),
+      );
+      const secondHold = await createOrder(
+        request(
+          "/api/orders",
+          orderFor(second.id, second.ticketTypes[0]!.id, `hold-b-${suffix}@seats.test`),
+          tokens.other,
+        ),
+      );
+      expect(firstHold.status).toBe(201);
+      expect(secondHold.status).toBe(201);
+
+      const blockedAgain = await createOrder(
+        request("/api/orders", orderFor(eventId, firstType.id, `hold-a2-${suffix}@seats.test`), tokens.buyer),
+      );
+      expect(blockedAgain.status).toBe(409);
+
+      const readMap = async (targetId: string) => {
+        const map = await organizerSeats(
+          request(`/api/organizer/events/${targetId}/seats`, undefined, tokens.organizer),
+          { params: Promise.resolve({ id: targetId }) },
+        );
+        expect(map.status).toBe(200);
+        const body = (await map.json()) as {
+          sections: { rows: { seats: { id: string; status: string }[] }[] }[];
+        };
+        return new Map(
+          body.sections.flatMap((item) =>
+            item.rows.flatMap((line) => line.seats.map((seat) => [seat.id, seat.status])),
+          ),
+        );
+      };
+      expect((await readMap(eventId)).get(shared!.id)).toBe("HELD");
+      expect((await readMap(second.id)).get(shared!.id)).toBe("HELD");
+
+      const blocked = await deleteSeat(
+        request(`/api/organizer/events/${eventId}/seats/${shared!.id}`, undefined, tokens.organizer, "DELETE"),
+        { params: Promise.resolve({ id: eventId, seatId: shared!.id }) },
+      );
+      expect(blocked.status).toBe(409);
+
+      const extra = await prisma.seat.create({
+        data: { seatRowId: row.id, number: "9" },
+      });
+      const removed = await deleteSeat(
+        request(`/api/organizer/events/${eventId}/seats/${extra.id}`, undefined, tokens.organizer, "DELETE"),
+        { params: Promise.resolve({ id: eventId, seatId: extra.id }) },
+      );
+      expect(removed.status).toBe(200);
+      expect((await readMap(eventId)).has(extra.id)).toBe(false);
+      expect((await readMap(second.id)).has(extra.id)).toBe(false);
+
+      await prisma.seatHold.deleteMany({ where: { eventId: second.id } });
+      await prisma.orderItem.deleteMany({ where: { order: { eventId: second.id } } });
+      await prisma.order.deleteMany({ where: { eventId: second.id } });
+      await prisma.ticketType.deleteMany({ where: { eventId: second.id } });
+      await prisma.auditLog.deleteMany({ where: { eventId: second.id } });
+      await prisma.event.delete({ where: { id: second.id } });
     });
   },
 );

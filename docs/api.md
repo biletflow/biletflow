@@ -45,6 +45,8 @@ Implemented auth response shapes, role checks, migration notes and audit usage:
 | `GET` `POST` | `/api/organizer/events/:id/ticket-types` | `ticketTypeInputSchema` |
 | `POST` | `/api/organizer/events/:id/sections` | `venueSectionSchema`. Requires a venue on the event |
 | `POST` | `/api/organizer/events/:id/sections/:sectionId/rows` | `seatRowSchema`. Creates the row and its seats |
+| `GET` | `/api/organizer/events/:id/seats` | Every section, row and seat for that event. `status` is `AVAILABLE`, `HELD` or `SOLD` |
+| `DELETE` | `/api/organizer/events/:id/seats/:seatId` | Deletes a free seat. `409` when this or another event in the venue holds or has sold it |
 | `PUT` `DELETE` | `/api/organizer/ticket-types/:id` | Delete is refused once tickets are sold; hide instead |
 
 Every response includes the counters `quantity`, `sold`, `reserved`, `refunded`,
