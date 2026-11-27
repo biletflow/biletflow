@@ -2,7 +2,7 @@ import { prisma } from "@biletflow/db";
 import { createOrderSchema } from "@biletflow/shared";
 
 import { errorResponse } from "@/lib/api-error";
-import { createOrder, presentOrder } from "@/lib/checkout";
+import { createOrder, orderInclude, presentOrder } from "@/lib/checkout";
 import { assertParsed, json, readJson } from "@/lib/http";
 import { requireUser } from "@/lib/session";
 
@@ -14,16 +14,7 @@ export async function GET(request: Request) {
     const orders = await prisma.order.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
-      include: {
-        event: { select: { title: true, startsAt: true, refundPolicy: true } },
-        items: true,
-        tickets: {
-          include: {
-            attendee: { select: { fullName: true, email: true } },
-            ticketType: { select: { name: true } },
-          },
-        },
-      },
+      include: orderInclude,
     });
     return json({ orders: orders.map(order => ({ ...presentOrder(order), eventTitle: order.event.title })) });
   } catch (error) {

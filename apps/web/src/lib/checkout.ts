@@ -20,7 +20,7 @@ import { issueTickets, ticketSigningKey, type AttendeeInput } from "./tickets";
 
 const orderEventSelect = { id: true, title: true, slug: true, startsAt: true, endsAt: true, timezone: true, status: true, updatedAt: true, refundPolicy: true, venue: { select: { name: true, address: true, city: true, country: true } } } as const;
 
-const orderInclude = {
+export const orderInclude = {
   event: { select: orderEventSelect },
   items: true,
   tickets: {
