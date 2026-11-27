@@ -7,6 +7,7 @@ import { ApiError } from "./api-error";
 import { audit } from "./audit";
 import { clientIp, isUniqueViolation } from "./http";
 import { convertReservation, releaseInventory } from "./inventory";
+import { convertOrderSeats, releaseOrderSeats } from "./seats";
 import { maybeActivate, presentActivation } from "./activation";
 import { notifyOrderPaid, notifyPaymentFailed } from "./notifications";
 import { getOwnedOrder, presentOrder } from "./checkout";
@@ -81,6 +82,7 @@ async function expireOrder(orderId: string, userId: string, headers: Headers) {
     for (const item of current.items) {
       await releaseInventory(tx, item.ticketTypeId, item.quantity);
     }
+    await releaseOrderSeats(tx, orderId);
     await tx.order.update({ where: { id: orderId }, data: { status: "EXPIRED" } });
     await audit(tx, {
       actorUserId: userId,
@@ -227,6 +229,11 @@ export async function processPaymentWebhook(raw: string, signature: string | nul
         };
       }
 
+      const seated = order.items.filter((item) => item.seatId);
+      if (seated.length > 0) {
+        const converted = await convertOrderSeats(tx, order.id);
+        if (converted !== seated.length) throw new ApiError(409, "CONFLICT");
+      }
       for (const item of order.items) {
         await convertReservation(tx, item.ticketTypeId, item.quantity);
       }
@@ -329,6 +336,7 @@ async function releasePaidHold(
     for (const item of order.items) {
       await releaseInventory(tx, item.ticketTypeId, item.quantity);
     }
+    await releaseOrderSeats(tx, order.id);
     await tx.order.update({
       where: { id: order.id },
       data: {

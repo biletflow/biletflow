@@ -114,6 +114,25 @@ export const checkoutItemSchema = z.object({
   seatIds: z.array(z.string().cuid()).optional(),
 });
 
+export const venueSectionSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+  displayOrder: z.number().int().min(0).max(1000).default(0),
+  priceCategory: z.string().trim().max(40).optional(),
+});
+
+export const seatRowSchema = z.object({
+  label: z.string().trim().min(1).max(20),
+  seats: z
+    .array(
+      z.object({
+        number: z.string().trim().min(1).max(20),
+        isAccessible: z.boolean().default(false),
+      }),
+    )
+    .min(1)
+    .max(200),
+});
+
 export const createOrderSchema = z.object({
   eventId: z.string().cuid(),
   items: z.array(checkoutItemSchema).min(1).max(20),

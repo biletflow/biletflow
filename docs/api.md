@@ -30,6 +30,7 @@ Implemented auth response shapes, role checks, migration notes and audit usage:
 
 | `GET` | `/api/events` | Public listing. Only `PUBLISHED` + `PUBLIC`. Filters: category, date, query |
 | `GET` | `/api/events/:slug` | Public event page payload including visible ticket types |
+| `GET` | `/api/events/:slug/seats` | Free seats for a published assigned-seating event |
 | `POST` | `/api/events/:slug/report` | `eventReportSchema`. Signed-in user reports a published event |
 | `POST` | `/api/organizer/events` | `eventInputSchema` |
 | `GET` `PUT` | `/api/organizer/events/:id` | `eventInputSchema` |
@@ -42,6 +43,8 @@ Implemented auth response shapes, role checks, migration notes and audit usage:
 ## Ticket types
 
 | `GET` `POST` | `/api/organizer/events/:id/ticket-types` | `ticketTypeInputSchema` |
+| `POST` | `/api/organizer/events/:id/sections` | `venueSectionSchema`. Requires a venue on the event |
+| `POST` | `/api/organizer/events/:id/sections/:sectionId/rows` | `seatRowSchema`. Creates the row and its seats |
 | `PUT` `DELETE` | `/api/organizer/ticket-types/:id` | Delete is refused once tickets are sold; hide instead |
 
 Every response includes the counters `quantity`, `sold`, `reserved`, `refunded`,
@@ -58,7 +61,7 @@ Every response includes the counters `quantity`, `sold`, `reserved`, `refunded`,
 ## Checkout
 
 | `POST` | `/api/promo/preview` | `applyPromoSchema`. Server-calculated discount and new total. Never trusts a client-supplied amount |
-| `POST` | `/api/orders` | `createOrderSchema`. Reserves inventory atomically, returns the order with `expiresAt`. Free orders return `PAID` immediately with tickets issued |
+| `POST` | `/api/orders` | `createOrderSchema`. Reserves inventory atomically, returns the order with `expiresAt`. Free orders return `PAID` immediately with tickets issued. Assigned seating sends `seatIds` whose length matches `quantity`; each seat is held by one conditional insert and copied onto the ticket |
 | `GET` | `/api/orders/:id` | |
 | `POST` | `/api/orders/:id/cancel` | Releases reservation |
 | `POST` | `/api/orders/:id/refund` | `refundOrderSchema`. Simulated refund when the event refund policy window is still open. Checked-in tickets are refused. Repeating the request does not create a second refund |
@@ -115,6 +118,11 @@ by construction.
 | `PUT` | `/api/support/cases/:id/assignee` | Staff only |
 
 Clients poll `GET /api/support/cases/:id` every 10 seconds while the thread is open. No WebSockets.
+
+## Notifications
+
+| `GET` | `/api/notifications` | The signed-in user's latest in-app notifications, including `readAt` |
+| `POST` | `/api/notifications/:id/read` | Sets `readAt` on the caller's own row. A later call keeps the first timestamp. Another user's id is `404` |
 
 ## Analytics
 
