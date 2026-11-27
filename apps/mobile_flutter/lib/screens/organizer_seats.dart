@@ -77,11 +77,13 @@ class _OrganizerSeatingState extends State<OrganizerSeating> {
       await widget.api.put(path, payload);
       if (mounted) widget.onChanged();
     } catch (error) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
         error is ApiException && error.status == 409
           ? seatText(context, 'Seating cannot change after orders exist.', 'Нельзя изменить рассадку после заказов.', 'Тапсырыстардан кейін отыру түрін өзгертуге болмайды.')
           : AppLocalizations.of(context).apiError(error is ApiException ? error.code : ''),
-      )));
+        )));
+      }
     } finally {
       if (mounted) setState(() => busy = false);
     }

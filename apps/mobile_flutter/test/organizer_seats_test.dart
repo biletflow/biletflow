@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/screens/organizer_seats.dart';
+import 'package:biletflow_mobile/screens/organizer_seats.dart';
 
 void main() {
   test('validates seat labels and rejects duplicates', () {
