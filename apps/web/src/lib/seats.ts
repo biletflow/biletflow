@@ -208,14 +208,15 @@ export async function deleteFreeSeat(
   actor: MapEditor,
   headers: Headers,
 ) {
-  const event = await prisma.event.findUnique({
-    where: { id: eventId },
-    select: { id: true, venueId: true },
-  });
-  if (!event?.venueId) throw new ApiError(404, "NOT_FOUND");
-  await assertCanEditVenueMap(actor, event.venueId);
-
   await prisma.$transaction(async (tx) => {
+    // Match checkout's Event -> Seat lock order before writing the audit log.
+    await tx.$queryRaw`SELECT "id" FROM "Event" WHERE "id" = ${eventId} FOR UPDATE`;
+    const event = await tx.event.findUnique({
+      where: { id: eventId },
+      select: { id: true, venueId: true },
+    });
+    if (!event?.venueId) throw new ApiError(404, "NOT_FOUND");
+    await assertCanEditVenueMap(actor, event.venueId);
     const locked = await tx.$queryRaw<{ id: string }[]>`
       SELECT s."id"
       FROM "Seat" s
@@ -223,7 +224,7 @@ export async function deleteFreeSeat(
       JOIN "VenueSection" sec ON sec."id" = r."venueSectionId"
       WHERE s."id" = ${seatId}
         AND sec."venueId" = ${event.venueId}
-      FOR UPDATE
+      FOR UPDATE OF s
     `;
     if (locked.length !== 1) throw new ApiError(404, "NOT_FOUND");
     const blockingHold = await tx.seatHold.findFirst({
