@@ -61,7 +61,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: ListTile(
                 leading: Icon(read ? Icons.notifications_none : Icons.notifications_active),
                 title: Text('${row['subject'] ?? ''}'),
-                subtitle: Text([ '${row['body'] ?? ''}', if (DateTime.tryParse('${row['createdAt']}') case final date?) MaterialLocalizations.of(context).formatMediumDate(date.toLocal()) + ' ' + MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(date.toLocal())), ].join('\n')),
+                subtitle: Text([ '${row['body'] ?? ''}', if (DateTime.tryParse('${row['createdAt']}') case final date?) '${MaterialLocalizations.of(context).formatMediumDate(date.toLocal())} ${MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(date.toLocal()))}', ].join('\n')),
                 isThreeLine: true,
                 onTap: read ? null : () => markRead('${row['id']}'),
               ),
