@@ -85,8 +85,8 @@ export function CheckoutForm({
   useEffect(() => {
     if (!assignedSeating) return;
     const controller = new AbortController();
-    void loadSeats(controller.signal);
-    return () => controller.abort();
+    const timer = window.setTimeout(() => { void loadSeats(controller.signal); }, 0);
+    return () => { window.clearTimeout(timer); controller.abort(); };
   }, [assignedSeating, loadSeats]);
 
   async function refreshSeats() {
