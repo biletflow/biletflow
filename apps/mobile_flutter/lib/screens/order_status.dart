@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../core/api.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/event_utilities.dart';
 import '../widgets/status_badge.dart';
 import 'support.dart';
 import '../widgets/refund_policy.dart';
@@ -247,6 +248,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                   ),
                 ],
                 if (status == 'PAID') ...[
+                  EventUtilities(api: widget.api, calendarPath: '/api/orders/${Uri.encodeComponent(widget.orderId)}/calendar', venue: order?['event'] is Map ? (order!['event'] as Map)['venue'] : null),
                   RefundPolicyNotice(
                     policy: order?['refundPolicy'],
                     startsAt: order?['eventStartsAt'],
@@ -332,9 +334,8 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                                             ticket['ticketTypeName'],
                                         'attendeeName': ticket['attendeeName'],
                                         'status': ticket['status'],
-                                        'event': {
-                                          'title':
-                                              '${l10n.order} ${order?['reference'] ?? ''}',
+                                        'event': order?['event'] ?? {
+                                          'title': '${l10n.order} ${order?['reference'] ?? ''}',
                                         },
                                       },
                                     ),

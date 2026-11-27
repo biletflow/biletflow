@@ -6,6 +6,7 @@ import '../core/format.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/biletflow_theme.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/event_utilities.dart';
 import '../widgets/event_card.dart';
 import '../widgets/quantity_stepper.dart';
 import 'checkout.dart';
@@ -119,7 +120,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             onPressed: () async {
               final box = context.findRenderObject() as RenderBox?;
               await Share.share(
-                '$title\n${widget.api.base.resolve('/e/${Uri.encodeComponent(widget.slug)}')}',
+                '$title\n${widget.api.base.resolve('/events/${Uri.encodeComponent(widget.slug)}')}',
                 sharePositionOrigin: box == null || !box.hasSize ? null : box.localToGlobal(Offset.zero) & box.size,
               );
             },
@@ -177,6 +178,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       ].where((part) => part.isNotEmpty).join(' · '),
                     ),
                   ),
+                EventUtilities(api: widget.api, calendarPath: '/api/events/${Uri.encodeComponent(widget.slug)}/calendar', venue: venue),
                 if (organizer is Map)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),

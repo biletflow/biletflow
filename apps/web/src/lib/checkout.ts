@@ -18,8 +18,10 @@ import {
 } from "./notifications";
 import { issueTickets, ticketSigningKey, type AttendeeInput } from "./tickets";
 
+const orderEventSelect = { id: true, title: true, slug: true, startsAt: true, endsAt: true, timezone: true, status: true, updatedAt: true, refundPolicy: true, venue: { select: { name: true, address: true, city: true, country: true } } } as const;
+
 const orderInclude = {
-  event: { select: { startsAt: true, refundPolicy: true } },
+  event: { select: orderEventSelect },
   items: true,
   tickets: {
     include: {
@@ -38,6 +40,7 @@ export function presentOrder(order: PresentedOrder) {
     eventId: order.eventId,
     refundPolicy: order.event.refundPolicy,
     eventStartsAt: order.event.startsAt,
+    event: order.event,
     status: order.status,
     subtotalKzt: order.subtotalKzt,
     discountKzt: order.discountKzt,
@@ -326,7 +329,7 @@ export async function createOrder(
         where: { id: created.id },
         include: {
           ...orderInclude,
-          event: { select: { title: true, startsAt: true, refundPolicy: true } },
+          event: { select: orderEventSelect },
         },
       });
     });
@@ -423,7 +426,7 @@ export async function cancelReservation(userId: string, orderId: string, headers
       where: { id: orderId },
       include: {
         items: true,
-        event: { select: { title: true, startsAt: true, refundPolicy: true } },
+        event: { select: orderEventSelect },
       },
     });
     if (!current || current.userId !== userId) throw new ApiError(404, "NOT_FOUND");

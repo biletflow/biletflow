@@ -13,6 +13,7 @@ import {
   formatKzt,
 } from "@/lib/format";
 import { labelOf } from "@/lib/labels";
+import { eventLocation, mapsUrl } from "@/lib/calendar";
 
 import type { Metadata } from "next";
 
@@ -128,6 +129,10 @@ export default async function EventPage({
               </p>
             </section>
 
+            <a className="text-brand inline-flex items-center gap-2 font-semibold" href={`/api/events/${encodeURIComponent(slug)}/calendar`} download>
+              <CalendarDays className="size-4" aria-hidden />
+              {locale === "ru" ? "Добавить в календарь" : locale === "kk" ? "Күнтізбеге қосу" : "Add to calendar"}
+            </a>
             {event.venue ? (
               <section className="border-ink-300 rounded-xl border bg-white p-6">
                 <h2 className="text-ink-900 text-lg font-bold">{t("venue")}</h2>
@@ -141,6 +146,9 @@ export default async function EventPage({
                       {event.venue.address}, {labelOf(tCity, event.venue.city)},{" "}
                       {labelOf(tCountry, event.venue.country)}
                     </p>
+                    <a href={mapsUrl(eventLocation(event))} target="_blank" rel="noopener noreferrer" className="text-brand mt-2 inline-block text-sm font-semibold">
+                      {locale === "ru" ? "Открыть на карте" : locale === "kk" ? "Картада ашу" : "Open in maps"}
+                    </a>
                   </div>
                 </div>
               </section>
