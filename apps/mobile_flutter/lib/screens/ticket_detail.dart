@@ -55,6 +55,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     setState(() {
       _qrLoading = true;
       _qrError = null;
+      _qr = null;
     });
     try {
       final bytes = await widget.api.getBytes(
@@ -69,6 +70,22 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     } finally {
       if (mounted) setState(() => _qrLoading = false);
     }
+  }
+
+  Future<void> _showFullQr() async {
+    if (!_canShowQr || _qrLoading) return;
+    await _loadQr();
+    if (!mounted || _qrError != null || _qr == null) return;
+    final bytes = _qr!;
+    final l10n = AppLocalizations.of(context);
+    await Navigator.push<void>(context, MaterialPageRoute(builder: (_) => Scaffold(
+      appBar: AppBar(title: Text(l10n.admissionQr)),
+      backgroundColor: Colors.white,
+      body: SafeArea(child: Center(child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Image.memory(bytes, fit: BoxFit.contain, width: double.infinity),
+      ))),
+    )));
   }
 
   Future<void> _sharePdf() async {
@@ -120,6 +137,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         ? formatEventWhen(event['startsAt'], context: context)
         : '';
     final status = '${summary['status'] ?? ''}';
+    final seat = [summary['sectionName'], summary['rowLabel'], summary['seatNumber']].whereType<String>().where((part) => part.isNotEmpty).join(' ');
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
@@ -130,6 +148,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
           const SizedBox(height: 8),
           Text(l10n.ticketTypeName('${summary['ticketTypeName'] ?? ''}')),
           Text('${summary['attendeeName'] ?? ''}'),
+          if (seat.isNotEmpty) Text(seat),
           if (when.isNotEmpty) Text(when),
           const SizedBox(height: 8),
           Align(
@@ -158,14 +177,16 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
             TextButton(onPressed: _loadQr, child: Text(l10n.refresh)),
           ] else if (_qr != null)
             Center(
-              child: Image.memory(
+              child: InkWell(onTap: _showFullQr, child: Image.memory(
                 _qr!,
                 width: 240,
                 height: 240,
                 fit: BoxFit.contain,
                 gaplessPlayback: true,
-              ),
+              )),
             ),
+          if (_canShowQr && _qr != null && !_qrLoading && _qrError == null)
+            OutlinedButton.icon(onPressed: _showFullQr, icon: const Icon(Icons.fullscreen), label: Text(switch (l10n.locale.languageCode) { 'ru' => 'На весь экран', 'kk' => 'Толық экран', _ => 'Full screen' })),
           const SizedBox(height: 20),
           FilledButton.icon(
             onPressed: _pdfBusy ? null : _sharePdf,

@@ -9,6 +9,23 @@ import 'order_history.dart';
 import 'order_status.dart';
 import 'ticket_detail.dart';
 
+Map<String, List<Map<String, dynamic>>> groupTicketsByEvent(List<dynamic> tickets) {
+  final groups = <String, List<Map<String, dynamic>>>{};
+  for (final raw in tickets.whereType<Map>()) {
+    final ticket = Map<String, dynamic>.from(raw);
+    final event = ticket['event'];
+    final key = event is Map ? '${event['id'] ?? event['slug'] ?? ticket['id']}' : '${ticket['id']}';
+    groups.putIfAbsent(key, () => []).add(ticket);
+  }
+  return groups;
+}
+
+String ticketSeat(Map<String, dynamic> ticket) =>
+    [ticket['sectionName'], ticket['rowLabel'], ticket['seatNumber']]
+        .whereType<String>()
+        .where((part) => part.isNotEmpty)
+        .join(' ');
+
 class MyTicketsScreen extends StatefulWidget {
   final ApiClient api;
   const MyTicketsScreen({super.key, required this.api});
@@ -50,6 +67,7 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final groups = groupTicketsByEvent(_tickets).values.toList();
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.myTickets),
@@ -89,30 +107,43 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
             )
           : ListView.separated(
               padding: const EdgeInsets.all(16),
-              itemCount: _tickets.length,
+              itemCount: groups.length,
               separatorBuilder: (_, __) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
-                final raw = _tickets[index];
-                if (raw is! Map) return const SizedBox.shrink();
-                final ticket = Map<String, dynamic>.from(raw);
-                final event = ticket['event'];
+                final tickets = groups[index];
+                final event = tickets.first['event'];
                 final title = event is Map
                     ? '${event['title'] ?? l10n.eventDetails}'
                     : l10n.eventDetails;
                 final when = event is Map
                     ? formatEventWhen(event['startsAt'], context: context)
                     : '';
-                final id = '${ticket['id'] ?? ''}';
-                final orderId = ticket['orderId'];
-                final ticketStatus = '${ticket['status'] ?? ''}';
                 return Card(
-                  child: ListTile(
+                  child: ExpansionTile(
+                    initiallyExpanded: true,
                     title: Text(title),
+                    subtitle: Text(when),
+                    children: [
+                      for (final ticket in tickets)
+                        _ticketTile(ticket, l10n),
+                    ],
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _ticketTile(Map<String, dynamic> ticket, AppLocalizations l10n) {
+    final id = '${ticket['id'] ?? ''}';
+    final orderId = ticket['orderId'];
+    final ticketStatus = '${ticket['status'] ?? ''}';
+    return ListTile(
+                    title: Text(l10n.ticketTypeName('${ticket['ticketTypeName'] ?? ''}')),
                     subtitle: Text(
                       [
-                        '${ticket['ticketTypeName'] ?? ''}',
                         '${ticket['attendeeName'] ?? ''}',
-                        if (when.isNotEmpty) when,
+                        ticketSeat(ticket),
                       ].where((part) => part.isNotEmpty).join(' · '),
                     ),
                     trailing: Row(
@@ -145,20 +176,12 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
                     ),
                     onTap: id.isEmpty
                         ? null
-                        : () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => TicketDetailScreen(
-                                api: widget.api,
-                                ticketId: id,
-                                summary: ticket,
-                              ),
-                            ),
-                          ),
-                  ),
-                );
-              },
-            ),
+                        : () async {
+                            await Navigator.push(context, MaterialPageRoute(
+                              builder: (_) => TicketDetailScreen(api: widget.api, ticketId: id, summary: ticket),
+                            ));
+                            if (mounted) await _load();
+                          },
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../core/api.dart';
 import '../core/format.dart';
@@ -110,7 +111,20 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final assigned = event?['seatingMode'] == 'ASSIGNED';
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.eventDetails)),
+      appBar: AppBar(title: Text(l10n.eventDetails), actions: [
+        if (event != null)
+          IconButton(
+            icon: const Icon(Icons.share_outlined),
+            tooltip: seatLabel(context, 'Share event', 'Поделиться', 'Бөлісу'),
+            onPressed: () async {
+              final box = context.findRenderObject() as RenderBox?;
+              await Share.share(
+                '$title\n${widget.api.base.resolve('/e/${Uri.encodeComponent(widget.slug)}')}',
+                sharePositionOrigin: box == null || !box.hasSize ? null : box.localToGlobal(Offset.zero) & box.size,
+              );
+            },
+          ),
+      ]),
       body: _loading
           ? const LoadingState()
           : _error != null
