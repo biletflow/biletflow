@@ -163,6 +163,7 @@ export async function getPublicEventBySlug(slug: string) {
       registrationOpensAt: true,
       registrationClosesAt: true,
       cancellationReason: true,
+      seatingMode: true,
       venue: { select: { name: true, address: true, city: true, country: true } },
       organizer: {
         select: {
