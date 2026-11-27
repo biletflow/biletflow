@@ -11,6 +11,8 @@ describe("web checkout seat selection", () => {
   it("removes unavailable seats on refresh and respects inventory limits", () => {
     expect(retainAvailableSeats(["gone", "a2", "a2", "a1"], sections, 1)).toEqual(["a2"]);
     expect(retainAvailableSeats(["a1"], [], 2)).toEqual([]);
+    const occupied: SeatSection[] = [{ id: "s", name: "Stalls", rows: [{ id: "r", label: "A", seats: [{ id: "a1", number: "1", isAccessible: false, status: "SOLD" }, { id: "a2", number: "2", isAccessible: true, status: "AVAILABLE" }] }] }];
+    expect(retainAvailableSeats(["a1", "a2"], occupied, 2)).toEqual(["a2"]);
   });
   it("includes seat IDs for assigned checkout only", () => {
     expect(checkoutItems("type", 2, true, ["a1", "a2"])).toEqual([{ ticketTypeId: "type", quantity: 2, seatIds: ["a1", "a2"] }]);

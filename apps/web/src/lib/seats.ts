@@ -139,7 +139,7 @@ function eventSeatStatus(
   return "AVAILABLE";
 }
 
-export async function listFreeSeats(slug: string) {
+export async function listFreeSeats(slug: string, includeUnavailable = false) {
   const event = await prisma.event.findFirst({
     where: {
       slug,
@@ -163,11 +163,12 @@ export async function listFreeSeats(slug: string) {
             id: row.id,
             label: row.label,
             seats: row.seats
-              .filter((seat) => eventSeatStatus(seat, board.held, board.sold) === "AVAILABLE")
+              .filter((seat) => includeUnavailable || eventSeatStatus(seat, board.held, board.sold) === "AVAILABLE")
               .map((seat) => ({
                 id: seat.id,
                 number: seat.number,
                 isAccessible: seat.isAccessible,
+                ...(includeUnavailable ? { status: eventSeatStatus(seat, board.held, board.sold) } : {}),
               })),
           }))
           .filter((row) => row.seats.length > 0),

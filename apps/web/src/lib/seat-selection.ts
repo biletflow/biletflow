@@ -1,11 +1,11 @@
 export type SeatSection = {
   id: string;
   name: string;
-  rows: { id: string; label: string; seats: { id: string; number: string; isAccessible: boolean }[] }[];
+  rows: { id: string; label: string; seats: { id: string; number: string; isAccessible: boolean; status?: "AVAILABLE" | "HELD" | "SOLD" | "UNAVAILABLE" }[] }[];
 };
 
 export function retainAvailableSeats(selected: string[], sections: SeatSection[], limit: number) {
-  const available = new Set(sections.flatMap((section) => section.rows.flatMap((row) => row.seats.map((seat) => seat.id))));
+  const available = new Set(sections.flatMap((section) => section.rows.flatMap((row) => row.seats.filter((seat) => !seat.status || seat.status === "AVAILABLE").map((seat) => seat.id))));
   return [...new Set(selected)].filter((id) => available.has(id)).slice(0, Math.max(0, limit));
 }
 

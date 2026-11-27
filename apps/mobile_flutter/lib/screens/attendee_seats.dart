@@ -36,7 +36,7 @@ class _AttendeeSeatsState extends State<AttendeeSeats> {
       (value as List? ?? []).whereType<Map<String, dynamic>>().toList();
 
   Future<List<Map<String, dynamic>>> load() async {
-    final data = await widget.api.get('/api/events/${Uri.encodeComponent(widget.slug)}/seats');
+    final data = await widget.api.get('/api/events/${Uri.encodeComponent(widget.slug)}/seats?view=all');
     return rows(data['sections']);
   }
 
@@ -70,7 +70,8 @@ class _AttendeeSeatsState extends State<AttendeeSeats> {
                 Wrap(spacing: 6, runSpacing: 6, children: [
                   for (final seat in rows(row['seats']))
                     ChoiceChip(
-                      label: Text('${seat['number']}${seat['isAccessible'] == true ? ' *' : ''}'),
+                      label: Text('${seat['number']}${seat['isAccessible'] == true ? ' *' : ''} · ${selected.containsKey(seat['id']) ? seatLabel(context, 'Selected', 'Выбрано', 'Таңдалды') : switch (seat['status']) { 'HELD' => seatLabel(context, 'Held', 'Бронь', 'Брондалған'), 'SOLD' => seatLabel(context, 'Sold', 'Продано', 'Сатылды'), 'UNAVAILABLE' => seatLabel(context, 'Unavailable', 'Недоступно', 'Қолжетімсіз'), _ => seatLabel(context, 'Available', 'Свободно', 'Бос') }}'),
+                      disabledColor: switch (seat['status']) { 'HELD' => Colors.amber.shade100, 'SOLD' => Colors.red.shade100, 'UNAVAILABLE' => Colors.grey.shade300, _ => null },
                       selected: selected.containsKey(seat['id']),
                       onSelected: (seat['status'] != null && seat['status'] != 'AVAILABLE') || (!selected.containsKey(seat['id']) && selected.length >= widget.limit) ? null : (value) {
                         setState(() {

@@ -65,6 +65,7 @@ export function CheckoutForm({
     Math.min(Math.max(1, initialQuantity), maxQuantity),
   );
   const seatText = seatCopy[locale as keyof typeof seatCopy] ?? seatCopy.en;
+  const statusText = locale === "ru" ? { AVAILABLE: "Свободно", HELD: "Забронировано", SOLD: "Продано", UNAVAILABLE: "Недоступно" } : locale === "kk" ? { AVAILABLE: "Бос", HELD: "Брондалған", SOLD: "Сатылды", UNAVAILABLE: "Қолжетімсіз" } : { AVAILABLE: "Available", HELD: "Held", SOLD: "Sold", UNAVAILABLE: "Unavailable" };
   const [sections, setSections] = useState<SeatSection[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [seatLoading, setSeatLoading] = useState(assignedSeating);
@@ -73,7 +74,7 @@ export function CheckoutForm({
   const quantity = assignedSeating ? selected.length : generalQuantity;
   const loadSeats = useCallback(async (signal?: AbortSignal) => {
     try {
-      const response = await fetch("/api/events/" + encodeURIComponent(eventSlug) + "/seats", { cache: "no-store", signal });
+      const response = await fetch("/api/events/" + encodeURIComponent(eventSlug) + "/seats?view=all", { cache: "no-store", signal });
       if (!response.ok) throw new Error("seat map");
       const data = await response.json() as { sections: SeatSection[] };
       if (signal?.aborted) return;
@@ -276,11 +277,13 @@ export function CheckoutForm({
               <p className="text-xs font-medium">{seatText.row} {row.label}</p>
               <div className="flex flex-wrap gap-2">{row.seats.map((seat) => {
                 const active = selected.includes(seat.id);
-                return <button key={seat.id} type="button" aria-pressed={active} aria-label={section.name + " " + seatText.row + " " + row.label + " " + seat.number + (seat.isAccessible ? " (" + seatText.accessible + ")" : "")}
-                  disabled={pending || (!active && quantity >= maxQuantity)}
-                  className={"min-w-10 rounded-lg border px-3 py-2 font-semibold disabled:opacity-50 " + (active ? "bg-brand border-brand text-white" : "bg-green-50 border-green-300 text-green-800")}
+                const status = seat.status ?? "AVAILABLE";
+                const available = status === "AVAILABLE";
+                return <button key={seat.id} type="button" aria-pressed={active} aria-label={section.name + " " + seatText.row + " " + row.label + " " + seat.number + (seat.isAccessible ? " (" + seatText.accessible + ")" : "") + " · " + (active ? seatText.selected : statusText[status])}
+                  disabled={pending || !available || (!active && quantity >= maxQuantity)}
+                  className={"min-w-10 rounded-lg border px-3 py-2 font-semibold disabled:opacity-50 " + (active ? "bg-brand border-brand text-white" : status === "HELD" ? "bg-amber-100 border-amber-400 text-amber-900" : status === "SOLD" ? "bg-red-100 border-red-300 text-red-900" : status === "UNAVAILABLE" ? "bg-gray-100 border-gray-400 text-gray-700" : "bg-green-50 border-green-300 text-green-800")}
                   onClick={() => { const next = toggleSeat(selected, seat.id, maxQuantity); setSelected(next); setDiscountKzt(0); setPromoLabel(null); setSeatConflict(false); if (!isFree && !campaignToken && next.length > 0) void applyPromo(next.length); }}>
-                  {seat.number}{seat.isAccessible ? " *" : ""}
+                  {seat.number}{seat.isAccessible ? " *" : ""}<span className="block text-xs">{active ? seatText.selected : statusText[status]}</span>
                 </button>;
               })}</div>
             </div>)}
