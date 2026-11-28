@@ -61,6 +61,7 @@ export function summarizeSales(orders: Sale[], timeZone: string) {
       byCampaign.set(order.campaignId, row);
     }
   }
+  // The buyer is refunded totalKzt. The processing fee is not returned.
   totals.net = totals.collected - totals.refunds - totals.fees;
   return { totals, byDay, byType, byCampaign };
 }

@@ -24,7 +24,7 @@ Implemented auth response shapes, role checks, migration notes and audit usage:
 | `GET` `PUT` | `/api/organizer/profile` | `organizerProfileSchema` |
 | `POST` | `/api/organizer/verification` | `identityVerificationSchema`. Marks the profile `PENDING_REVIEW` with a simulated document reference. No file bytes are stored |
 | `GET` `POST` | `/api/organizer/payout-accounts` | `payoutAccountSchema` |
-| `GET` | `/api/organizer/payouts` | Simulated payout list with status |
+| `GET` | `/api/organizer/payouts` | Stored simulated payout rows. Not recomputed from orders, and not the analytics net |
 
 ## Events
 
