@@ -1,5 +1,7 @@
 # Team-wide integration testing (issue #68)
 
+Historical milestone record. For final-release checks, see #198 and #195.
+
 One shared suite covers the currently implemented attendee web, organizer/admin
 shells, authentication API, audit helper and mobile scanner session flow.
 

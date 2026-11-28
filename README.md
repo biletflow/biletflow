@@ -6,7 +6,7 @@ Self-service event ticketing platform for Kazakhstan. Organizers can create even
 
 - Event creation, publication and ticket management
 - Free registration, simulated payments and QR/PDF tickets
-- Mobile ticket verification and attendee check-in
+- Native Flutter workflows for attendees, organizers, platform admins and check-in staff
 - Promo codes, refunds and support cases
 - Organizer analytics, event history and admin moderation
 
@@ -73,6 +73,14 @@ Populate a fresh development database with demo data if you want to use the samp
 pnpm db:seed
 ```
 
+For the final NU demonstration dataset, use a separate empty local database ending in `_demo` or `_verify`. Set its `DATABASE_URL` and `BILETFLOW_FINAL_DEMO=1` in the local root .env, deploy migrations and generate the client as above, then run instead of the standard seed:
+
+```sh
+pnpm exec dotenv -e .env -- pnpm --filter @biletflow/db run seed:final
+```
+
+The import refuses a nonempty database and regenerates ticket QR codes using your local signing key. All demo financial data is simulated; event listings are coursework examples, not official registration.
+
 ### 4. Start the web app and API
 
 ```sh
@@ -98,7 +106,7 @@ For subsequent sessions, start the backing services if needed and rerun the web 
 
 | Member | Responsibilities |
 | --- | --- |
-| Adina | Product owner, project management, design, organizer and admin UI |
+| Adina | Product owner, project management, design, organizer and admin UI, final integration and demo data |
 | Dariya | Tech lead, attendee web and mobile UI, frontend integration |
 | Zhansaya | Database, authentication, orders, payments, promotions, analytics and API |
 | Kamila | Flutter mobile application, QR scanner, check-in backend and mobile testing |

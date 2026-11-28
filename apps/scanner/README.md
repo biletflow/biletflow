@@ -1,4 +1,6 @@
-# Authenticated scanner workflow
+# Expo scanner reference
+
+Flutter is the final mobile client. The following Expo notes and test matrices are historical; see [Flutter setup](../mobile_flutter/README.md) and #198 for final device checks.
 
 Start the web/API server and seed the development database following the root
 README. In `apps/scanner/.env.local`, set `EXPO_PUBLIC_API_URL` to the web server's

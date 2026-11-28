@@ -1,5 +1,7 @@
 # BiletFlow team demo validation (#88)
 
+Historical milestone record. For final-release checks, see #198 and #195.
+
 This checklist is not evidence of a completed end-to-end run.
 
 ## Preconditions

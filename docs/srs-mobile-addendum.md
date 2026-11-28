@@ -1,7 +1,6 @@
 # BiletFlow SRS v0.3 — mobile scope addendum
 
-Status: proposed clarification for team and instructor review, 25 November 2026.
-This addendum accompanies the original SRS v0.3; it does not claim instructor sign-off.
+Updated 28 November 2026. The team reports that the instructor requested full mobile functionality matching the website. This records the verbal scope change; written approval is not attached.
 
 ## Scope
 Replace the scanner-only mobile scope in sections 1.2, 2.1, 4.8, 7, 8, 9 and 13 with a native Flutter/Dart client for Android and iOS. Attendee, Organizer and Platform Admin workflows are included alongside authorized Event Admin check-in. Remove the original exclusion of native attendee and organizer apps. Retain the web application, one Next.js HTTP backend and PostgreSQL/Prisma database. No WebView or second backend. The Expo scanner remains a reference.
@@ -18,12 +17,12 @@ Original bonus/excluded boundaries remain in force except the explicit mobile ex
 ## Integration and verification
 Demonstrate organizer publishing, attendee checkout in Flutter, issued QR, physical-device scanner admission and duplicate rejection, then refreshed web analytics. Verify activation conditions, admin moderation, support/refunds and language switching. Record current commit, CI results, Android and iOS evidence and remaining defects. The prior device results in #134 do not establish that a later commit was tested.
 
-## Proposed organizer/admin implementation
-The Adina mobile-parity branch adds native screens for event overview and audit history, activation, organizer profile and simulated payouts, admin search/moderation and settings, campaign creation and configuration, and order CSV export. The event overview JSON route uses existing server reporting calculations. Activation settlement is server-side and owner-scoped. These are implementation changes pending review and testing, not a statement of complete parity. Campaign date and ticket-type configuration and CSV export are implemented but still need testing, along with localization and cross-platform regression.
+## Organizer/admin implementation
+The Adina mobile-parity branch adds native screens for event overview and audit history, activation, organizer profile and simulated payouts, admin search/moderation and settings, campaign creation and configuration, and order CSV export. The event overview JSON route uses existing server reporting calculations. Activation settlement is server-side and owner-scoped. These changes are integrated in #195, with final parity verification tracked in #199. Campaign date and ticket-type configuration and CSV export are implemented but still need testing, along with localization and cross-platform regression.
 
 ## API additions
 - GET /api/organizer/events/{id}/overview?from=YYYY-MM-DD&to=YYYY-MM-DD: owner-authorized inventory, attendance, simulated sales totals, daily sales, ticket types and campaign aggregates. Date filtering affects sales, not current inventory.
 - POST /api/organizer/events/{id}/activation/simulate: owner-authorized simulated settlement for an existing activation payment, with intentId and outcome (APPROVED, DECLINED, ABANDONED). No client signing key.
 
 ## Final handoff
-Issues #117 and #135 remain open until team rehearsal and sign-off. Review and merge feature branches only after checking their actual diffs and test results.
+Continue from #195. Final regression, parity and release tasks are tracked in #198, #199 and #201. Earlier device results do not establish verification of the final revision.

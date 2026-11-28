@@ -1,5 +1,7 @@
 # Integration testing — #68
 
+Historical milestone record. For final-release checks, see #198 and #195.
+
 Backend/auth checks, 14 October 2026. Base: `5cee301`.
 
 The HTTP suite starts from the same payloads used by the web forms and scanner.
