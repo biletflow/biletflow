@@ -159,6 +159,8 @@ by construction.
 
 | `GET` `POST` | `/api/organizer/events/:id/campaigns` | `campaignInputSchema`. Generates the promo code and the opaque QR token |
 | `PUT` | `/api/organizer/campaigns/:id` | Disable, edit dates and limits |
+
+Checkout accepts the code while the campaign is `ACTIVE`, inside its dates, and `redeemed` is still below `maxRedemptions` (or the cap is unset). The counter moves in that same transaction. The next order is `400` `PROMO_INVALID`, and `redeemed` stays at the cap. `perUserLimit` is how many of one user's orders may use the code. The default is 1. A further order by that user is the same `400`.
 | `GET` | `/api/organizer/campaigns/:id/qr.png` | Visually distinct from a ticket QR: different frame, campaign label, no ticket styling |
 | `GET` | `/api/organizer/campaigns/:id/report` | Redemptions, orders, tickets, gross, discount, net |
 
