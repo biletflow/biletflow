@@ -4,12 +4,26 @@ import '../core/api.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/status_badge.dart';
+import 'admin_moderation.dart';
+import 'organizer_activation.dart';
 import 'organizer_editor.dart';
+import 'event_staff.dart';
+import 'organizer_overview.dart';
 import 'organizer_reports.dart';
+import 'organizer_seats.dart';
 
 List<EditorField> _eventFields(AppLocalizations l10n) => [
   (key: 'title', label: l10n.eventTitle, required: true, number: false),
   (key: 'description', label: l10n.description, required: false, number: false),
+  (key: 'category', label: l10n.category, required: false, number: false),
+  (key: 'visibility', label: l10n.visibility, required: true, number: false),
+  (key: 'venueId', label: l10n.venueField, required: false, number: false),
+  (
+    key: 'coverImageUrl',
+    label: l10n.eventCoverUrlField,
+    required: false,
+    number: false,
+  ),
   (key: 'startsAt', label: l10n.startsAt, required: true, number: false),
   (key: 'endsAt', label: l10n.endsAt, required: true, number: false),
   (key: 'capacity', label: l10n.capacity, required: false, number: true),
@@ -59,7 +73,10 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
         builder: (_) => OrganizerEditor(
           title: l10n.createEvent,
           fields: _eventFields(l10n),
+          eventApi: widget.api,
           initial: {
+            'visibility': 'PUBLIC',
+            'timezone': 'Asia/Almaty',
             'startsAt': starts.toIso8601String(),
             'endsAt': starts.add(const Duration(hours: 2)).toIso8601String(),
           },
@@ -195,12 +212,22 @@ class _EventScreenState extends State<EventScreen> {
         builder: (_) => OrganizerEditor(
           title: l10n.editEvent,
           fields: _eventFields(l10n),
+          eventApi: widget.api,
+          ticketTypes:
+              (event['ticketTypes'] as List?)?.whereType<Map>().toList() ?? [],
           initial: _settings(event, [
             'title',
             'description',
             'startsAt',
             'endsAt',
             'capacity',
+            'category',
+            'visibility',
+            'venueId',
+            'coverImageUrl',
+            'timezone',
+            'seatingMode',
+            'refundPolicy',
           ]),
           save: (body) => widget.api.put(path, body),
         ),
@@ -374,6 +401,63 @@ class _EventScreenState extends State<EventScreen> {
                     ),
                     child: Text(l10n.attendanceAndCampaigns),
                   ),
+                  OutlinedButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrganizerOverview(
+                          api: widget.api,
+                          eventId: widget.id,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      adminLabel(
+                        context,
+                        'Event overview',
+                        'Обзор мероприятия',
+                        'Іс-шара шолуы',
+                      ),
+                    ),
+                  ),
+                  OutlinedButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrganizerActivation(
+                          api: widget.api,
+                          eventId: widget.id,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      adminLabel(
+                        context,
+                        'Paid sales activation',
+                        'Активация платных продаж',
+                        'Ақылы сатылымды іске қосу',
+                      ),
+                    ),
+                  ),
+                  OutlinedButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EventStaffScreen(
+                          api: widget.api,
+                          eventId: widget.id,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      adminLabel(
+                        context,
+                        'Event administrators',
+                        'Администраторы мероприятия',
+                        'Іс-шара әкімшілері',
+                      ),
+                    ),
+                  ),
                   if (editable)
                     OutlinedButton(
                       onPressed: changing ? null : () => editEvent(event),
@@ -381,7 +465,27 @@ class _EventScreenState extends State<EventScreen> {
                     ),
                   if (status == 'DRAFT')
                     OutlinedButton(
-                      onPressed: changing ? null : () => eventAction('publish'),
+                      onPressed: changing
+                          ? null
+                          : () {
+                              if (event['venueId'] == null ||
+                                  event['venueId'].toString().isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      adminLabel(
+                                        context,
+                                        'Select a venue and save before publishing.',
+                                        'Выберите площадку и сохраните изменения перед публикацией.',
+                                        'Жариялау алдында өтетін орынды таңдап, сақтаңыз.',
+                                      ),
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+                              eventAction('publish');
+                            },
                       child: Text(l10n.publish),
                     ),
                   if (status == 'PUBLISHED')
@@ -402,6 +506,7 @@ class _EventScreenState extends State<EventScreen> {
                   ),
                 ],
               ),
+              OrganizerSeating(api: widget.api, event: event, editable: editable && !changing, onChanged: reload),
               const SizedBox(height: 20),
               Text(
                 l10n.ticketTypes,

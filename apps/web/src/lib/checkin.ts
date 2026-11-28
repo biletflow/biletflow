@@ -230,6 +230,7 @@ export async function searchAttendees(user: Scanner, eventId: string, query: str
         { attendee: { fullName: { contains: query, mode: "insensitive" } } },
         { attendee: { email: { contains: query, mode: "insensitive" } } },
         { order: { reference: { contains: query, mode: "insensitive" } } },
+        { id: { contains: query, mode: "insensitive" } },
       ],
     },
     take: 50,

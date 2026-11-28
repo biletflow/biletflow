@@ -50,6 +50,8 @@ const copy = {
     addAccount: "Add simulated payout account",
     accountsEmpty: "No payout accounts yet. Add one to unlock paid-sales activation.",
     payoutHistory: "Simulated payouts",
+    payoutNote:
+      "These amounts are a saved simulated payout. They are not recalculated from current sales, refunds, or fees.",
     payoutsEmpty: "No payouts yet.",
     saved: "Profile saved.",
     accountAdded: "Payout account added.",
@@ -72,6 +74,8 @@ const copy = {
     addAccount: "Добавить тестовый счёт",
     accountsEmpty: "Счетов пока нет. Добавьте счёт для активации платных продаж.",
     payoutHistory: "Тестовые выплаты",
+    payoutNote:
+      "Это сохранённая тестовая выплата. Она не пересчитывается из текущих продаж, возвратов и комиссий.",
     payoutsEmpty: "Выплат пока нет.",
     saved: "Профиль сохранён.",
     accountAdded: "Счёт добавлен.",
@@ -94,6 +98,8 @@ const copy = {
     addAccount: "Сынақ шотын қосу",
     accountsEmpty: "Шот жоқ. Ақылы сатылым үшін шот қосыңыз.",
     payoutHistory: "Сынақ төлемдер",
+    payoutNote:
+      "Бұл сақталған сынақ төлем. Ол ағымдағы сатылым, қайтарым және комиссиядан қайта есептелмейді.",
     payoutsEmpty: "Төлем жоқ.",
     saved: "Профиль сақталды.",
     accountAdded: "Шот қосылды.",
@@ -360,6 +366,7 @@ export default function OrganizerSettings({ locale }: { locale: string }) {
 
       <section className="space-y-4 rounded-xl border border-ink-300 bg-white p-6">
         <h2 className="text-xl font-bold">{t.payoutHistory}</h2>
+        <p className="text-ink-600 text-sm">{t.payoutNote}</p>
         {payouts.length === 0 ? (
           <p className="text-ink-600 text-sm">{t.payoutsEmpty}</p>
         ) : (

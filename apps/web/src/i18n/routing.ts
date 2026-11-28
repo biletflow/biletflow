@@ -9,7 +9,7 @@ export const routing = defineRouting({
 export type Locale = (typeof routing.locales)[number];
 
 export const localeLabels: Record<Locale, string> = {
-  ru: "RU",
-  kk: "KZ",
+  ru: "РУ",
+  kk: "ҚҚ",
   en: "EN",
 };

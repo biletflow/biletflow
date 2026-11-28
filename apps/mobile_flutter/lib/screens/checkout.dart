@@ -4,12 +4,14 @@ import '../core/api.dart';
 import '../core/uuid.dart';
 import '../l10n/app_localizations.dart';
 import 'order_status.dart';
+import '../widgets/refund_policy.dart';
 
 /// Campaign QR codes are event links with a `c` token, not promo text.
 String? campaignTokenFrom(String raw) {
   final value = raw.trim();
-  if (!value.startsWith('http://') && !value.startsWith('https://'))
+  if (!value.startsWith('http://') && !value.startsWith('https://')) {
     return null;
+  }
   final token = Uri.tryParse(value)?.queryParameters['c']?.trim();
   if (token == null || token.isEmpty) return null;
   return token;
@@ -20,11 +22,15 @@ class CheckoutLine {
   final String name;
   final int priceKzt;
   final int quantity;
+  final List<String> seatIds;
+  final List<String> seatLabels;
   const CheckoutLine({
     required this.ticketTypeId,
     required this.name,
     required this.priceKzt,
     required this.quantity,
+    this.seatIds = const [],
+    this.seatLabels = const [],
   });
 }
 
@@ -32,20 +38,26 @@ class CheckoutScreen extends StatefulWidget {
   final ApiClient api;
   final String eventId;
   final String eventTitle;
+  final String? refundPolicy;
+  final String? eventStartsAt;
   final List<CheckoutLine> lines;
   final String? initialName;
   final String? initialEmail;
   final String? initialCampaignToken;
+  final String? initialPromoCode;
 
   const CheckoutScreen({
     super.key,
     required this.api,
     required this.eventId,
     required this.eventTitle,
+    this.refundPolicy,
+    this.eventStartsAt,
     required this.lines,
     this.initialName,
     this.initialEmail,
     this.initialCampaignToken,
+    this.initialPromoCode,
   });
 
   @override
@@ -56,7 +68,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   late final TextEditingController _name;
   late final TextEditingController _email;
   final _promo = TextEditingController();
-  late String _idempotencyKey;
+  final _idempotencyKey = randomUuid();
+  String? _initialCampaignToken;
+  int _promoRequest = 0;
+  bool _previewing = false;
   int _discountKzt = 0;
   String? _promoLabel;
   String? _error;
@@ -67,14 +82,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     super.initState();
     _name = TextEditingController(text: widget.initialName ?? '');
     _email = TextEditingController(text: widget.initialEmail ?? '');
-    _idempotencyKey = randomUuid();
     final seeded = widget.initialCampaignToken?.trim();
-    if (seeded != null && seeded.isNotEmpty) _promo.text = seeded;
+    if (seeded != null && seeded.isNotEmpty) {
+      _initialCampaignToken = campaignTokenFrom(seeded) ?? seeded;
+    }
+    _promo.text = widget.initialPromoCode?.trim() ?? '';
     if ((widget.initialName == null || widget.initialName!.isEmpty) ||
         (widget.initialEmail == null || widget.initialEmail!.isEmpty)) {
       _prefillFromMe();
     }
-    if (_promo.text.trim().isNotEmpty) {
+    if (_initialCampaignToken != null || _promo.text.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _applyPromo();
       });
@@ -85,7 +102,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final raw = _promo.text.trim();
     final token = campaignTokenFrom(raw);
     if (token != null) return (code: null, token: token);
-    if (raw.isEmpty) return (code: null, token: null);
+    if (raw.isEmpty) return (code: null, token: _initialCampaignToken);
     return (code: raw, token: null);
   }
 
@@ -123,13 +140,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       widget.lines.fold(0, (sum, line) => sum + line.quantity);
 
   Future<void> _applyPromo() async {
+    final request = ++_promoRequest;
+    final offer = _offer();
     setState(() {
       _error = null;
       _promoLabel = null;
       _discountKzt = 0;
+      _previewing = offer.code != null || offer.token != null;
     });
-    final offer = _offer();
-    if (offer.code == null && offer.token == null) return;
+    if (!_previewing) return;
     try {
       final data = await widget.api.post('/api/promo/preview', {
         'eventId': widget.eventId,
@@ -146,7 +165,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       });
       final totals = data['totals'];
       final campaign = data['campaign'];
-      if (!mounted) return;
+      if (!mounted || request != _promoRequest) return;
       final l10n = AppLocalizations.of(context);
       setState(() {
         _discountKzt = totals is Map && totals['discountKzt'] is num
@@ -157,13 +176,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             : (offer.token != null ? l10n.campaignApplied : l10n.promoApplied);
       });
     } on ApiException catch (error) {
-      if (mounted) setState(() => _error = error.code);
+      if (mounted && request == _promoRequest) {
+        setState(() => _error = error.code);
+      }
     } catch (_) {
-      if (mounted) setState(() => _error = 'REQUEST_FAILED');
+      if (mounted && request == _promoRequest) {
+        setState(() => _error = 'REQUEST_FAILED');
+      }
+    } finally {
+      if (mounted && request == _promoRequest) {
+        setState(() => _previewing = false);
+      }
     }
   }
 
   Future<void> _submit() async {
+    if (_pending || _previewing) return;
     final fullName = _name.text.trim();
     final email = _email.text.trim().toLowerCase();
     if (fullName.length < 2 || !email.contains('@')) {
@@ -184,7 +212,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'eventId': widget.eventId,
         'items': [
           for (final line in widget.lines)
-            {'ticketTypeId': line.ticketTypeId, 'quantity': line.quantity},
+            {
+              'ticketTypeId': line.ticketTypeId,
+              'quantity': line.quantity,
+              if (line.seatIds.isNotEmpty) 'seatIds': line.seatIds,
+            },
         ],
         'attendees': attendees,
         if (offer.code != null) 'promoCode': offer.code,
@@ -196,22 +228,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         throw const ApiException(500, 'INVALID_ORDER_RESPONSE');
       }
       final orderId = '${order['id'] ?? ''}';
-      final status = '${order['status'] ?? ''}';
       if (orderId.isEmpty) {
         throw const ApiException(500, 'INVALID_ORDER_RESPONSE');
       }
-      if (status == 'PAID') {
-        if (!mounted) return;
-        await Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                OrderStatusScreen(api: widget.api, orderId: orderId),
-          ),
-        );
-        return;
-      }
-      await widget.api.post('/api/orders/$orderId/pay', {});
       if (!mounted) return;
       await Navigator.pushReplacement(
         context,
@@ -220,11 +239,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         ),
       );
     } on ApiException catch (error) {
-      _idempotencyKey = randomUuid();
-      setState(() => _error = error.code);
+      if (mounted) setState(() => _error = error.code);
     } catch (_) {
-      _idempotencyKey = randomUuid();
-      setState(() => _error = 'REQUEST_FAILED');
+      if (mounted) setState(() => _error = 'REQUEST_FAILED');
     } finally {
       if (mounted) setState(() => _pending = false);
     }
@@ -246,10 +263,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ...widget.lines.map(
             (line) => ListTile(
               contentPadding: EdgeInsets.zero,
-              title: Text(line.name),
-              subtitle: Text('× ${line.quantity}'),
+              title: Text(l10n.ticketTypeName(line.name)),
+              subtitle: Text(line.seatLabels.isEmpty ? '× ${line.quantity}' : line.seatLabels.join('\n')),
               trailing: Text(l10n.money(line.priceKzt * line.quantity)),
             ),
+          ),
+          RefundPolicyNotice(
+            policy: widget.refundPolicy,
+            startsAt: widget.eventStartsAt,
           ),
           const Divider(),
           TextField(
@@ -269,21 +290,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Expanded(
                 child: TextField(
                   controller: _promo,
+                  enabled: !_pending,
                   decoration: InputDecoration(labelText: l10n.promoOrCampaign),
                   onChanged: (_) {
-                    if (_discountKzt > 0 || _promoLabel != null) {
-                      setState(() {
-                        _discountKzt = 0;
-                        _promoLabel = null;
-                      });
-                    }
+                    _promoRequest++;
+                    setState(() {
+                      _initialCampaignToken = null;
+                      _discountKzt = 0;
+                      _promoLabel = null;
+                      _previewing = false;
+                      _error = null;
+                    });
                   },
                 ),
               ),
               const SizedBox(width: 8),
               TextButton(
-                onPressed: _pending ? null : _applyPromo,
-                child: Text(l10n.apply),
+                onPressed: _pending || _previewing ? null : _applyPromo,
+                child: Text(_previewing ? l10n.working : l10n.apply),
               ),
             ],
           ),
@@ -307,12 +331,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             ),
           const SizedBox(height: 16),
+          if (_total > 0)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text(
+                l10n.simulatedPayment,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
           FilledButton(
-            onPressed: _pending ? null : _submit,
+            onPressed: _pending || _previewing ? null : _submit,
             child: Text(_pending ? l10n.working : l10n.placeOrder),
           ),
-          const SizedBox(height: 8),
-          Text(l10n.checkoutNote, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );

@@ -15,8 +15,10 @@ SQL statements, not read-then-write:
 
 Free orders are marked `PAID` and tickets are issued in the checkout transaction.
 Paid orders stay `AWAITING_PAYMENT` and hold stock. `POST /api/payments/webhook`
-is the only place those paid tickets are created. Decline and abandon release the
-hold and create no ticket. The webhook checks `x-biletflow-signature` (HMAC-SHA256
+is the only place those paid tickets are created. Decline, abandon, expiry, and
+reservation cancel release the seat hold, the reserved count, and the promo
+redemption, and create no ticket. Repeating the cancel or the webhook does not
+move those counters again. The webhook checks `x-biletflow-signature` (HMAC-SHA256
 of the raw body, hex) and dedupes on `ProcessedWebhookEvent`.
 
 `GET /sandbox/pay/:intentId` is labelled simulated and offers Approve, Decline,
@@ -55,7 +57,7 @@ The same path is covered without a server by
 request must not duplicate:
 
 - an unsigned, forged, or malformed webhook does not issue a ticket or move inventory
-- decline and abandon release the hold once, leave the order cancelled, and create no ticket
+- decline and abandon release the hold and the promo redemption once, leave the order cancelled, and create no ticket
 - replaying that webhook, or sending it again under a new event key, still creates no ticket
 - the same checkout idempotency key returns the same order and reserves one seat
 - repeating pay, or the activation-fee payment, returns the open intent

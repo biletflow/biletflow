@@ -29,6 +29,13 @@ export function isUniqueViolation(error: unknown) {
 export function assertParsed<T>(
   parsed: { success: true; data: T } | { success: false },
 ): T {
-  if (!parsed.success) throw new ApiError(400, "VALIDATION_FAILED");
+  if (!parsed.success) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("VALIDATION_FAILED", JSON.stringify(
+        (parsed as { error?: { issues?: unknown } }).error?.issues
+      ));
+    }
+    throw new ApiError(400, "VALIDATION_FAILED");
+  }
   return parsed.data;
 }

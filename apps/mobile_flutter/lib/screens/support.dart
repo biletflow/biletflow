@@ -84,9 +84,17 @@ class _SupportScreenState extends State<SupportScreen> {
 }
 
 class SupportComposer extends StatefulWidget {
-  const SupportComposer({super.key, required this.api, this.orderId});
+  const SupportComposer({
+    super.key,
+    required this.api,
+    this.orderId,
+    this.eventId,
+    this.ticketId,
+  });
   final ApiClient api;
   final String? orderId;
+  final String? eventId;
+  final String? ticketId;
 
   @override
   State<SupportComposer> createState() => _SupportComposerState();
@@ -115,10 +123,18 @@ class _SupportComposerState extends State<SupportComposer> {
     });
     try {
       final result = await widget.api.post(_casesPath, {
-        'category': widget.orderId == null ? 'TECHNICAL' : 'REFUND',
+        'category': widget.orderId != null
+            ? 'REFUND'
+            : widget.ticketId != null
+            ? 'TICKET_DELIVERY'
+            : widget.eventId != null
+            ? 'EVENT_INFORMATION'
+            : 'TECHNICAL',
         'subject': subject.text.trim(),
         'body': body.text.trim(),
         if (widget.orderId != null) 'orderId': widget.orderId,
+        if (widget.eventId != null) 'eventId': widget.eventId,
+        if (widget.ticketId != null) 'ticketId': widget.ticketId,
       });
       final id = (result['case'] as Map)['id'] as String;
       if (mounted) Navigator.pop(context, id);

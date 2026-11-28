@@ -53,7 +53,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('BF-1001'), findsOneWidget);
-    expect(find.text('PAID'), findsOneWidget);
+    expect(find.text('Confirmed'), findsOneWidget);
     expect(find.text('Free entry'), findsOneWidget);
     expect(find.textContaining('Aliya'), findsOneWidget);
   });

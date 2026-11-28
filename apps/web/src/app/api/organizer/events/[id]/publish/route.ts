@@ -17,6 +17,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       const current = await tx.event.findUnique({ where: { id } });
       if (!current) throw new ApiError(404, "NOT_FOUND");
       if (current.status !== "DRAFT") throw new ApiError(409, "CONFLICT");
+      if (!current.venueId) throw new ApiError(409, "VENUE_REQUIRED");
       const visible = await tx.ticketType.count({
         where: { eventId: id, isHidden: false },
       });

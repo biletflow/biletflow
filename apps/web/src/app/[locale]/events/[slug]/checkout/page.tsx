@@ -76,10 +76,17 @@ export default async function CheckoutPage({
 
   return (
     <div className="bg-ink-100 min-h-[70vh] px-4 py-12">
+      <div data-refund-policy className="mx-auto mb-5 max-w-3xl rounded-xl border border-ink-300 bg-white p-5">
+        <h2 className="font-bold">{t("refundPolicy")}</h2>
+        <p className="mt-2 text-sm text-ink-600">
+          {t(`refund.${event.refundPolicy}`)}
+        </p>
+      </div>
       <CheckoutForm
         eventId={event.id}
         eventSlug={event.slug}
         eventTitle={event.title}
+        assignedSeating={event.seatingMode === "ASSIGNED"}
         locale={locale}
         ticketType={{
           id: ticketType.id,

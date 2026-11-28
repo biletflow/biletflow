@@ -13,6 +13,7 @@ type Mode = "sign-in" | "sign-up";
 
 function messageKey(error: { code?: string; message?: string; status?: number } | null) {
   const code = error?.code ?? error?.message ?? "";
+  if (code === "RATE_LIMITED" || error?.status === 429) return "errorRateLimited";
   if (code === "VALIDATION_FAILED") return "errorValidation";
   if (code === "FORBIDDEN" || error?.status === 403) return "errorForbidden";
   if (code === "USER_ALREADY_EXISTS") return "errorExists";

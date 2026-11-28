@@ -58,6 +58,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       admin: "",
       scanner: "",
     };
+    let venueId = "";
     let ip = 1;
 
     function request(path: string, body?: unknown, token = "", method?: string) {
@@ -86,6 +87,16 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
     const endsAt = new Date(Date.now() + 2 * 86_400_000).toISOString();
 
     beforeAll(async () => {
+      const venue = await prisma.venue.create({
+        data: {
+          name: `Integration venue ${suffix}`,
+          address: "Test address",
+          city: "Astana",
+          country: "KZ",
+          timezone: "Asia/Almaty",
+        },
+      });
+      venueId = venue.id;
       for (const [role, email] of [
         ["ORGANIZER", emails.organizer],
         ["ATTENDEE", emails.attendee],
@@ -148,6 +159,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       await prisma.session.deleteMany({ where: { userId: { in: userIds } } });
       await prisma.account.deleteMany({ where: { userId: { in: userIds } } });
       await prisma.user.deleteMany({ where: { id: { in: userIds } } });
+      if (venueId) await prisma.venue.deleteMany({ where: { id: venueId } });
       await prisma.$disconnect();
     });
 
@@ -175,7 +187,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       const created = await createEvent(
         request(
           "/api/organizer/events",
-          { title: `Campus night ${suffix}`, startsAt, endsAt, timezone: "Asia/Almaty" },
+          { title: `Campus night ${suffix}`, startsAt, endsAt, venueId, timezone: "Asia/Almaty" },
           tokens.organizer,
         ),
       );
@@ -341,6 +353,10 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
         ),
       );
       expect(blocked.status).toBe(409);
+      expect((await blocked.json()).error).toMatchObject({
+        code: "CONFLICT",
+        reason: "PAID_SALES_INACTIVE",
+      });
 
       const checklist = await activation(
         request(`/api/organizer/events/${event.id}/activation`, undefined, tokens.organizer),
@@ -371,7 +387,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       expect(sandboxHtml).toContain("Approve");
       expect(sandboxHtml).toContain("Decline");
       expect(sandboxHtml).toContain("Abandon");
-      expect(sandboxHtml).toContain("No real money moves");
+      expect(sandboxHtml).toContain("Test payment. No real funds will be charged.");
 
       const unlocked = await sandboxPost(
         new Request(feeBody.url, {
@@ -510,7 +526,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       const other = await createEvent(
         request(
           "/api/organizer/events",
-          { title: `Other night ${suffix}`, startsAt, endsAt, timezone: "Asia/Almaty" },
+          { title: `Other night ${suffix}`, startsAt, endsAt, venueId, timezone: "Asia/Almaty" },
           tokens.organizer,
         ),
       );

@@ -44,6 +44,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       admin: "",
       scanner: "",
     };
+    let venueId = "";
     let ip = 1;
     const startsAt = new Date(Date.now() + 86_400_000).toISOString();
     const endsAt = new Date(Date.now() + 2 * 86_400_000).toISOString();
@@ -71,6 +72,16 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
     }
 
     beforeAll(async () => {
+      const venue = await prisma.venue.create({
+        data: {
+          name: `Integration venue ${suffix}`,
+          address: "Test address",
+          city: "Astana",
+          country: "KZ",
+          timezone: "Asia/Almaty",
+        },
+      });
+      venueId = venue.id;
       for (const [role, email] of [
         ["ORGANIZER", emails.organizer],
         ["ATTENDEE", emails.attendee],
@@ -144,6 +155,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       await prisma.session.deleteMany({ where: { userId: { in: userIds } } });
       await prisma.account.deleteMany({ where: { userId: { in: userIds } } });
       await prisma.user.deleteMany({ where: { id: { in: userIds } } });
+      if (venueId) await prisma.venue.deleteMany({ where: { id: venueId } });
       await prisma.$disconnect();
     });
 
@@ -151,7 +163,7 @@ describe.skipIf(process.env.RUN_AUTH_INTEGRATION !== "1")(
       const created = await createEvent(
         request(
           "/api/organizer/events",
-          { title: `${name} ${suffix.slice(0, 8)}`, startsAt, endsAt, timezone: "Asia/Almaty" },
+          { title: `${name} ${suffix.slice(0, 8)}`, startsAt, endsAt, venueId, timezone: "Asia/Almaty" },
           tokens.organizer,
         ),
       );

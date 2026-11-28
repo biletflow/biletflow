@@ -3,16 +3,17 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { TicketSelector, type SelectableTicketType } from "@/components/ticket-selector";
+import { EventCover } from "@/components/event-cover";
 import { Link } from "@/i18n/navigation";
 import { getSessionUser } from "@/lib/auth-guard";
 import { getPublicEventBySlug, listRelatedEvents } from "@/lib/events";
 import {
-  categoryGradient,
   formatEventDate,
   formatEventDateTime,
   formatKzt,
 } from "@/lib/format";
 import { labelOf } from "@/lib/labels";
+import { eventLocation, mapsUrl } from "@/lib/calendar";
 
 import type { Metadata } from "next";
 
@@ -75,10 +76,11 @@ export default async function EventPage({
   return (
     <>
       <div
-        className={`relative bg-gradient-to-br ${categoryGradient(event.category)} h-64 sm:h-80`}
+        className="relative flex min-h-64 items-end sm:min-h-80"
       >
-        <div className="absolute inset-0 bg-black/25" aria-hidden />
-        <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-8 sm:px-6 lg:px-8">
+        <EventCover category={event.category} image={event.coverImageUrl} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-black/15" aria-hidden />
+        <div className="relative mx-auto flex w-full max-w-7xl flex-col justify-end px-4 py-8 sm:px-6 lg:px-8">
           {event.category ? (
             <span className="text-brand w-fit rounded-md bg-white px-2.5 py-1 text-xs font-bold">
               {labelOf(tCategory, event.category)}
@@ -127,6 +129,10 @@ export default async function EventPage({
               </p>
             </section>
 
+            <a className="text-brand inline-flex items-center gap-2 font-semibold" href={`/api/events/${encodeURIComponent(slug)}/calendar`} download>
+              <CalendarDays className="size-4" aria-hidden />
+              {locale === "ru" ? "Добавить в календарь" : locale === "kk" ? "Күнтізбеге қосу" : "Add to calendar"}
+            </a>
             {event.venue ? (
               <section className="border-ink-300 rounded-xl border bg-white p-6">
                 <h2 className="text-ink-900 text-lg font-bold">{t("venue")}</h2>
@@ -140,6 +146,9 @@ export default async function EventPage({
                       {event.venue.address}, {labelOf(tCity, event.venue.city)},{" "}
                       {labelOf(tCountry, event.venue.country)}
                     </p>
+                    <a href={mapsUrl(eventLocation(event))} target="_blank" rel="noopener noreferrer" className="text-brand mt-2 inline-block text-sm font-semibold">
+                      {locale === "ru" ? "Открыть на карте" : locale === "kk" ? "Картада ашу" : "Open in maps"}
+                    </a>
                   </div>
                 </div>
               </section>

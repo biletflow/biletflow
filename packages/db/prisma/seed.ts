@@ -121,7 +121,7 @@ async function main() {
 
   const organizers = [];
   for (const [i, spec] of [
-    { email: "organizer@biletflow.kz", name: "Aigerim Nurlanova", org: "Almaty Jazz Collective" },
+    { email: "organizer@biletflow.kz", name: "Waqar Ahmad", org: "Nazarbayev University" },
     { email: "organizer2@biletflow.kz", name: "Daniyar Seitov", org: "KBTU Student Union" },
     { email: "organizer3@biletflow.kz", name: "Zarina Abenova", org: "Astana Tech Meetups" },
   ].entries()) {
@@ -434,9 +434,9 @@ async function main() {
       }
 
       if (useCampaign) {
-        // perUserLimit is 1, so skip if this buyer already redeemed this campaign.
-        const existing = await prisma.promoRedemption.findUnique({
-          where: { campaignId_userId: { campaignId: campaign!.id, userId: buyer.id } },
+        // The demo campaigns allow one redemption per buyer.
+        const existing = await prisma.promoRedemption.findFirst({
+          where: { campaignId: campaign!.id, userId: buyer.id },
         });
         if (!existing) {
           await prisma.promoRedemption.create({

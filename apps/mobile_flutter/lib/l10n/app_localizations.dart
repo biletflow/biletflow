@@ -1,4 +1,7 @@
 import 'package:flutter/foundation.dart';
+
+import '../core/format.dart';
+
 import 'package:material_ui/material_ui.dart';
 
 class AppLocalizations {
@@ -15,6 +18,70 @@ class AppLocalizations {
 
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
+
+  static const _catalogLabels = <String, Map<String, String>>{
+    'en': {
+      'Almaty': 'Almaty',
+      'Astana': 'Astana',
+      'Shymkent': 'Shymkent',
+      'Music': 'Music',
+      'Community': 'Community',
+      'Technology': 'Technology',
+      'Film': 'Film',
+      'Business': 'Business',
+      'Education': 'Education',
+      'General Admission': 'General Admission',
+      'VIP': 'VIP',
+      'Free Entry': 'Free Entry',
+      'Standard': 'Standard',
+      'Student': 'Student',
+      'Seat': 'Seat',
+      'Early Bird': 'Early Bird',
+    },
+    'ru': {
+      'Almaty': 'Алматы',
+      'Astana': 'Астана',
+      'Shymkent': 'Шымкент',
+      'Music': 'Музыка',
+      'Community': 'Сообщество',
+      'Technology': 'Технологии',
+      'Film': 'Кино',
+      'Business': 'Бизнес',
+      'Education': 'Образование',
+      'General Admission': 'Общий вход',
+      'VIP': 'VIP',
+      'Free Entry': 'Бесплатный вход',
+      'Standard': 'Стандарт',
+      'Student': 'Студенческий',
+      'Seat': 'Место',
+      'Early Bird': 'Ранняя цена',
+    },
+    'kk': {
+      'Almaty': 'Алматы',
+      'Astana': 'Астана',
+      'Shymkent': 'Шымкент',
+      'Music': 'Музыка',
+      'Community': 'Қауымдастық',
+      'Technology': 'Технология',
+      'Film': 'Кино',
+      'Business': 'Бизнес',
+      'Education': 'Білім',
+      'General Admission': 'Жалпы кіру',
+      'VIP': 'VIP',
+      'Free Entry': 'Тегін кіру',
+      'Standard': 'Стандарт',
+      'Student': 'Студенттік',
+      'Seat': 'Орын',
+      'Early Bird': 'Ерте баға',
+    },
+  };
+
+  String cityName(String value) =>
+      _catalogLabels[locale.languageCode]?[value] ?? value;
+  String categoryName(String value) =>
+      _catalogLabels[locale.languageCode]?[value] ?? value;
+  String ticketTypeName(String value) =>
+      _catalogLabels[locale.languageCode]?[value] ?? value;
 
   static const _tables = <String, Map<String, String>>{
     'en': {
@@ -100,6 +167,8 @@ class AppLocalizations {
       'city': 'City',
       'allCities': 'All cities',
       'category': 'Category',
+      'visibility': 'Visibility',
+      'preview': 'Preview',
       'allCategories': 'All categories',
       'price': 'Price',
       'anyPrice': 'Any price',
@@ -124,19 +193,18 @@ class AppLocalizations {
       'total': 'Total: {amount}',
       'placeOrder': 'Place order',
       'working': 'Working…',
-      'checkoutNote': 'Server totals and inventory are authoritative. Paid orders use the authenticated simulated payment API.',
       'order': 'Order',
       'refresh': 'Refresh',
       'status': 'Status: {status}',
       'totalLabel': 'Total: {amount}',
-      'simulatedPayment': 'Simulated payment — no real money moves.',
+      'simulatedPayment': 'Test payment. No real funds will be charged.',
       'approvePayment': 'Approve payment',
       'decline': 'Decline',
       'abandon': 'Abandon',
       'cancelReservation': 'Cancel reservation',
       'refundOrder': 'Refund order',
       'refundConfirmation': 'All tickets in this order will be invalidated. Continue with the refund?',
-      'paymentSucceeded': 'Payment succeeded. Tickets are ready.',
+      'paymentSucceeded': 'Your tickets are ready.',
       'holdExpired': 'Checkout hold expired. No ticket was issued.',
       'orderClosed': 'Order closed without tickets.',
       'noTickets': 'No tickets yet',
@@ -146,7 +214,7 @@ class AppLocalizations {
       'sharePdf': 'Share / save PDF',
       'preparingPdf': 'Preparing PDF…',
       'pdfFailed': 'Unable to open PDF',
-      'qrNote': 'QR and PDF come from the server with your bearer token. The token is never put in the image URL.',
+      'qrNote': 'Show this QR code at the entrance.',
       'ticketStatusValid': 'Valid',
       'ticketStatusCheckedIn': 'Checked in',
       'ticketStatusCancelled': 'Cancelled',
@@ -171,12 +239,17 @@ class AppLocalizations {
       'resetSent':
           'If an account exists for that email, a reset link is on its way.',
       'resetPassword': 'Choose a new password',
+      'verifyEmail': 'Verify email',
+      'verificationLead': 'Paste the verification link from your email.',
+      'resendVerification': 'Resend verification email',
+      'verificationSent': 'A verification email is on its way.',
+      'invalidEmailLink': 'Enter a valid link or token from your email.',
       'resetLead':
-          'Paste the token from the reset link, then choose a new password.',
+          'Paste the reset link from your email and choose a new password.',
+      'resetToken': 'Reset link or token',
       'newPassword': 'New password',
       'savePassword': 'Save password',
       'savingPassword': 'Saving…',
-      'resetToken': 'Reset token',
       'backToSignIn': 'Back to sign in',
       'createEvent': 'Create event',
       'editEvent': 'Edit event',
@@ -222,7 +295,7 @@ class AppLocalizations {
       'reportTickets': 'Tickets',
       'grossSales': 'Gross sales',
       'discounts': 'Discounts',
-      'netSales': 'Net sales',
+      'netSales': 'After discounts and refunds',
       'active': 'Active',
       'paidSalesReviews': 'Paid-sales reviews',
       'noPendingReviews': 'No pending reviews',
@@ -245,6 +318,28 @@ class AppLocalizations {
       'campaignApplied': 'Campaign applied',
       'hidden': 'Hidden',
       'errorAuth': 'Sign in again',
+      'discover': 'Discover',
+      'welcomeBack': 'Welcome back',
+      'heroTitle': 'Your next great event',
+      'heroAccent': 'starts here',
+      'upcoming': 'Upcoming events',
+      'workspace': 'Workspace',
+      'orderHistory': 'Order history',
+      'showAtDoor': 'Show at the door',
+      'shareEvent': 'Share event',
+      'noOrders': 'No orders yet',
+      'registrationUnavailable': 'Registration is closed.',
+      'paidSalesUnavailable':
+          'Paid sales are currently unavailable for this event.',
+      'paid': 'Confirmed',
+      'awaiting': 'Awaiting payment',
+      'expired': 'Expired',
+      'failed': 'Payment failed',
+      'unknown': 'Unavailable',
+      'rate': 'Too many attempts. Wait a moment and try again.',
+      'simRefund': 'This is a test refund. Your tickets will become invalid.',
+      'testOrder': 'Test transaction',
+      'verified': 'Email verified',
     },
     'ru': {
       'scannerTitle': 'QR-сканер',
@@ -330,6 +425,8 @@ class AppLocalizations {
       'city': 'Город',
       'allCities': 'Все города',
       'category': 'Категория',
+      'visibility': 'Видимость',
+      'preview': 'Предпросмотр',
       'allCategories': 'Все категории',
       'price': 'Цена',
       'anyPrice': 'Любая цена',
@@ -354,12 +451,12 @@ class AppLocalizations {
       'total': 'Итого: {amount}',
       'placeOrder': 'Оформить заказ',
       'working': 'Отправляем…',
-      'checkoutNote': 'Итоги и наличие считает сервер. Оплата идёт через авторизованный симулятор без WebView.',
       'order': 'Заказ',
       'refresh': 'Обновить',
       'status': 'Статус: {status}',
       'totalLabel': 'Итого: {amount}',
-      'simulatedPayment': 'Симуляция оплаты — реальные деньги не списываются.',
+      'simulatedPayment':
+          'Тестовая оплата. Реальные средства не будут списаны.',
       'approvePayment': 'Одобрить оплату',
       'decline': 'Отклонить',
       'abandon': 'Отменить',
@@ -367,7 +464,7 @@ class AppLocalizations {
       'refundOrder': 'Вернуть заказ',
       'refundConfirmation':
           'Все билеты в заказе станут недействительными. Продолжить возврат?',
-      'paymentSucceeded': 'Оплата прошла. Билеты готовы.',
+      'paymentSucceeded': 'Ваши билеты готовы.',
       'holdExpired': 'Время брони истекло. Билет не выдан.',
       'orderClosed': 'Заказ закрыт без билетов.',
       'noTickets': 'У вас пока нет билетов',
@@ -377,7 +474,7 @@ class AppLocalizations {
       'sharePdf': 'Поделиться / сохранить PDF',
       'preparingPdf': 'Готовим PDF…',
       'pdfFailed': 'Не удалось открыть PDF',
-      'qrNote': 'QR и PDF загружаются с сервера с bearer-токеном. Токен не попадает в URL изображения.',
+      'qrNote': 'Покажите этот QR-код на входе.',
       'ticketStatusValid': 'Действителен',
       'ticketStatusCheckedIn': 'Проверен',
       'ticketStatusCancelled': 'Отменён',
@@ -402,11 +499,16 @@ class AppLocalizations {
       'resetSent':
           'Если аккаунт с этим email есть, ссылка для сброса уже отправлена.',
       'resetPassword': 'Новый пароль',
-      'resetLead': 'Вставьте токен из ссылки и задайте новый пароль.',
+      'verifyEmail': 'Подтвердить email',
+      'verificationLead': 'Вставьте ссылку для подтверждения из письма.',
+      'resendVerification': 'Отправить письмо повторно',
+      'verificationSent': 'Письмо для подтверждения отправлено.',
+      'invalidEmailLink': 'Введите действительную ссылку или токен из письма.',
+      'resetLead': 'Вставьте ссылку из письма и задайте новый пароль.',
+      'resetToken': 'Ссылка или токен сброса',
       'newPassword': 'Новый пароль',
       'savePassword': 'Сохранить пароль',
       'savingPassword': 'Сохраняем…',
-      'resetToken': 'Токен сброса',
       'backToSignIn': 'Ко входу',
       'createEvent': 'Создать событие',
       'editEvent': 'Изменить событие',
@@ -454,7 +556,7 @@ class AppLocalizations {
       'reportTickets': 'Билеты',
       'grossSales': 'Валовые продажи',
       'discounts': 'Скидки',
-      'netSales': 'Чистые продажи',
+      'netSales': 'После скидок и возвратов',
       'active': 'Активна',
       'paidSalesReviews': 'Проверка платных продаж',
       'noPendingReviews': 'Нет заявок на проверку',
@@ -477,6 +579,29 @@ class AppLocalizations {
       'campaignApplied': 'Кампания применена',
       'hidden': 'Скрыт',
       'errorAuth': 'Войдите снова',
+      'discover': 'События',
+      'welcomeBack': 'С возвращением',
+      'heroTitle': 'Ваше следующее событие',
+      'heroAccent': 'начинается здесь',
+      'upcoming': 'Ближайшие события',
+      'workspace': 'Управление',
+      'orderHistory': 'История заказов',
+      'showAtDoor': 'Показать на входе',
+      'shareEvent': 'Поделиться событием',
+      'noOrders': 'Заказов пока нет',
+      'registrationUnavailable': 'Регистрация закрыта.',
+      'paidSalesUnavailable':
+          'Платные продажи для этого мероприятия сейчас недоступны.',
+      'paid': 'Подтверждён',
+      'awaiting': 'Ожидает оплаты',
+      'expired': 'Срок истёк',
+      'failed': 'Оплата не прошла',
+      'unknown': 'Недоступно',
+      'rate': 'Слишком много попыток. Подождите и попробуйте снова.',
+      'simRefund':
+          'Это тестовый возврат. Ваши билеты станут недействительными.',
+      'testOrder': 'Тестовая операция',
+      'verified': 'Почта подтверждена',
     },
     'kk': {
       'scannerTitle': 'QR сканері',
@@ -560,6 +685,8 @@ class AppLocalizations {
       'city': 'Қала',
       'allCities': 'Барлық қалалар',
       'category': 'Санат',
+      'visibility': 'Көрінуі',
+      'preview': 'Алдын ала көру',
       'allCategories': 'Барлық санаттар',
       'price': 'Баға',
       'anyPrice': 'Кез келген баға',
@@ -584,19 +711,18 @@ class AppLocalizations {
       'total': 'Жиыны: {amount}',
       'placeOrder': 'Тапсырыс беру',
       'working': 'Жіберілуде…',
-      'checkoutNote': 'Жиынтық пен қорды сервер есептейді. Төлем авторизацияланған симулятор арқылы өтеді.',
       'order': 'Тапсырыс',
       'refresh': 'Жаңарту',
       'status': 'Күйі: {status}',
       'totalLabel': 'Жиыны: {amount}',
-      'simulatedPayment': 'Сынақ төлемі — нақты ақша қозғалмайды.',
+      'simulatedPayment': 'Сынақ төлемі. Нақты қаражат есептен шығарылмайды.',
       'approvePayment': 'Төлемді мақұлдау',
       'decline': 'Қабылдамау',
       'abandon': 'Бас тарту',
       'cancelReservation': 'Бронды болдырмау',
       'refundOrder': 'Тапсырысты қайтару',
       'refundConfirmation': 'Тапсырыстағы барлық билет жарамсыз болады. Қайтаруды жалғастырасыз ба?',
-      'paymentSucceeded': 'Төлем өтті. Билеттер дайын.',
+      'paymentSucceeded': 'Билеттеріңіз дайын.',
       'holdExpired': 'Брондау уақыты бітті. Билет берілген жоқ.',
       'orderClosed': 'Тапсырыс билетсіз жабылды.',
       'noTickets': 'Сізде әлі билет жоқ',
@@ -606,7 +732,7 @@ class AppLocalizations {
       'sharePdf': 'PDF бөлісу / сақтау',
       'preparingPdf': 'PDF дайындалуда…',
       'pdfFailed': 'PDF ашу мүмкін болмады',
-      'qrNote': 'QR мен PDF серверден bearer токенмен жүктеледі. Токен сурет URL-іне енбейді.',
+      'qrNote': 'Кіреберісте осы QR-кодты көрсетіңіз.',
       'ticketStatusValid': 'Жарамды',
       'ticketStatusCheckedIn': 'Тексерілді',
       'ticketStatusCancelled': 'Тоқтатылды',
@@ -631,11 +757,16 @@ class AppLocalizations {
       'resetSent':
           'Бұл email-ге аккаунт болса, қалпына келтіру сілтемесі жіберілді.',
       'resetPassword': 'Жаңа құпиясөз',
-      'resetLead': 'Сілтемедегі токенді қойып, жаңа құпиясөз қойыңыз.',
+      'verifyEmail': 'Электрондық поштаны растау',
+      'verificationLead': 'Хаттағы растау сілтемесін қойыңыз.',
+      'resendVerification': 'Растау хатын қайта жіберу',
+      'verificationSent': 'Растау хаты жіберілді.',
+      'invalidEmailLink': 'Хаттағы жарамды сілтемені немесе токенді енгізіңіз.',
+      'resetLead': 'Хаттағы сілтемені қойып, жаңа құпиясөз таңдаңыз.',
+      'resetToken': 'Қалпына келтіру сілтемесі немесе токені',
       'newPassword': 'Жаңа құпиясөз',
       'savePassword': 'Құпиясөзді сақтау',
       'savingPassword': 'Сақталуда…',
-      'resetToken': 'Қалпына келтіру токені',
       'backToSignIn': 'Кіруге оралу',
       'createEvent': 'Іс-шара құру',
       'editEvent': 'Іс-шараны өзгерту',
@@ -683,7 +814,7 @@ class AppLocalizations {
       'reportTickets': 'Билеттер',
       'grossSales': 'Жалпы сатылым',
       'discounts': 'Жеңілдіктер',
-      'netSales': 'Таза сатылым',
+      'netSales': 'Жеңілдік пен қайтарымнан кейін',
       'active': 'Белсенді',
       'paidSalesReviews': 'Ақылы сатуды тексеру',
       'noPendingReviews': 'Тексеру өтініші жоқ',
@@ -706,6 +837,27 @@ class AppLocalizations {
       'campaignApplied': 'Кампания қолданылды',
       'hidden': 'Жасырын',
       'errorAuth': 'Қайта кіріңіз',
+      'discover': 'Іс-шаралар',
+      'welcomeBack': 'Қош келдіңіз',
+      'heroTitle': 'Келесі керемет іс-шараңыз',
+      'heroAccent': 'осы жерден басталады',
+      'upcoming': 'Алдағы іс-шаралар',
+      'workspace': 'Басқару',
+      'orderHistory': 'Тапсырыстар тарихы',
+      'showAtDoor': 'Кіреберісте көрсету',
+      'shareEvent': 'Іс-шарамен бөлісу',
+      'noOrders': 'Әзірге тапсырыс жоқ',
+      'registrationUnavailable': 'Тіркелу жабық.',
+      'paidSalesUnavailable': 'Бұл іс-шараға ақылы билеттер қазір сатылмайды.',
+      'paid': 'Расталды',
+      'awaiting': 'Төлем күтілуде',
+      'expired': 'Мерзімі аяқталды',
+      'failed': 'Төлем өтпеді',
+      'unknown': 'Қолжетімсіз',
+      'rate': 'Әрекет саны тым көп. Біраз күтіп, қайталап көріңіз.',
+      'simRefund': 'Бұл — сынақ қайтарымы. Билеттеріңіз жарамсыз болады.',
+      'testOrder': 'Сынақ операциясы',
+      'verified': 'Электрондық пошта расталды',
     },
   };
 
@@ -815,6 +967,20 @@ class AppLocalizations {
   String get city => _t('city');
   String get allCities => _t('allCities');
   String get category => _t('category');
+  String get venueField => locale.languageCode == 'ru'
+      ? 'Площадка'
+      : locale.languageCode == 'kk'
+          ? 'Өтетін орын'
+          : 'Venue';
+
+  String get eventCoverUrlField => locale.languageCode == 'ru'
+      ? 'Ссылка на обложку мероприятия'
+      : locale.languageCode == 'kk'
+          ? 'Іс-шара мұқабасының сілтемесі'
+          : 'Event cover URL';
+
+  String get visibility => _t('visibility');
+  String get preview => _t('preview');
   String get allCategories => _t('allCategories');
   String get price => _t('price');
   String get anyPrice => _t('anyPrice');
@@ -823,7 +989,9 @@ class AppLocalizations {
   String get over10k => _t('over10k');
   String get noEvents => _t('noEvents');
   String get soldOut => _t('soldOut');
-  String fromPrice(int amount) => _fmt('fromPrice', {'amount': '$amount'});
+  String fromPrice(int amount) => _fmt('fromPrice', {
+    'amount': formatWholeNumber(amount, locale.languageCode),
+  });
   String get tickets => _t('tickets');
   String get noTicketTypes => _t('noTicketTypes');
   String left(int count) => _fmt('left', {'count': '$count'});
@@ -832,15 +1000,31 @@ class AppLocalizations {
       _fmt('continueWithTickets', {'count': '$count'});
   String get selectTickets => _t('selectTickets');
   String get checkout => _t('checkout');
+  String get discover => _t('discover');
+  String get welcomeBack => _t('welcomeBack');
+  String get heroTitle => _t('heroTitle');
+  String get heroAccent => _t('heroAccent');
+  String get upcoming => _t('upcoming');
+  String get workspace => _t('workspace');
+  String get orderHistory => _t('orderHistory');
+  String get showAtDoor => _t('showAtDoor');
+  String get shareEvent => _t('shareEvent');
+  String get noOrders => _t('noOrders');
+  String get registrationUnavailable => _t('registrationUnavailable');
+  String get paidSalesUnavailable => _t('paidSalesUnavailable');
+  String get testRefund => _t('simRefund');
+  String get testTransaction => _t('testOrder');
+  String get emailVerified => _t('verified');
   String get fullName => _t('fullName');
   String get promoCode => _t('promoCode');
   String get apply => _t('apply');
   String get promoApplied => _t('promoApplied');
-  String discount(int amount) => _fmt('discount', {'amount': '$amount'});
+  String discount(int amount) => _fmt('discount', {
+    'amount': formatWholeNumber(amount, locale.languageCode),
+  });
   String total(String amount) => _fmt('total', {'amount': amount});
   String get placeOrder => _t('placeOrder');
   String get working => _t('working');
-  String get checkoutNote => _t('checkoutNote');
   String get order => _t('order');
   String get refundOrder => _t('refundOrder');
   String get refundConfirmation => _t('refundConfirmation');
@@ -875,17 +1059,75 @@ class AppLocalizations {
       case 'REFUNDED':
         return _t('ticketStatusRefunded');
       default:
-        return code;
+        return _t('unknown');
     }
   }
 
+  String orderStatus(String code) => switch (code) {
+    'PAID' => _t('paid'),
+    'PENDING' || 'AWAITING_PAYMENT' => _t('awaiting'),
+    'EXPIRED' => _t('expired'),
+    'FAILED' => _t('failed'),
+    _ => ticketStatus(code),
+  };
+
   String apiError(String code) {
+    final refundErrors = <String, List<String>>{
+      'VENUE_REQUIRED': [
+        'Select a venue and save before publishing.',
+        'Выберите площадку и сохраните изменения перед публикацией.',
+        'Жариялау алдында өтетін орынды таңдап, сақтаңыз.',
+      ],
+      'REFUND_WINDOW_24H': [
+        'Refunds are not available less than 24 hours before the event.',
+        'До начала мероприятия осталось менее 24 часов. Возврат недоступен.',
+        'Іс-шараның басталуына 24 сағаттан аз уақыт қалды. Билетті қайтару мүмкін емес.',
+      ],
+      'REFUND_WINDOW_48H': [
+        'Refunds are not available less than 48 hours before the event.',
+        'До начала мероприятия осталось менее 48 часов. Возврат недоступен.',
+        'Іс-шараның басталуына 48 сағаттан аз уақыт қалды. Билетті қайтару мүмкін емес.',
+      ],
+      'REFUND_NOT_ALLOWED': [
+        'Tickets for this event are non-refundable.',
+        'Билеты на это мероприятие не подлежат возврату.',
+        'Бұл іс-шараның билеттері қайтарылмайды.',
+      ],
+      'REFUND_CHECKED_IN': [
+        'Checked-in tickets cannot be refunded.',
+        'Использованные билеты нельзя вернуть.',
+        'Пайдаланылған билеттерді қайтару мүмкін емес.',
+      ],
+      'REFUND_UNPAID': [
+        'Only paid orders can be refunded.',
+        'Вернуть можно только оплаченный заказ.',
+        'Тек төленген тапсырысты қайтаруға болады.',
+      ],
+      'REFUND_WINDOW_CLOSED': [
+        'The refund period has ended.',
+        'Срок возврата билетов истёк.',
+        'Билеттерді қайтару мерзімі аяқталды.',
+      ],
+    };
+    final refundMessage = refundErrors[code];
+    if (refundMessage != null) {
+      return refundMessage[switch (locale.languageCode) {
+        'ru' => 1,
+        'kk' => 2,
+        _ => 0,
+      }];
+    }
+
     switch (code) {
       case 'VALIDATION_FAILED':
         return _t('errorValidation');
-      case 'CONFLICT':
       case 'SOLD_OUT':
         return _t('errorConflict');
+      case 'REGISTRATION_CLOSED':
+      case 'TICKET_SALES_CLOSED':
+        return registrationUnavailable;
+      case 'PAID_SALES_INACTIVE':
+        return paidSalesUnavailable;
       case 'HOLD_EXPIRED':
         return _t('errorHoldExpired');
       case 'PROMO_INVALID':
@@ -899,8 +1141,10 @@ class AppLocalizations {
         return _t('errorNotFound');
       case 'UNAUTHENTICATED':
         return _t('errorAuth');
+      case 'RATE_LIMITED':
+        return _t('rate');
       default:
-        return code.isEmpty ? _t('errorGeneric') : code;
+        return _t('errorGeneric');
     }
   }
 
@@ -915,6 +1159,11 @@ class AppLocalizations {
   String get sendingReset => _t('sendingReset');
   String get resetSent => _t('resetSent');
   String get resetPassword => _t('resetPassword');
+  String get verifyEmail => _t('verifyEmail');
+  String get verificationLead => _t('verificationLead');
+  String get resendVerification => _t('resendVerification');
+  String get verificationSent => _t('verificationSent');
+  String get invalidEmailLink => _t('invalidEmailLink');
   String get resetLead => _t('resetLead');
   String get newPassword => _t('newPassword');
   String get savePassword => _t('savePassword');
@@ -990,7 +1239,8 @@ class AppLocalizations {
   String get campaignApplied => _t('campaignApplied');
   String get hidden => _t('hidden');
 
-  String money(int amount) => amount == 0 ? free : '₸$amount';
+  String money(int amount) =>
+      formatKzt(amount, freeLabel: free, languageCode: locale.languageCode);
 }
 
 class _AppLocalizationsDelegate

@@ -120,16 +120,18 @@ class _ScannerScreenState extends State<ScannerScreen>
         },
       );
     } on TimeoutException {
-      if (mounted) {
-        setState(() => error = l10n.scanTimeout);
-      }
+      if (mounted) showConnectionError(l10n.scanTimeout);
     } catch (_) {
-      if (mounted) {
-        setState(() => error = l10n.scanRequestFailed);
-      }
+      if (mounted) showConnectionError(l10n.scanRequestFailed);
     } finally {
       if (mounted) setState(() => busy = false);
     }
+  }
+
+  void showConnectionError(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   List<Map<String, dynamic>> readList(Map<String, dynamic> data, String key) =>
@@ -197,7 +199,7 @@ class _ScannerScreenState extends State<ScannerScreen>
   void detected(BarcodeCapture capture) {
     final selected = eventId;
     if (busy ||
-        starting ||
+        stopping ||
         !scanning ||
         selected == null ||
         ModalRoute.of(context)?.isCurrent != true ||
@@ -205,13 +207,22 @@ class _ScannerScreenState extends State<ScannerScreen>
       return;
     }
     for (final barcode in capture.barcodes) {
+      debugPrint('BiletFlow QR: barcode detected');
       final payload = barcode.rawValue;
       if (payload == null || payload.isEmpty) continue;
       unawaited(
         run(() async {
-          setState(() => scanning = false);
-          await camera.stop();
+          setState(() {
+            scanning = false;
+            stopping = true;
+          });
+          unawaited(camera.stop().timeout(const Duration(seconds: 3)).catchError((Object _) {
+            debugPrint('BiletFlow QR: camera stop failed');
+          }).whenComplete(() {
+            if (mounted) setState(() => stopping = false);
+          }));
           if (!mounted) return;
+          debugPrint('BiletFlow QR: sending check-in request');
           final data = await api.post('/api/checkin', {
             'eventId': selected,
             'payload': payload,
@@ -234,12 +245,11 @@ class _ScannerScreenState extends State<ScannerScreen>
 
   Future<void> findAttendees() async {
     if (locked || eventId == null) return;
+    FocusManager.instance.primaryFocus?.unfocus();
     await run(() async {
       final query = search.text.trim();
-      if (query.isEmpty) {
-        setState(() => attendees = null);
-        return;
-      }
+      setState(() => attendees = null);
+      if (query.isEmpty) return;
       final data = await api.get(
         '$eventPath/attendees?q=${Uri.encodeQueryComponent(query)}',
       );
@@ -338,8 +348,18 @@ class _ScannerScreenState extends State<ScannerScreen>
               ],
             ),
           if (stats case final counts?)
-            Text(
-              '${l10n.checkedInLabel}: ${counts['checkedIn']} / ${counts['registered']}',
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.groups_outlined),
+                title: Text(
+                  '${l10n.checkedInLabel}: ${counts['checkedIn']} / ${counts['registered']}',
+                ),
+                trailing: IconButton(
+                  onPressed: locked ? null : () => run(refreshStats),
+                  tooltip: l10n.refreshAttendance,
+                  icon: const Icon(Icons.refresh),
+                ),
+              ),
             ),
           if (busy) const LinearProgressIndicator(),
           if (error case final message?)
@@ -351,6 +371,15 @@ class _ScannerScreenState extends State<ScannerScreen>
               ),
             ),
           if (result case final data?) resultCard(data),
+          if (scanning)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(switch (l10n.locale.languageCode) {
+                'ru' => 'Поместите QR-код билета в кадр.',
+                'kk' => 'Билеттің QR-кодын камера жақтауына келтіріңіз.',
+                _ => 'Position the ticket QR code inside the camera view.',
+              }),
+            ),
           Offstage(
             offstage: !scanning,
             child: AspectRatio(
@@ -393,7 +422,21 @@ class _ScannerScreenState extends State<ScannerScreen>
                   ListTile(
                     title: Text('${attendee['attendeeName']}'),
                     subtitle: Text(
-                      '${attendee['ticketTypeName']} · ${l10n.ticketStatus('${attendee['status']}')}',
+                      [
+                        '${attendee['ticketTypeName']} · ${l10n.ticketStatus('${attendee['status']}')}',
+                        if (attendee['orderReference'] != null)
+                          '${switch (l10n.locale.languageCode) {
+                            'ru' => 'Заказ',
+                            'kk' => 'Тапсырыс',
+                            _ => 'Order',
+                          }}: ${attendee['orderReference']}',
+                        if (attendee['ticketId'] != null)
+                          '${switch (l10n.locale.languageCode) {
+                            'ru' => 'ID билета',
+                            'kk' => 'Билет ID',
+                            _ => 'Ticket ID',
+                          }}: ${attendee['ticketId']}',
+                      ].join('\n'),
                     ),
                     trailing: attendee['checkInRecordId'] is String
                         ? TextButton(

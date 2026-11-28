@@ -81,7 +81,7 @@ void main() {
         expect(request.url.path, '/api/auth/request-password-reset');
         expect(jsonDecode(request.body), {
           'email': 'aida@example.test',
-          'redirectTo': 'https://example.test/en/reset-password',
+          'redirectTo': '/en/reset-password',
         });
         return http.Response('{"status":true}', 200);
       }),
@@ -106,10 +106,91 @@ void main() {
     );
   });
 
+  testWidgets('verifies an email link against the current account', (
+    tester,
+  ) async {
+    final calls = <String>[];
+    final api = ApiClient(
+      'https://example.test',
+      client: MockClient((request) async {
+        calls.add(request.url.path);
+        if (request.url.path == '/api/auth/verify-email') {
+          expect(request.url.queryParameters, {'token': 'signed.token'});
+          return http.Response('{"status":true}', 200);
+        }
+        expect(request.url.path, '/api/me');
+        return http.Response('{"user":{"emailVerified":true}}', 200);
+      }),
+    )..token = 'attendee';
+    final session = Session(api);
+    addTearDown(api.close);
+    addTearDown(session.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: const [AppLocalizations.delegate],
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => Navigator.push<void>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => VerifyEmailScreen(session: session),
+              ),
+            ),
+            child: const Text('Open verification'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Open verification'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byType(TextFormField),
+      'https://example.test/api/auth/verify-email?token=signed.token&callbackURL=/',
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Verify email'));
+    await tester.pumpAndSettle();
+    expect(calls, ['/api/auth/verify-email', '/api/me']);
+    expect(session.user?['emailVerified'], isTrue);
+  });
+
+  testWidgets('resets a password from the original email URL', (tester) async {
+    final calls = <String>[];
+    final api = ApiClient(
+      'https://example.test',
+      client: MockClient((request) async {
+        calls.add(request.url.path);
+        expect(jsonDecode(request.body), {
+          'token': 'reset-token',
+          'newPassword': 'new-password123',
+        });
+        return http.Response('{"status":true}', 200);
+      }),
+    );
+    addTearDown(api.close);
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: const [AppLocalizations.delegate],
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ResetPasswordScreen(api: api),
+      ),
+    );
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'http://localhost:3000/api/auth/reset-password/reset-token?callbackURL=/en/reset-password',
+    );
+    await tester.enterText(find.byType(TextFormField).last, 'new-password123');
+    await tester.tap(find.byType(FilledButton));
+    await tester.pumpAndSettle();
+    expect(calls, ['/api/auth/reset-password']);
+  });
+
   testWidgets('checkout sends a campaign token instead of a promo code', (
     tester,
   ) async {
-    String? orderBody;
+    final orderRequests = <Map<String, dynamic>>[];
     final api = ApiClient(
       'https://example.test',
       client: MockClient((request) async {
@@ -128,7 +209,10 @@ void main() {
           );
         }
         if (request.method == 'POST' && request.url.path == '/api/orders') {
-          orderBody = request.body;
+          orderRequests.add(jsonDecode(request.body) as Map<String, dynamic>);
+          if (orderRequests.length == 1) {
+            throw http.ClientException('Connection lost');
+          }
           return http.Response(
             '{"order":{"id":"order-1","status":"AWAITING_PAYMENT"}}',
             201,
@@ -161,7 +245,7 @@ void main() {
           ],
           initialName: 'Aida',
           initialEmail: 'a@example.test',
-          initialCampaignToken: 'https://biletflow.kz/e/jazz?c=abc123',
+          initialCampaignToken: 'abc123',
         ),
       ),
     );
@@ -169,7 +253,19 @@ void main() {
     expect(find.text('Early bird'), findsOneWidget);
     await tester.tap(find.text('Place order'));
     await tester.pumpAndSettle();
-    final body = jsonDecode(orderBody!) as Map<String, dynamic>;
+    expect(
+      find.text('Could not complete that request. Try again.'),
+      findsOneWidget,
+    );
+    await tester.ensureVisible(find.text('Place order'));
+    await tester.tap(find.text('Place order'));
+    await tester.pumpAndSettle();
+    expect(orderRequests, hasLength(2));
+    expect(
+      orderRequests[0]['clientIdempotencyKey'],
+      orderRequests[1]['clientIdempotencyKey'],
+    );
+    final body = orderRequests.last;
     expect(body['campaignToken'], 'abc123');
     expect(body.containsKey('promoCode'), isFalse);
   });

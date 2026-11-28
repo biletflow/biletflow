@@ -9,6 +9,7 @@ import '../core/api.dart';
 import '../core/format.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/status_badge.dart';
+import 'support.dart';
 
 class TicketDetailScreen extends StatefulWidget {
   final ApiClient api;
@@ -54,24 +55,62 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     setState(() {
       _qrLoading = true;
       _qrError = null;
+      _qr = null;
     });
     try {
       final bytes = await widget.api.getBytes(
         '/api/tickets/${widget.ticketId}/qr.png',
         accept: 'image/png',
       );
-      setState(() => _qr = Uint8List.fromList(bytes));
+      if (mounted) setState(() => _qr = Uint8List.fromList(bytes));
     } on ApiException catch (error) {
-      setState(() => _qrError = error.code);
+      if (mounted) setState(() => _qrError = error.code);
     } catch (_) {
-      setState(() => _qrError = 'REQUEST_FAILED');
+      if (mounted) setState(() => _qrError = 'REQUEST_FAILED');
     } finally {
       if (mounted) setState(() => _qrLoading = false);
     }
   }
 
+  Future<void> _showFullQr() async {
+    if (!_canShowQr || _qrLoading) return;
+    await _loadQr();
+    if (!mounted || _qrError != null || _qr == null) return;
+    final bytes = _qr!;
+    final l10n = AppLocalizations.of(context);
+    final summary = widget.summary;
+    final event = summary['event'];
+    final title = event is Map ? '${event['title'] ?? ''}' : '';
+    final seat = [
+      summary['sectionName'],
+      summary['rowLabel'],
+      summary['seatNumber'],
+    ].whereType<String>().where((part) => part.isNotEmpty).join(' ');
+    await Navigator.push<void>(context, MaterialPageRoute(builder: (_) => Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        title: Text(l10n.showAtDoor),
+      ),
+      body: SafeArea(child: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          if (title.isNotEmpty)
+            Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
+          Text('${summary['attendeeName'] ?? ''}', style: const TextStyle(color: Colors.white)),
+          Text(l10n.ticketTypeName('${summary['ticketTypeName'] ?? ''}'), style: const TextStyle(color: Colors.white70)),
+          if (seat.isNotEmpty) Text(seat, style: const TextStyle(color: Colors.white70)),
+          const SizedBox(height: 24),
+          Image.memory(bytes, fit: BoxFit.contain),
+        ],
+      )),
+    )));
+  }
+
   Future<void> _sharePdf() async {
     setState(() => _pdfBusy = true);
+    final l10n = AppLocalizations.of(context);
     try {
       final bytes = await widget.api.getBytes(
         '/api/tickets/${widget.ticketId}/pdf',
@@ -80,23 +119,26 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/biletflow-ticket-${widget.ticketId}.pdf');
       await file.writeAsBytes(bytes, flush: true);
+      if (!mounted) return;
+      final box = context.findRenderObject() as RenderBox?;
       await Share.shareXFiles(
         [XFile(file.path, mimeType: 'application/pdf')],
-        subject: 'BiletFlow ticket',
+        subject: 'BiletFlow · ${l10n.tickets}',
+        sharePositionOrigin: box == null || !box.hasSize
+            ? null
+            : box.localToGlobal(Offset.zero) & box.size,
       );
     } on ApiException catch (error) {
       if (mounted) {
         final l10n = AppLocalizations.of(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.apiError(error.code))),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l10n.apiError(error.code))));
       }
     } catch (_) {
       if (mounted) {
         final l10n = AppLocalizations.of(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.pdfFailed)),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l10n.pdfFailed)));
       }
     } finally {
       if (mounted) setState(() => _pdfBusy = false);
@@ -108,9 +150,14 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     final l10n = AppLocalizations.of(context);
     final summary = widget.summary;
     final event = summary['event'];
-    final title = event is Map ? '${event['title'] ?? 'Ticket'}' : 'Ticket';
-    final when = event is Map ? formatEventWhen(event['startsAt']) : '';
+    final title = event is Map
+        ? '${event['title'] ?? l10n.tickets}'
+        : l10n.tickets;
+    final when = event is Map
+        ? formatEventWhen(event['startsAt'], context: context)
+        : '';
     final status = '${summary['status'] ?? ''}';
+    final seat = [summary['sectionName'], summary['rowLabel'], summary['seatNumber']].whereType<String>().where((part) => part.isNotEmpty).join(' ');
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
@@ -119,8 +166,9 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         children: [
           Text(title, style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),
-          Text('${summary['ticketTypeName'] ?? ''}'),
+          Text(l10n.ticketTypeName('${summary['ticketTypeName'] ?? ''}')),
           Text('${summary['attendeeName'] ?? ''}'),
+          if (seat.isNotEmpty) Text(seat),
           if (when.isNotEmpty) Text(when),
           const SizedBox(height: 8),
           Align(
@@ -128,7 +176,10 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
             child: StatusBadge.ticket(status, l10n.ticketStatus(status)),
           ),
           const SizedBox(height: 20),
-          Text(l10n.admissionQr, style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            l10n.admissionQr,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 8),
           if (!_canShowQr)
             Text(
@@ -138,20 +189,27 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
             )
           else if (_qrLoading)
             const Center(child: CircularProgressIndicator())
-          else if (_qrError != null)
+          else if (_qrError != null) ...[
             Text(
               l10n.apiError(_qrError!),
               style: TextStyle(color: Theme.of(context).colorScheme.error),
-            )
-          else if (_qr != null)
+            ),
+            TextButton(onPressed: _loadQr, child: Text(l10n.refresh)),
+          ] else if (_qr != null)
             Center(
-              child: Image.memory(
+              child: InkWell(onTap: _showFullQr, child: Image.memory(
                 _qr!,
                 width: 240,
                 height: 240,
                 fit: BoxFit.contain,
                 gaplessPlayback: true,
-              ),
+              )),
+            ),
+          if (_canShowQr && _qr != null && !_qrLoading && _qrError == null)
+            OutlinedButton.icon(
+              onPressed: _showFullQr,
+              icon: const Icon(Icons.fullscreen),
+              label: Text(l10n.showAtDoor),
             ),
           const SizedBox(height: 20),
           FilledButton.icon(
@@ -159,8 +217,32 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
             icon: const Icon(Icons.picture_as_pdf),
             label: Text(_pdfBusy ? l10n.preparingPdf : l10n.sharePdf),
           ),
-          const SizedBox(height: 8),
-          Text(l10n.qrNote, style: Theme.of(context).textTheme.bodySmall),
+          if (_qr != null) ...[
+            const SizedBox(height: 8),
+            Text(l10n.qrNote, style: Theme.of(context).textTheme.bodySmall),
+          ],
+          TextButton.icon(
+            icon: const Icon(Icons.support_agent),
+            label: Text(l10n.support),
+            onPressed: () async {
+              final caseId = await Navigator.push<String>(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SupportComposer(
+                    api: widget.api,
+                    ticketId: widget.ticketId,
+                  ),
+                ),
+              );
+              if (!context.mounted || caseId == null) return;
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SupportThread(api: widget.api, id: caseId),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

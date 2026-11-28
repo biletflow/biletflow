@@ -45,7 +45,7 @@ async function signup(page: Page) {
   await page
     .getByRole("button", { name: "Create account", exact: true })
     .click();
-  await expect(page).toHaveURL("http://localhost:3000/en");
+  await expect(page).toHaveURL(/\/en$/);
   return email;
 }
 
@@ -146,7 +146,7 @@ test("browser signup, cookie persistence, attendee access and logout work togeth
   ).toBeVisible();
   for (const target of ["admin", "organizer"]) {
     await page.goto(`/en/${target}`);
-    await expect(page).toHaveURL("http://localhost:3000/en");
+    await expect(page).toHaveURL(/\/en$/);
   }
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(
@@ -181,7 +181,7 @@ test("platform admin sees seeded users without credentials", async ({
   const table = page.getByRole("table");
   await expect(table).toContainText("scanner@biletflow.kz");
   await expect(table).toContainText("organizer@biletflow.kz");
-  await expect(table).toContainText("PLATFORM_ADMIN");
+  await expect(table.getByRole("row").filter({hasText:"admin@biletflow.kz"}).getByRole("cell",{name:"Platform admin",exact:true})).toBeVisible();
   await expect(table).not.toContainText(password!);
 });
 
@@ -191,7 +191,7 @@ test("anonymous dashboards redirect to sign-in in every locale", async ({
   for (const locale of ["en", "ru", "kk"])
     for (const target of ["organizer", "admin"]) {
       await page.goto(`/${locale}/${target}`);
-      await expect(page).toHaveURL(`http://localhost:3000/${locale}/sign-in`);
+      await expect(new URL(page.url()).pathname).toBe(`/${locale}/sign-in`);
     }
 });
 
@@ -256,7 +256,7 @@ test("both seeded scanner accounts work through the running Next.js API", async 
     };
     const scanner = createScannerAuth(
       device,
-      "http://localhost:3000",
+      process.env.E2E_BASE_URL ?? "http://localhost:3000",
       nativeFetch,
     );
     await scanner.login(email, password!);
@@ -315,6 +315,9 @@ test("paid checkout issues a ticket after simulated approval", async ({
     .getByRole("link", { name: messages.en.event.buyTickets, exact: true })
     .click();
   await expect(page.getByText("₸8,000", { exact: true }).first()).toBeVisible();
+  await expect(
+    page.getByText(messages.en.checkout.testPayment, { exact: true }),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: messages.en.checkout.submitPaid, exact: true })
     .click();

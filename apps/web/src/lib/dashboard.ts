@@ -27,8 +27,9 @@ export async function listOrganizerEvents(organizerId: string) {
   });
 }
 
-export async function listAdminUsers() {
+export async function listAdminUsers(limit?: number) {
   return prisma.user.findMany({
+    take: limit,
     orderBy: [{ role: "asc" }, { name: "asc" }],
     select: {
       id: true,

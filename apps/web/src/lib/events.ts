@@ -159,10 +159,14 @@ export async function getPublicEventBySlug(slug: string) {
       timezone: true,
       capacity: true,
       paidSalesActive: true,
+      paidSalesSuspended: true,
       refundPolicy: true,
       registrationOpensAt: true,
       registrationClosesAt: true,
       cancellationReason: true,
+      updatedAt: true,
+      calendarSequence: true,
+      seatingMode: true,
       venue: { select: { name: true, address: true, city: true, country: true } },
       organizer: {
         select: {
@@ -177,7 +181,11 @@ export async function getPublicEventBySlug(slug: string) {
   });
 
   if (!event) return null;
-  return { ...event, ...summarise(event) };
+  return {
+    ...event,
+    ...summarise(event),
+    paidSalesActive: event.paidSalesActive && !event.paidSalesSuspended,
+  };
 }
 
 export async function listRelatedEvents(eventId: string, category: string | null) {

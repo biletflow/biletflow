@@ -57,9 +57,9 @@ export const eventInputSchema = z
   .object({
     title: z.string().trim().min(3).max(200),
     description: z.string().trim().max(20000).optional(),
-    category: z.string().trim().max(60).optional(),
-    coverImageUrl: z.string().url().optional(),
-    venueId: z.string().cuid().optional(),
+    category: z.string().trim().max(60).nullish(),
+    coverImageUrl: z.string().url().nullish(),
+    venueId: z.string().cuid().nullish(),
     visibility: eventVisibilitySchema.default("PUBLIC"),
     seatingMode: seatingModeSchema.default("GENERAL_ADMISSION"),
     startsAt: z.coerce.date(),

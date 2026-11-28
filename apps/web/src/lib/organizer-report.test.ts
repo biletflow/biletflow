@@ -26,4 +26,47 @@ describe("organizer reporting", () => {
     expect(report.byDay.get("2026-11-19")).toBe(9000);
     expect(dateKey(order.paidAt)).toBe("2026-11-19");
   });
+
+  it("keeps processing fees on refunded orders, which is the demo payout gap", () => {
+    const paid = new Date("2026-11-20T08:00:00Z");
+    const sale = (
+      subtotalKzt: number,
+      discountKzt: number,
+      feeKzt: number,
+      totalKzt: number,
+      refundKzt = 0,
+    ) => ({
+      paidAt: paid,
+      subtotalKzt,
+      discountKzt,
+      feeKzt,
+      totalKzt,
+      campaignId: null,
+      items: [{ ticketTypeId: "door", quantity: 1, totalKzt }],
+      refunds: refundKzt === 0 ? [] : [{ amountKzt: refundKzt, status: "SUCCEEDED" }],
+    });
+    const report = summarizeSales(
+      [
+        sale(20000, 0, 800, 20000),
+        sale(30000, 0, 1150, 30000),
+        sale(5000, 1000, 240, 4000),
+        sale(10000, 0, 450, 10000, 10000),
+        sale(2500, 500, 170, 2000, 2000),
+        sale(0, 0, 0, 0),
+        { ...sale(20000, 0, 800, 20000), paidAt: null },
+      ],
+      "Asia/Almaty",
+    );
+    expect(report.totals).toMatchObject({
+      gross: 67500,
+      discounts: 1500,
+      fees: 2810,
+      refunds: 12000,
+      collected: 66000,
+      net: 51190,
+      count: 6,
+    });
+    const storedPayoutNet = 48050 + 3760;
+    expect(storedPayoutNet - report.totals.net).toBe(450 + 170);
+  });
 });

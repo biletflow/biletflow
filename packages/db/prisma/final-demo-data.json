@@ -1,0 +1,5068 @@
+{
+  "User": [
+    {
+      "id": "cmwz7psnp0000v0ssey7vcxlx",
+      "name": "Platform Admin",
+      "email": "admin@biletflow.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "PLATFORM_ADMIN",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:21.878",
+      "updatedAt": "2026-11-27T16:45:21.878"
+    },
+    {
+      "id": "cmwz7psps000av0ssbtb5i3r3",
+      "name": "Daniyar Seitov",
+      "email": "organizer2@biletflow.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ORGANIZER",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:21.953",
+      "updatedAt": "2026-11-27T16:45:21.953"
+    },
+    {
+      "id": "cmwz7psqr000hv0ssf88yd2t5",
+      "name": "Zarina Abenova",
+      "email": "organizer3@biletflow.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ORGANIZER",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:21.988",
+      "updatedAt": "2026-11-27T16:45:21.988"
+    },
+    {
+      "id": "cmwz7psrr000ov0ssx7b6ffcf",
+      "name": "Marat Iskakov",
+      "email": "scanner@biletflow.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.023",
+      "updatedAt": "2026-11-27T16:45:22.023"
+    },
+    {
+      "id": "cmwz7pssp000rv0ssdgc97gzh",
+      "name": "Gulnara Amanova",
+      "email": "scanner2@biletflow.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.057",
+      "updatedAt": "2026-11-27T16:45:22.057"
+    },
+    {
+      "id": "cmwz7psti000xv0sscll5fbxh",
+      "name": "Timur Bekova",
+      "email": "attendee2@example.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.087",
+      "updatedAt": "2026-11-27T16:45:22.087"
+    },
+    {
+      "id": "cmwz7pstu0010v0ssgc0rfgnc",
+      "name": "Dana Bekova",
+      "email": "attendee3@example.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.098",
+      "updatedAt": "2026-11-27T16:45:22.098"
+    },
+    {
+      "id": "cmwz7psu50013v0ssohai4naf",
+      "name": "Yerlan Bekova",
+      "email": "attendee4@example.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.11",
+      "updatedAt": "2026-11-27T16:45:22.11"
+    },
+    {
+      "id": "cmwz7psuh0016v0ssbgd0zzmu",
+      "name": "Saule Sultanov",
+      "email": "attendee5@example.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.121",
+      "updatedAt": "2026-11-27T16:45:22.121"
+    },
+    {
+      "id": "cmwz7psur0019v0ss37i2ewys",
+      "name": "Nurlan Omarov",
+      "email": "attendee6@example.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.131",
+      "updatedAt": "2026-11-27T16:45:22.131"
+    },
+    {
+      "id": "cmwz7psv6001cv0ss59f2fn89",
+      "name": "Madina Zhaksylykova",
+      "email": "attendee7@example.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.146",
+      "updatedAt": "2026-11-27T16:45:22.146"
+    },
+    {
+      "id": "cmwz7psvg001fv0ss3wzihltl",
+      "name": "Askar Zhaksylykova",
+      "email": "attendee8@example.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.157",
+      "updatedAt": "2026-11-27T16:45:22.157"
+    },
+    {
+      "id": "cmwz7psvq001iv0ssng1k03yn",
+      "name": "Aisha Sultanov",
+      "email": "attendee9@example.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.166",
+      "updatedAt": "2026-11-27T16:45:22.166"
+    },
+    {
+      "id": "cmwz7psw1001lv0ssqt7kc503",
+      "name": "Ruslan Sultanov",
+      "email": "attendee10@example.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.178",
+      "updatedAt": "2026-11-27T16:45:22.178"
+    },
+    {
+      "id": "cmwz7pst4000uv0ssso9hc0tv",
+      "name": "Aliya Zhaksylykova",
+      "email": "attendee1@example.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:22.072",
+      "updatedAt": "2026-11-27T16:45:22.072"
+    },
+    {
+      "id": "cmwz7psol0003v0ss4jvi0kac",
+      "name": "Waqar Ahmad",
+      "email": "organizer@biletflow.kz",
+      "emailVerified": true,
+      "image": null,
+      "role": "ORGANIZER",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T16:45:21.909",
+      "updatedAt": "2026-11-27T21:55:44.638"
+    },
+    {
+      "id": "cmwzk9d6200btv05wji0et7fm",
+      "name": "Demo Registered User",
+      "email": "registered@example.kz",
+      "emailVerified": false,
+      "image": null,
+      "role": "ATTENDEE",
+      "status": "ACTIVE",
+      "locale": "ru",
+      "phone": null,
+      "createdAt": "2026-11-27T22:36:30.308",
+      "updatedAt": "2026-11-27T22:36:30.308"
+    }
+  ],
+  "OrganizerProfile": [
+    {
+      "id": "cmwz7psq9000ev0sstiz8hn4v",
+      "userId": "cmwz7psps000av0ssbtb5i3r3",
+      "displayName": "KBTU Student Union",
+      "description": "KBTU Student Union organises events across Kazakhstan.",
+      "logoUrl": null,
+      "contactEmail": "organizer2@biletflow.kz",
+      "contactPhone": null,
+      "websiteUrl": null,
+      "verificationStatus": "APPROVED",
+      "identityDocUrl": null,
+      "verifiedAt": "2026-11-27T16:45:21.965",
+      "reviewNote": null,
+      "createdAt": "2026-11-27T16:45:21.969",
+      "updatedAt": "2026-11-27T16:45:21.969"
+    },
+    {
+      "id": "cmwz7psrc000lv0ssewwu1z6u",
+      "userId": "cmwz7psqr000hv0ssf88yd2t5",
+      "displayName": "Astana Tech Meetups",
+      "description": "Astana Tech Meetups organises events across Kazakhstan.",
+      "logoUrl": null,
+      "contactEmail": "organizer3@biletflow.kz",
+      "contactPhone": null,
+      "websiteUrl": null,
+      "verificationStatus": "PENDING_REVIEW",
+      "identityDocUrl": null,
+      "verifiedAt": null,
+      "reviewNote": null,
+      "createdAt": "2026-11-27T16:45:22.008",
+      "updatedAt": "2026-11-27T16:45:22.008"
+    },
+    {
+      "id": "cmwz7psp20007v0ss9cqwda3l",
+      "userId": "cmwz7psol0003v0ss4jvi0kac",
+      "displayName": "Nazarbayev University",
+      "description": "Nazarbayev University is a leading research university in Astana, Kazakhstan, hosting academic conferences, educational workshops, cultural events, student activities, and professional development programs.",
+      "logoUrl": null,
+      "contactEmail": "organizer@biletflow.kz",
+      "contactPhone": null,
+      "websiteUrl": null,
+      "verificationStatus": "APPROVED",
+      "identityDocUrl": null,
+      "verifiedAt": "2026-11-27T16:45:21.92",
+      "reviewNote": null,
+      "createdAt": "2026-11-27T16:45:21.926",
+      "updatedAt": "2026-11-27T20:06:15.793"
+    }
+  ],
+  "PayoutAccount": [
+    {
+      "id": "cmwz7psqf000gv0ssazxjxt0z",
+      "organizerProfileId": "cmwz7psq9000ev0sstiz8hn4v",
+      "holderName": "Daniyar Seitov",
+      "bankName": "Forte Bank",
+      "iban_last4": "7288",
+      "currency": "KZT",
+      "isDefault": true,
+      "simulated": true,
+      "createdAt": "2026-11-27T16:45:21.975",
+      "updatedAt": "2026-11-27T16:45:21.975"
+    },
+    {
+      "id": "cmwz7psri000nv0ssjltvmlur",
+      "organizerProfileId": "cmwz7psrc000lv0ssewwu1z6u",
+      "holderName": "Zarina Abenova",
+      "bankName": "Forte Bank",
+      "iban_last4": "7204",
+      "currency": "KZT",
+      "isDefault": true,
+      "simulated": true,
+      "createdAt": "2026-11-27T16:45:22.014",
+      "updatedAt": "2026-11-27T16:45:22.014"
+    },
+    {
+      "id": "cmwz7pspe0009v0ssh5zd8qjx",
+      "organizerProfileId": "cmwz7psp20007v0ss9cqwda3l",
+      "holderName": "Waqar Ahmad",
+      "bankName": "Halyk Bank",
+      "iban_last4": "5678",
+      "currency": "KZT",
+      "isDefault": true,
+      "simulated": true,
+      "createdAt": "2026-11-27T16:45:21.938",
+      "updatedAt": "2026-11-27T21:55:44.638"
+    }
+  ],
+  "Venue": [
+    {
+      "id": "cmwz7pswb001ov0ssvs0yybds",
+      "name": "KBTU Main Auditorium",
+      "address": "Tole Bi 59",
+      "city": "Almaty",
+      "country": "KZ",
+      "timezone": "Asia/Almaty",
+      "latitude": null,
+      "longitude": null,
+      "capacity": 300,
+      "isPredefinedLayout": false,
+      "createdAt": "2026-11-27T16:45:22.188",
+      "updatedAt": "2026-11-27T16:45:22.188"
+    },
+    {
+      "id": "cmwz7psx3001pv0sss3jgqjlr",
+      "name": "Almaty Central Concert Hall",
+      "address": "Abai Avenue 103",
+      "city": "Almaty",
+      "country": "KZ",
+      "timezone": "Asia/Almaty",
+      "latitude": null,
+      "longitude": null,
+      "capacity": 800,
+      "isPredefinedLayout": false,
+      "createdAt": "2026-11-27T16:45:22.188",
+      "updatedAt": "2026-11-27T16:45:22.188"
+    },
+    {
+      "id": "cmwz7psx6001qv0ssxk52xe0p",
+      "name": "Astana Hub",
+      "address": "Mangilik El 55/8",
+      "city": "Astana",
+      "country": "KZ",
+      "timezone": "Asia/Almaty",
+      "latitude": null,
+      "longitude": null,
+      "capacity": 200,
+      "isPredefinedLayout": false,
+      "createdAt": "2026-11-27T16:45:22.188",
+      "updatedAt": "2026-11-27T16:45:22.188"
+    },
+    {
+      "id": "cmwzdoq5o0000v0uwe2jb20ae",
+      "name": "NU School of Medicine",
+      "address": "5/1 Kerey and Zhanibek Khan Street",
+      "city": "Astana",
+      "country": "KZ",
+      "timezone": "Asia/Almaty",
+      "latitude": null,
+      "longitude": null,
+      "capacity": null,
+      "isPredefinedLayout": false,
+      "createdAt": "2026-11-27T19:32:29.677",
+      "updatedAt": "2026-11-27T19:32:29.677"
+    },
+    {
+      "id": "cmwzdoq8b0004v0uww68z0lcx",
+      "name": "Best Western Plus Atakent Park Hotel, Congress Hall",
+      "address": "42 Timiryazev Street, Building 10",
+      "city": "Almaty",
+      "country": "KZ",
+      "timezone": "Asia/Almaty",
+      "latitude": null,
+      "longitude": null,
+      "capacity": null,
+      "isPredefinedLayout": false,
+      "createdAt": "2026-11-27T19:32:29.772",
+      "updatedAt": "2026-11-27T19:32:29.772"
+    },
+    {
+      "id": "cmwzdoqa30008v0uwfthnd7rq",
+      "name": "NU Library, Block 5, Room E.438",
+      "address": "53 Kabanbay Batyr Avenue",
+      "city": "Astana",
+      "country": "KZ",
+      "timezone": "Asia/Almaty",
+      "latitude": null,
+      "longitude": null,
+      "capacity": null,
+      "isPredefinedLayout": false,
+      "createdAt": "2026-11-27T19:32:29.836",
+      "updatedAt": "2026-11-27T19:32:29.836"
+    },
+    {
+      "id": "cmwzdoqbf000cv0uwlqf1197z",
+      "name": "Nazarbayev University",
+      "address": "53 Kabanbay Batyr Avenue",
+      "city": "Astana",
+      "country": "KZ",
+      "timezone": "Asia/Almaty",
+      "latitude": null,
+      "longitude": null,
+      "capacity": null,
+      "isPredefinedLayout": false,
+      "createdAt": "2026-11-27T19:32:29.883",
+      "updatedAt": "2026-11-27T19:32:29.883"
+    }
+  ],
+  "VenueSection": [
+    {
+      "id": "cmwz80gpv000bv0sgcpdc9xmx",
+      "venueId": "cmwz7psx3001pv0sss3jgqjlr",
+      "name": "Stalls",
+      "displayOrder": 0,
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:53:39.619"
+    },
+    {
+      "id": "nu_impact_vip",
+      "venueId": "cmwzdoqbf000cv0uwlqf1197z",
+      "name": "VIP",
+      "displayOrder": 0,
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_impact_standard",
+      "venueId": "cmwzdoqbf000cv0uwlqf1197z",
+      "name": "Standard",
+      "displayOrder": 1,
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_library_standard",
+      "venueId": "cmwzdoqa30008v0uwfthnd7rq",
+      "name": "Main Hall",
+      "displayOrder": 0,
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    }
+  ],
+  "SeatRow": [
+    {
+      "id": "cmwz80wub000fv0sgr6c7cziv",
+      "venueSectionId": "cmwz80gpv000bv0sgcpdc9xmx",
+      "label": "A",
+      "displayOrder": 0,
+      "createdAt": "2026-11-27T16:54:00.515"
+    },
+    {
+      "id": "cmwz82fl9000uv0sgcbiu4ss7",
+      "venueSectionId": "cmwz80gpv000bv0sgcpdc9xmx",
+      "label": "B",
+      "displayOrder": 0,
+      "createdAt": "2026-11-27T16:55:11.469"
+    },
+    {
+      "id": "nu_impact_row_A",
+      "venueSectionId": "nu_impact_vip",
+      "label": "A",
+      "displayOrder": 1,
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_impact_row_B",
+      "venueSectionId": "nu_impact_vip",
+      "label": "B",
+      "displayOrder": 2,
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_impact_row_C",
+      "venueSectionId": "nu_impact_standard",
+      "label": "C",
+      "displayOrder": 3,
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_impact_row_D",
+      "venueSectionId": "nu_impact_standard",
+      "label": "D",
+      "displayOrder": 4,
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_impact_row_E",
+      "venueSectionId": "nu_impact_standard",
+      "label": "E",
+      "displayOrder": 5,
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_impact_row_F",
+      "venueSectionId": "nu_impact_standard",
+      "label": "F",
+      "displayOrder": 6,
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_library_row_A",
+      "venueSectionId": "nu_library_standard",
+      "label": "A",
+      "displayOrder": 1,
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_library_row_B",
+      "venueSectionId": "nu_library_standard",
+      "label": "B",
+      "displayOrder": 2,
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_library_row_C",
+      "venueSectionId": "nu_library_standard",
+      "label": "C",
+      "displayOrder": 3,
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "nu_library_row_D",
+      "venueSectionId": "nu_library_standard",
+      "label": "D",
+      "displayOrder": 4,
+      "createdAt": "2026-11-27T20:52:33.266"
+    }
+  ],
+  "Seat": [
+    {
+      "id": "cmwz80wub000gv0sgqs6qa8un",
+      "seatRowId": "cmwz80wub000fv0sgr6c7cziv",
+      "number": "1",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:54:00.515"
+    },
+    {
+      "id": "cmwz80wub000hv0sg4ipsgqhr",
+      "seatRowId": "cmwz80wub000fv0sgr6c7cziv",
+      "number": "2",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:54:00.515"
+    },
+    {
+      "id": "cmwz80wub000iv0sgwjkj1e4j",
+      "seatRowId": "cmwz80wub000fv0sgr6c7cziv",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:54:00.515"
+    },
+    {
+      "id": "cmwz80wub000jv0sgqpae70lx",
+      "seatRowId": "cmwz80wub000fv0sgr6c7cziv",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:54:00.515"
+    },
+    {
+      "id": "cmwz80wub000kv0sgouh3259v",
+      "seatRowId": "cmwz80wub000fv0sgr6c7cziv",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:54:00.515"
+    },
+    {
+      "id": "cmwz81zst000nv0sgs4jtxnho",
+      "seatRowId": "cmwz80wub000fv0sgr6c7cziv",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:54:51.005"
+    },
+    {
+      "id": "cmwz82fl9000vv0sgh0r8f0ec",
+      "seatRowId": "cmwz82fl9000uv0sgcbiu4ss7",
+      "number": "1",
+      "isAccessible": true,
+      "status": "AVAILABLE",
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:55:11.469"
+    },
+    {
+      "id": "cmwz82fl9000wv0sgtu33lm0s",
+      "seatRowId": "cmwz82fl9000uv0sgcbiu4ss7",
+      "number": "2",
+      "isAccessible": true,
+      "status": "AVAILABLE",
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:55:11.469"
+    },
+    {
+      "id": "cmwz82fl9000xv0sgvl66aj1o",
+      "seatRowId": "cmwz82fl9000uv0sgcbiu4ss7",
+      "number": "3",
+      "isAccessible": true,
+      "status": "AVAILABLE",
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:55:11.469"
+    },
+    {
+      "id": "cmwz82fl9000yv0sgpu09xy5h",
+      "seatRowId": "cmwz82fl9000uv0sgcbiu4ss7",
+      "number": "4",
+      "isAccessible": true,
+      "status": "AVAILABLE",
+      "priceCategory": null,
+      "createdAt": "2026-11-27T16:55:11.469"
+    },
+    {
+      "id": "c47f3a0cd36796c7bdd97f4fc",
+      "seatRowId": "nu_impact_row_A",
+      "number": "1",
+      "isAccessible": true,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cb8019d36167686ecd265f938",
+      "seatRowId": "nu_impact_row_A",
+      "number": "2",
+      "isAccessible": true,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c32ebe950945504be0ab8afaa",
+      "seatRowId": "nu_impact_row_A",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c6601c2d6f6b9e3acb7465ec9",
+      "seatRowId": "nu_impact_row_A",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cfe808c8ee2393344b7107197",
+      "seatRowId": "nu_impact_row_A",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c6ed217a9cc3c195068f3f557",
+      "seatRowId": "nu_impact_row_A",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cd31c57c0a8fa58500c740263",
+      "seatRowId": "nu_impact_row_A",
+      "number": "7",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c9459df2cad84aa2e36e3641f",
+      "seatRowId": "nu_impact_row_A",
+      "number": "8",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cc105735ceba07d34892ebdf6",
+      "seatRowId": "nu_impact_row_A",
+      "number": "9",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c2d059fd4bd240f73556f3a4d",
+      "seatRowId": "nu_impact_row_A",
+      "number": "10",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c70664b1c28692406162ae6f2",
+      "seatRowId": "nu_impact_row_B",
+      "number": "1",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cdfb3fcb81e24a40537192605",
+      "seatRowId": "nu_impact_row_B",
+      "number": "2",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c31629f22ddde6c900b920612",
+      "seatRowId": "nu_impact_row_B",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c651fe8e08ac443079fe09d4f",
+      "seatRowId": "nu_impact_row_B",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c9365f35b3a36d1b8d6978e84",
+      "seatRowId": "nu_impact_row_B",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "ccefc7acc65626c78fea470f8",
+      "seatRowId": "nu_impact_row_B",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cf5983d74b0f14cc6bb1e91f8",
+      "seatRowId": "nu_impact_row_B",
+      "number": "7",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cb000a73d867ecad2ab49dd76",
+      "seatRowId": "nu_impact_row_B",
+      "number": "8",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c077daf7a910b1feb6052177a",
+      "seatRowId": "nu_impact_row_B",
+      "number": "9",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c4ee7ff6012e0c46541802f3d",
+      "seatRowId": "nu_impact_row_B",
+      "number": "10",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "VIP",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c1a7078d72e997a5624971efc",
+      "seatRowId": "nu_impact_row_C",
+      "number": "1",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cf8fa4e06e1b68b10ec6efb01",
+      "seatRowId": "nu_impact_row_C",
+      "number": "2",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c2a398e9e0b63c58806b50b35",
+      "seatRowId": "nu_impact_row_C",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "ccf65787b0c0613ac4a2d9847",
+      "seatRowId": "nu_impact_row_C",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c816016a9deae657fefd7d860",
+      "seatRowId": "nu_impact_row_C",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c93d185cb6a86744038f73cca",
+      "seatRowId": "nu_impact_row_C",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cea6b506bfa8f39725593b3a8",
+      "seatRowId": "nu_impact_row_C",
+      "number": "7",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c73c5afff99565fb005fe14ef",
+      "seatRowId": "nu_impact_row_C",
+      "number": "8",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c4f262e82b3061f83a68c3ea7",
+      "seatRowId": "nu_impact_row_C",
+      "number": "9",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c82caf23de55e0311cf6f738e",
+      "seatRowId": "nu_impact_row_C",
+      "number": "10",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c500122448b01d7389dcf94ce",
+      "seatRowId": "nu_impact_row_D",
+      "number": "1",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c78cd0c9b702ceab28f37e960",
+      "seatRowId": "nu_impact_row_D",
+      "number": "2",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cdd5cdc161c77eadd6f87c0c6",
+      "seatRowId": "nu_impact_row_D",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cbd24436f4ced92f1c706c224",
+      "seatRowId": "nu_impact_row_D",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c6b2ca168a7e1f31c61dd8bbd",
+      "seatRowId": "nu_impact_row_D",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "ca46b3dbddb2e3b56e779cc14",
+      "seatRowId": "nu_impact_row_D",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cf91014f1bd8707fa1f34d231",
+      "seatRowId": "nu_impact_row_D",
+      "number": "7",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cb90c2853de042655521a4134",
+      "seatRowId": "nu_impact_row_D",
+      "number": "8",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c192b861ead6e7e64d4bd97d3",
+      "seatRowId": "nu_impact_row_D",
+      "number": "9",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c3d9d5440b8f698cac27b21a0",
+      "seatRowId": "nu_impact_row_D",
+      "number": "10",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c7dca2ede431cb56e72fae754",
+      "seatRowId": "nu_impact_row_E",
+      "number": "1",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cfafe1b7fcb3f92ba20acfc4b",
+      "seatRowId": "nu_impact_row_E",
+      "number": "2",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cc802de3b7964a6f43cca1787",
+      "seatRowId": "nu_impact_row_E",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c82fb29a9a157350ddaa76b39",
+      "seatRowId": "nu_impact_row_E",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "ccd7ee8257fe0dd982dd3ddc3",
+      "seatRowId": "nu_impact_row_E",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c5e72da455cf80e869899b41f",
+      "seatRowId": "nu_impact_row_E",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c559aec0c97f27688193ed27d",
+      "seatRowId": "nu_impact_row_E",
+      "number": "7",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c127e8174c180f1b9ddeb1cf1",
+      "seatRowId": "nu_impact_row_E",
+      "number": "8",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c8b89c6bc08a90f692910020d",
+      "seatRowId": "nu_impact_row_E",
+      "number": "9",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c433bbf39c850a996003863dd",
+      "seatRowId": "nu_impact_row_E",
+      "number": "10",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c91161cefcb7f8beb5e296ed6",
+      "seatRowId": "nu_impact_row_F",
+      "number": "1",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cbb6278b319675db079b0bbe6",
+      "seatRowId": "nu_impact_row_F",
+      "number": "2",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c48a58e533a24579ab71e3458",
+      "seatRowId": "nu_impact_row_F",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "ca5c64482b3c74d5d8fc4ab61",
+      "seatRowId": "nu_impact_row_F",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cb361400b73013a4d74e5624d",
+      "seatRowId": "nu_impact_row_F",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c29cb1903ab01c1bbe1197b73",
+      "seatRowId": "nu_impact_row_F",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c0261c320bd5de1762fc2fa0a",
+      "seatRowId": "nu_impact_row_F",
+      "number": "7",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "ce10d803cfbdfd538c6c25593",
+      "seatRowId": "nu_impact_row_F",
+      "number": "8",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c382bd1d35e43d2b48650847f",
+      "seatRowId": "nu_impact_row_F",
+      "number": "9",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c44afee36329e9c6d11a96d78",
+      "seatRowId": "nu_impact_row_F",
+      "number": "10",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c0ff9ceebab1e1bca16248c2a",
+      "seatRowId": "nu_library_row_A",
+      "number": "1",
+      "isAccessible": true,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cae51a134dc967bec98d0bd68",
+      "seatRowId": "nu_library_row_A",
+      "number": "2",
+      "isAccessible": true,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "ce8d29bf7f40a8e03c2db6b4e",
+      "seatRowId": "nu_library_row_A",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c624a00f3f7d4ef402c0d3dbf",
+      "seatRowId": "nu_library_row_A",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c260991434a7aa4b76e2b2933",
+      "seatRowId": "nu_library_row_A",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c8945e0f96c4ed86dc6b72cf2",
+      "seatRowId": "nu_library_row_A",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "ccd8f774f23232e7206facd30",
+      "seatRowId": "nu_library_row_B",
+      "number": "1",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c428d49398f8a68f51d33a84e",
+      "seatRowId": "nu_library_row_B",
+      "number": "2",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c4664bad6d7f279e3dde880b8",
+      "seatRowId": "nu_library_row_B",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c1e3e5d2621b3a7db2988365b",
+      "seatRowId": "nu_library_row_B",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c81e8106e934dcdf9f52767cf",
+      "seatRowId": "nu_library_row_B",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c34839a05ce621228a8c837ff",
+      "seatRowId": "nu_library_row_B",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c6becee9478f76d4a79d051c1",
+      "seatRowId": "nu_library_row_C",
+      "number": "1",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c2632e97194d61d343f08e4a5",
+      "seatRowId": "nu_library_row_C",
+      "number": "2",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "ce2cc3c033ea9fd70a791a85c",
+      "seatRowId": "nu_library_row_C",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c898ed4c0b6191988f57fa6b3",
+      "seatRowId": "nu_library_row_C",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c67ed674fa280fbc2fb688e9f",
+      "seatRowId": "nu_library_row_C",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cc5a0905edd9d8786a5830b7b",
+      "seatRowId": "nu_library_row_C",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c88419e175b59ad286ca6fbea",
+      "seatRowId": "nu_library_row_D",
+      "number": "1",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c90a74fad635882e092e97119",
+      "seatRowId": "nu_library_row_D",
+      "number": "2",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cffe17193ca59f0d4fadc0b75",
+      "seatRowId": "nu_library_row_D",
+      "number": "3",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cf11ad9ae7115d28ee58ca76b",
+      "seatRowId": "nu_library_row_D",
+      "number": "4",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "c87ab513d33a709f5ba2906a9",
+      "seatRowId": "nu_library_row_D",
+      "number": "5",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cf2eca76e1a353e56e1ddc53a",
+      "seatRowId": "nu_library_row_D",
+      "number": "6",
+      "isAccessible": false,
+      "status": "AVAILABLE",
+      "priceCategory": "Standard",
+      "createdAt": "2026-11-27T20:52:33.266"
+    }
+  ],
+  "Event": [
+    {
+      "id": "cmwzdoq650002v0uw7hxevfr1",
+      "slug": "nu-demo-medicine-open-house-2026",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "venueId": "cmwzdoq5o0000v0uwe2jb20ae",
+      "title": "NU School of Medicine Open House",
+      "description": "Meet medical students and faculty, explore academic programmes and join campus activities.\n\n",
+      "category": "Community",
+      "coverImageUrl": "https://nu.edu.kz/wp-content/uploads/2026/11/ohd-tv-1280x720-en-aikorkem-bekeyeva-768x432.png",
+      "status": "PUBLISHED",
+      "visibility": "PUBLIC",
+      "seatingMode": "GENERAL_ADMISSION",
+      "startsAt": "2026-11-28T05:00:00",
+      "endsAt": "2026-11-28T10:00:00",
+      "timezone": "Asia/Almaty",
+      "registrationOpensAt": null,
+      "registrationClosesAt": "2026-11-28T05:00:00",
+      "capacity": 100,
+      "paidSalesActive": false,
+      "paidSalesSuspended": false,
+      "refundPolicy": "NO_REFUNDS",
+      "publishedAt": "2026-11-27T19:32:29.69",
+      "cancelledAt": null,
+      "cancellationReason": null,
+      "calendarSequence": 0,
+      "reportCount": 0,
+      "createdAt": "2026-11-27T19:32:29.693",
+      "updatedAt": "2026-11-27T19:32:29.693"
+    },
+    {
+      "id": "cmwzdoqac000av0uwafy2vlug",
+      "slug": "nu-demo-ealt-2026",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "venueId": "cmwzdoqa30008v0uwfthnd7rq",
+      "title": "Eurasian Academic Libraries Training 2026",
+      "description": "Professional training on AI, innovation and the changing role of academic libraries.\n\n",
+      "category": "Education",
+      "coverImageUrl": "https://nu.edu.kz/wp-content/uploads/2026/11/1-1-768x432.png",
+      "status": "PUBLISHED",
+      "visibility": "PUBLIC",
+      "seatingMode": "ASSIGNED",
+      "startsAt": "2026-11-30T03:00:00",
+      "endsAt": "2026-12-04T12:00:00",
+      "timezone": "Asia/Almaty",
+      "registrationOpensAt": null,
+      "registrationClosesAt": "2026-11-30T03:00:00",
+      "capacity": 24,
+      "paidSalesActive": true,
+      "paidSalesSuspended": false,
+      "refundPolicy": "UNTIL_24H_BEFORE",
+      "publishedAt": "2026-11-27T19:32:29.842",
+      "cancelledAt": null,
+      "cancellationReason": null,
+      "calendarSequence": 0,
+      "reportCount": 0,
+      "createdAt": "2026-11-27T19:32:29.844",
+      "updatedAt": "2026-11-27T21:46:38.147"
+    },
+    {
+      "id": "cmwzdoqbj000ev0uwmwos1wmx",
+      "slug": "nu-demo-impact-central-2026",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "venueId": "cmwzdoqbf000cv0uwlqf1197z",
+      "title": "Impact Central 2026: The ABCD Way",
+      "description": "Conference on case-based teaching, research and applied learning.\n\n",
+      "category": "Business",
+      "coverImageUrl": "https://nu.edu.kz/wp-content/uploads/2026/11/nugsb-impact-central-the-abcd-way-1280-x-720-piks.-1-768x432.png",
+      "status": "PUBLISHED",
+      "visibility": "PUBLIC",
+      "seatingMode": "ASSIGNED",
+      "startsAt": "2026-12-04T04:00:00",
+      "endsAt": "2026-12-05T12:00:00",
+      "timezone": "Asia/Almaty",
+      "registrationOpensAt": null,
+      "registrationClosesAt": "2026-12-04T04:00:00",
+      "capacity": 60,
+      "paidSalesActive": true,
+      "paidSalesSuspended": false,
+      "refundPolicy": "NO_REFUNDS",
+      "publishedAt": "2026-11-27T19:32:29.886",
+      "cancelledAt": null,
+      "cancellationReason": null,
+      "calendarSequence": 0,
+      "reportCount": 0,
+      "createdAt": "2026-11-27T19:32:29.888",
+      "updatedAt": "2026-11-27T21:46:38.613"
+    },
+    {
+      "id": "cmwzdoq8o0006v0uwy6twsdeu",
+      "slug": "nu-demo-day-almaty-2026",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "venueId": "cmwzdoq8b0004v0uww68z0lcx",
+      "title": "NU Day in Almaty",
+      "description": "Admissions workshops, faculty talks and student experiences for prospective applicants and families.\n\n",
+      "category": "Community",
+      "coverImageUrl": "https://static.tildacdn.pro/tila3735-3863-4630-b530-313832333035/NU_Day_Almaty_share_.png",
+      "status": "PUBLISHED",
+      "visibility": "PUBLIC",
+      "seatingMode": "GENERAL_ADMISSION",
+      "startsAt": "2026-11-28T06:00:00",
+      "endsAt": "2026-11-28T11:00:00",
+      "timezone": "Asia/Almaty",
+      "registrationOpensAt": null,
+      "registrationClosesAt": "2026-11-28T06:00:00",
+      "capacity": 100,
+      "paidSalesActive": false,
+      "paidSalesSuspended": false,
+      "refundPolicy": "NO_REFUNDS",
+      "publishedAt": "2026-11-27T19:32:29.779",
+      "cancelledAt": null,
+      "cancellationReason": null,
+      "calendarSequence": 0,
+      "reportCount": 0,
+      "createdAt": "2026-11-27T19:32:29.783",
+      "updatedAt": "2026-11-27T20:06:21.913"
+    },
+    {
+      "id": "cmwzdoqc4000hv0uwwx7z9ref",
+      "slug": "nu-demo-markethon-2026",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "venueId": "cmwzdoqbf000cv0uwlqf1197z",
+      "title": "Markethon 8.0",
+      "description": "A team hackathon tackling marketing, design and content challenges.\n\n",
+      "category": "Technology",
+      "coverImageUrl": "https://nu.edu.kz/wp-content/uploads/2026/11/5427072142555161689-assel-ultanbay-768x432.jpg",
+      "status": "PUBLISHED",
+      "visibility": "PUBLIC",
+      "seatingMode": "GENERAL_ADMISSION",
+      "startsAt": "2026-12-05T04:00:00",
+      "endsAt": "2026-12-06T04:00:00",
+      "timezone": "Asia/Almaty",
+      "registrationOpensAt": null,
+      "registrationClosesAt": "2026-12-05T04:00:00",
+      "capacity": 100,
+      "paidSalesActive": true,
+      "paidSalesSuspended": false,
+      "refundPolicy": "UNTIL_48H_BEFORE",
+      "publishedAt": "2026-11-27T19:32:29.907",
+      "cancelledAt": null,
+      "cancellationReason": null,
+      "calendarSequence": 0,
+      "reportCount": 0,
+      "createdAt": "2026-11-27T19:32:29.908",
+      "updatedAt": "2026-11-27T21:46:39.024"
+    },
+    {
+      "id": "c3213120b1a4a38ab2c5465f2",
+      "slug": "nu-private-workshop",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "venueId": "cmwzdoqbf000cv0uwlqf1197z",
+      "title": "Campus Innovation Workshop",
+      "description": "Internal testing event for organizer workflows.",
+      "category": "Education",
+      "coverImageUrl": null,
+      "status": "DRAFT",
+      "visibility": "PRIVATE",
+      "seatingMode": "GENERAL_ADMISSION",
+      "startsAt": "2026-12-11T21:55:44.638",
+      "endsAt": "2026-12-12T00:55:44.638",
+      "timezone": "Asia/Almaty",
+      "registrationOpensAt": null,
+      "registrationClosesAt": null,
+      "capacity": 40,
+      "paidSalesActive": false,
+      "paidSalesSuspended": false,
+      "refundPolicy": "NO_REFUNDS",
+      "publishedAt": null,
+      "cancelledAt": null,
+      "cancellationReason": null,
+      "calendarSequence": 0,
+      "reportCount": 0,
+      "createdAt": "2026-11-27T21:55:44.638",
+      "updatedAt": "2026-11-27T21:55:44.638"
+    },
+    {
+      "id": "c24952ee6f57b7d1cad9cf93b",
+      "slug": "nu-cancelled-workshop",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "venueId": "cmwzdoqbf000cv0uwlqf1197z",
+      "title": "Research Networking Workshop",
+      "description": "Internal testing event for cancellation workflows.",
+      "category": "Education",
+      "coverImageUrl": null,
+      "status": "CANCELLED",
+      "visibility": "PRIVATE",
+      "seatingMode": "GENERAL_ADMISSION",
+      "startsAt": "2026-12-07T21:55:44.638",
+      "endsAt": "2026-12-07T23:55:44.638",
+      "timezone": "Asia/Almaty",
+      "registrationOpensAt": null,
+      "registrationClosesAt": null,
+      "capacity": 50,
+      "paidSalesActive": false,
+      "paidSalesSuspended": false,
+      "refundPolicy": "NO_REFUNDS",
+      "publishedAt": null,
+      "cancelledAt": "2026-11-27T21:55:44.638",
+      "cancellationReason": "Simulated scheduling conflict",
+      "calendarSequence": 0,
+      "reportCount": 0,
+      "createdAt": "2026-11-27T21:55:44.638",
+      "updatedAt": "2026-11-27T21:55:44.638"
+    }
+  ],
+  "TicketType": [
+    {
+      "id": "c4d2b42436a549e53f8327719",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "name": "VIP",
+      "description": null,
+      "priceKzt": 15000,
+      "quantity": 20,
+      "sold": 2,
+      "reserved": 0,
+      "refunded": 0,
+      "maxPerOrder": 10,
+      "salesStartAt": null,
+      "salesEndAt": null,
+      "isHidden": false,
+      "displayOrder": 1,
+      "createdAt": "2026-11-27T20:52:33.266",
+      "updatedAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cmwzdoq8o0007v0uwy0taaqb4",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "name": "Free Entry",
+      "description": null,
+      "priceKzt": 0,
+      "quantity": 100,
+      "sold": 3,
+      "reserved": 0,
+      "refunded": 0,
+      "maxPerOrder": 4,
+      "salesStartAt": null,
+      "salesEndAt": null,
+      "isHidden": false,
+      "displayOrder": 0,
+      "createdAt": "2026-11-27T19:32:29.783",
+      "updatedAt": "2026-11-27T19:32:29.783"
+    },
+    {
+      "id": "cmwzdoq650003v0uwdj9ysufk",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "name": "Free Entry",
+      "description": null,
+      "priceKzt": 0,
+      "quantity": 100,
+      "sold": 4,
+      "reserved": 0,
+      "refunded": 0,
+      "maxPerOrder": 4,
+      "salesStartAt": null,
+      "salesEndAt": null,
+      "isHidden": false,
+      "displayOrder": 0,
+      "createdAt": "2026-11-27T19:32:29.693",
+      "updatedAt": "2026-11-27T19:32:29.693"
+    },
+    {
+      "id": "cmwzdoqbj000fv0uwt5vto6s0",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "name": "Standard",
+      "description": null,
+      "priceKzt": 10000,
+      "quantity": 40,
+      "sold": 2,
+      "reserved": 2,
+      "refunded": 0,
+      "maxPerOrder": 4,
+      "salesStartAt": null,
+      "salesEndAt": null,
+      "isHidden": false,
+      "displayOrder": 0,
+      "createdAt": "2026-11-27T19:32:29.888",
+      "updatedAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cmwzdoqac000bv0uww6y2xmth",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "name": "Standard",
+      "description": null,
+      "priceKzt": 5000,
+      "quantity": 24,
+      "sold": 0,
+      "reserved": 0,
+      "refunded": 2,
+      "maxPerOrder": 4,
+      "salesStartAt": null,
+      "salesEndAt": null,
+      "isHidden": false,
+      "displayOrder": 0,
+      "createdAt": "2026-11-27T19:32:29.844",
+      "updatedAt": "2026-11-27T20:52:33.266"
+    },
+    {
+      "id": "cmwzdoqc4000iv0uw96r4bcvz",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "name": "Standard",
+      "description": null,
+      "priceKzt": 2500,
+      "quantity": 100,
+      "sold": 2,
+      "reserved": 0,
+      "refunded": 1,
+      "maxPerOrder": 4,
+      "salesStartAt": null,
+      "salesEndAt": null,
+      "isHidden": false,
+      "displayOrder": 0,
+      "createdAt": "2026-11-27T19:32:29.908",
+      "updatedAt": "2026-11-27T19:32:29.908"
+    }
+  ],
+  "PaidSalesActivation": [
+    {
+      "id": "cmwzfp8qf000pv0e81exxnzfm",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "feeKzt": 15000,
+      "feePaid": false,
+      "identityVerified": false,
+      "payoutAccountConnected": true,
+      "termsAcceptedAt": null,
+      "activatedAt": null,
+      "reviewedById": null,
+      "reviewNote": null,
+      "simulated": true,
+      "createdAt": "2026-11-27T20:28:52.984",
+      "updatedAt": "2026-11-27T20:28:53.105"
+    },
+    {
+      "id": "cmwzih15a00abv05wxvea29bx",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "feeKzt": 15000,
+      "feePaid": true,
+      "identityVerified": true,
+      "payoutAccountConnected": true,
+      "termsAcceptedAt": "2026-11-27T21:46:31.353",
+      "activatedAt": "2026-11-27T21:46:38.142",
+      "reviewedById": "cmwz7psnp0000v0ssey7vcxlx",
+      "reviewNote": "Local simulated activation test",
+      "simulated": true,
+      "createdAt": "2026-11-27T21:46:28.75",
+      "updatedAt": "2026-11-27T21:46:38.143"
+    },
+    {
+      "id": "cmwzih8i600aqv05wz9puujtf",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "feeKzt": 15000,
+      "feePaid": true,
+      "identityVerified": true,
+      "payoutAccountConnected": true,
+      "termsAcceptedAt": "2026-11-27T21:46:38.349",
+      "activatedAt": "2026-11-27T21:46:38.609",
+      "reviewedById": "cmwz7psnp0000v0ssey7vcxlx",
+      "reviewNote": "Local simulated activation test",
+      "simulated": true,
+      "createdAt": "2026-11-27T21:46:38.286",
+      "updatedAt": "2026-11-27T21:46:38.61"
+    },
+    {
+      "id": "cmwzih8uj00b5v05wqadkp2vl",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "organizerId": "cmwz7psol0003v0ss4jvi0kac",
+      "feeKzt": 15000,
+      "feePaid": true,
+      "identityVerified": true,
+      "payoutAccountConnected": true,
+      "termsAcceptedAt": "2026-11-27T21:46:38.797",
+      "activatedAt": "2026-11-27T21:46:39.019",
+      "reviewedById": "cmwz7psnp0000v0ssey7vcxlx",
+      "reviewNote": "Local simulated activation test",
+      "simulated": true,
+      "createdAt": "2026-11-27T21:46:38.731",
+      "updatedAt": "2026-11-27T21:46:39.02"
+    }
+  ],
+  "PromotionalCampaign": [
+    {
+      "id": "nu_special30",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "name": "Special Offer",
+      "discountType": "PERCENT",
+      "discountValue": 30,
+      "status": "ACTIVE",
+      "startsAt": "2026-11-17T20:56:59.955",
+      "endsAt": "2026-11-26T20:56:59.955",
+      "maxRedemptions": 10,
+      "redeemed": 0,
+      "perUserLimit": 1,
+      "qrImageUrl": null,
+      "createdAt": "2026-11-27T20:56:59.955",
+      "updatedAt": "2026-11-27T20:56:59.955"
+    },
+    {
+      "id": "nu_partner15",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "name": "Partner Discount",
+      "discountType": "PERCENT",
+      "discountValue": 15,
+      "status": "DISABLED",
+      "startsAt": "2026-11-26T20:56:59.955",
+      "endsAt": "2026-12-02T20:56:59.955",
+      "maxRedemptions": 15,
+      "redeemed": 0,
+      "perUserLimit": 1,
+      "qrImageUrl": null,
+      "createdAt": "2026-11-27T20:56:59.955",
+      "updatedAt": "2026-11-27T20:56:59.955"
+    },
+    {
+      "id": "nu_student20",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "name": "Student Discount",
+      "discountType": "PERCENT",
+      "discountValue": 20,
+      "status": "ACTIVE",
+      "startsAt": "2026-11-26T20:56:59.955",
+      "endsAt": "2026-12-02T20:56:59.955",
+      "maxRedemptions": 30,
+      "redeemed": 1,
+      "perUserLimit": 1,
+      "qrImageUrl": null,
+      "createdAt": "2026-11-27T20:56:59.955",
+      "updatedAt": "2026-11-27T20:56:59.955"
+    },
+    {
+      "id": "nu_early500",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "name": "Early Bird",
+      "discountType": "FIXED_KZT",
+      "discountValue": 500,
+      "status": "ACTIVE",
+      "startsAt": "2026-11-26T20:56:59.955",
+      "endsAt": "2026-11-30T20:56:59.955",
+      "maxRedemptions": 20,
+      "redeemed": 1,
+      "perUserLimit": 1,
+      "qrImageUrl": null,
+      "createdAt": "2026-11-27T20:56:59.955",
+      "updatedAt": "2026-11-27T20:56:59.955"
+    }
+  ],
+  "CampaignTicketType": [],
+  "PromoCode": [
+    {
+      "id": "promo_nu_student20",
+      "campaignId": "nu_student20",
+      "code": "STUDENT20",
+      "isActive": true,
+      "createdAt": "2026-11-27T20:56:59.955",
+      "updatedAt": "2026-11-27T20:56:59.955"
+    },
+    {
+      "id": "promo_nu_early500",
+      "campaignId": "nu_early500",
+      "code": "EARLY500",
+      "isActive": true,
+      "createdAt": "2026-11-27T20:56:59.955",
+      "updatedAt": "2026-11-27T20:56:59.955"
+    },
+    {
+      "id": "promo_nu_special30",
+      "campaignId": "nu_special30",
+      "code": "SPECIAL30",
+      "isActive": true,
+      "createdAt": "2026-11-27T20:56:59.955",
+      "updatedAt": "2026-11-27T20:56:59.955"
+    },
+    {
+      "id": "promo_nu_partner15",
+      "campaignId": "nu_partner15",
+      "code": "PARTNER15",
+      "isActive": false,
+      "createdAt": "2026-11-27T20:56:59.955",
+      "updatedAt": "2026-11-27T20:56:59.955"
+    }
+  ],
+  "Order": [
+    {
+      "id": "cmwzh8dur000xv05whnb4gok4",
+      "reference": "BF-AD53415E000F",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "userId": "cmwz7psti000xv0sscll5fbxh",
+      "status": "PAID",
+      "subtotalKzt": 20000,
+      "discountKzt": 0,
+      "feeKzt": 800,
+      "totalKzt": 20000,
+      "currency": "KZT",
+      "campaignId": null,
+      "promoCodeId": null,
+      "clientIdempotencyKey": "bf202600-0000-4000-8000-000000000002",
+      "expiresAt": "2026-11-27T21:26:45.671",
+      "paidAt": "2026-11-27T21:11:46.077",
+      "cancelledAt": null,
+      "createdAt": "2026-11-27T21:11:45.699",
+      "updatedAt": "2026-11-27T21:11:46.08",
+      "attendees": [
+        {
+          "email": "attendee2@example.kz",
+          "fullName": "Test Attendee 2-1"
+        },
+        {
+          "email": "attendee2@example.kz",
+          "fullName": "Test Attendee 2-2"
+        }
+      ]
+    },
+    {
+      "id": "cmwzh8eio001rv05wmrcoa90z",
+      "reference": "BF-CCBE2F59731E",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "userId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "status": "PAID",
+      "subtotalKzt": 30000,
+      "discountKzt": 0,
+      "feeKzt": 1150,
+      "totalKzt": 30000,
+      "currency": "KZT",
+      "campaignId": null,
+      "promoCodeId": null,
+      "clientIdempotencyKey": "bf202600-0000-4000-8000-000000000003",
+      "expiresAt": "2026-11-27T21:26:46.536",
+      "paidAt": "2026-11-27T21:11:46.92",
+      "cancelledAt": null,
+      "createdAt": "2026-11-27T21:11:46.56",
+      "updatedAt": "2026-11-27T21:11:46.922",
+      "attendees": [
+        {
+          "email": "attendee3@example.kz",
+          "fullName": "Test Attendee 3-1"
+        },
+        {
+          "email": "attendee3@example.kz",
+          "fullName": "Test Attendee 3-2"
+        }
+      ]
+    },
+    {
+      "id": "cmwzh8f3y002lv05wrp7i7cmc",
+      "reference": "BF-C26B0F665B2E",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "userId": "cmwz7psu50013v0ssohai4naf",
+      "status": "PAID",
+      "subtotalKzt": 5000,
+      "discountKzt": 1000,
+      "feeKzt": 240,
+      "totalKzt": 4000,
+      "currency": "KZT",
+      "campaignId": "nu_student20",
+      "promoCodeId": "promo_nu_student20",
+      "clientIdempotencyKey": "bf202600-0000-4000-8000-000000000004",
+      "expiresAt": "2026-11-27T21:26:47.302",
+      "paidAt": "2026-11-27T21:11:47.524",
+      "cancelledAt": null,
+      "createdAt": "2026-11-27T21:11:47.326",
+      "updatedAt": "2026-11-27T21:11:47.525",
+      "attendees": [
+        {
+          "email": "attendee4@example.kz",
+          "fullName": "Test Attendee 4-1"
+        },
+        {
+          "email": "attendee4@example.kz",
+          "fullName": "Test Attendee 4-2"
+        }
+      ]
+    },
+    {
+      "id": "cmwzh892y0003v05wa2ffqojf",
+      "reference": "BF-94B38AF15C14",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "status": "REFUNDED",
+      "subtotalKzt": 10000,
+      "discountKzt": 0,
+      "feeKzt": 450,
+      "totalKzt": 10000,
+      "currency": "KZT",
+      "campaignId": null,
+      "promoCodeId": null,
+      "clientIdempotencyKey": "bf202600-0000-4000-8000-000000000001",
+      "expiresAt": "2026-11-27T21:26:39.339",
+      "paidAt": "2026-11-27T21:11:45.009",
+      "cancelledAt": null,
+      "createdAt": "2026-11-27T21:11:39.514",
+      "updatedAt": "2026-11-27T21:24:22.002",
+      "attendees": [
+        {
+          "email": "attendee1@example.kz",
+          "fullName": "Test Attendee 1-1"
+        },
+        {
+          "email": "attendee1@example.kz",
+          "fullName": "Test Attendee 1-2"
+        }
+      ]
+    },
+    {
+      "id": "cmwzhio64003gv05w10adrce6",
+      "reference": "BF-F1C08A4DBF3A",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "userId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "status": "REFUNDED",
+      "subtotalKzt": 2500,
+      "discountKzt": 500,
+      "feeKzt": 170,
+      "totalKzt": 2000,
+      "currency": "KZT",
+      "campaignId": "nu_early500",
+      "promoCodeId": "promo_nu_early500",
+      "clientIdempotencyKey": "bf202600-0000-4000-8000-000000000005",
+      "expiresAt": "2026-11-27T21:34:45.561",
+      "paidAt": "2026-11-27T21:19:50.004",
+      "cancelledAt": null,
+      "createdAt": "2026-11-27T21:19:45.629",
+      "updatedAt": "2026-11-27T21:25:02.507",
+      "attendees": [
+        {
+          "email": "attendee5@example.kz",
+          "fullName": "Test Attendee 5-1"
+        }
+      ]
+    },
+    {
+      "id": "cmwzhj7b00048v05wg57vvhe7",
+      "reference": "BF-81E24E65E000",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "userId": "cmwz7psur0019v0ss37i2ewys",
+      "status": "CANCELLED",
+      "subtotalKzt": 2500,
+      "discountKzt": 0,
+      "feeKzt": 188,
+      "totalKzt": 2500,
+      "currency": "KZT",
+      "campaignId": null,
+      "promoCodeId": null,
+      "clientIdempotencyKey": "bf202600-0000-4000-8000-000000000006",
+      "expiresAt": "2026-11-27T21:35:10.424",
+      "paidAt": null,
+      "cancelledAt": "2026-11-27T21:20:10.626",
+      "createdAt": "2026-11-27T21:20:10.428",
+      "updatedAt": "2026-11-27T21:20:10.629",
+      "attendees": [
+        {
+          "email": "attendee6@example.kz",
+          "fullName": "Test Attendee 6-1"
+        }
+      ]
+    },
+    {
+      "id": "cmwzhjn4t004rv05wptygwy3c",
+      "reference": "BF-845937B1A406",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "userId": "cmwz7psv6001cv0ss59f2fn89",
+      "status": "CANCELLED",
+      "subtotalKzt": 5000,
+      "discountKzt": 0,
+      "feeKzt": 275,
+      "totalKzt": 5000,
+      "currency": "KZT",
+      "campaignId": null,
+      "promoCodeId": null,
+      "clientIdempotencyKey": "bf202600-0000-4000-8000-000000000007",
+      "expiresAt": "2026-11-27T21:35:30.917",
+      "paidAt": null,
+      "cancelledAt": "2026-11-27T21:20:31.115",
+      "createdAt": "2026-11-27T21:20:30.941",
+      "updatedAt": "2026-11-27T21:20:31.118",
+      "attendees": [
+        {
+          "email": "attendee7@example.kz",
+          "fullName": "Test Attendee 7-1"
+        }
+      ]
+    },
+    {
+      "id": "cmwzhk2vw005av05w8lexrget",
+      "reference": "BF-CCAA52D1DDE5",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "userId": "cmwz7psvg001fv0ss3wzihltl",
+      "status": "PAID",
+      "subtotalKzt": 0,
+      "discountKzt": 0,
+      "feeKzt": 0,
+      "totalKzt": 0,
+      "currency": "KZT",
+      "campaignId": null,
+      "promoCodeId": null,
+      "clientIdempotencyKey": "bf202600-0000-4000-8000-000000000008",
+      "expiresAt": null,
+      "paidAt": "2026-11-27T21:20:51.353",
+      "cancelledAt": null,
+      "createdAt": "2026-11-27T21:20:51.356",
+      "updatedAt": "2026-11-27T21:20:51.356",
+      "attendees": [
+        {
+          "email": "attendee8@example.kz",
+          "fullName": "Test Attendee 8-1"
+        },
+        {
+          "email": "attendee8@example.kz",
+          "fullName": "Test Attendee 8-2"
+        },
+        {
+          "email": "attendee8@example.kz",
+          "fullName": "Test Attendee 8-3"
+        }
+      ]
+    },
+    {
+      "id": "cmwzhkil7005zv05worte79jm",
+      "reference": "BF-B376274A881A",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "userId": "cmwz7psvq001iv0ssng1k03yn",
+      "status": "PAID",
+      "subtotalKzt": 0,
+      "discountKzt": 0,
+      "feeKzt": 0,
+      "totalKzt": 0,
+      "currency": "KZT",
+      "campaignId": null,
+      "promoCodeId": null,
+      "clientIdempotencyKey": "bf202600-0000-4000-8000-000000000009",
+      "expiresAt": null,
+      "paidAt": "2026-11-27T21:21:11.705",
+      "cancelledAt": null,
+      "createdAt": "2026-11-27T21:21:11.707",
+      "updatedAt": "2026-11-27T21:21:11.707",
+      "attendees": [
+        {
+          "email": "attendee9@example.kz",
+          "fullName": "Test Attendee 9-1"
+        },
+        {
+          "email": "attendee9@example.kz",
+          "fullName": "Test Attendee 9-2"
+        }
+      ]
+    },
+    {
+      "id": "cmwzhkyad006lv05wrcf44gu0",
+      "reference": "BF-738CD3F69037",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "userId": "cmwz7psw1001lv0ssqt7kc503",
+      "status": "AWAITING_PAYMENT",
+      "subtotalKzt": 20000,
+      "discountKzt": 0,
+      "feeKzt": 800,
+      "totalKzt": 20000,
+      "currency": "KZT",
+      "campaignId": null,
+      "promoCodeId": null,
+      "clientIdempotencyKey": "bf202600-0000-4000-8000-000000000010",
+      "expiresAt": "2026-11-27T21:36:32.037",
+      "paidAt": null,
+      "cancelledAt": null,
+      "createdAt": "2026-11-27T21:21:32.053",
+      "updatedAt": "2026-11-27T21:21:32.053",
+      "attendees": [
+        {
+          "email": "attendee10@example.kz",
+          "fullName": "Test Attendee 10-1"
+        },
+        {
+          "email": "attendee10@example.kz",
+          "fullName": "Test Attendee 10-2"
+        }
+      ]
+    },
+    {
+      "id": "cmwzflocj0003v0e8c9hmi8qk",
+      "reference": "BF-25855DBD8E27",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "status": "PAID",
+      "subtotalKzt": 0,
+      "discountKzt": 0,
+      "feeKzt": 0,
+      "totalKzt": 0,
+      "currency": "KZT",
+      "campaignId": null,
+      "promoCodeId": null,
+      "clientIdempotencyKey": "3c41ba7a-2389-419a-b144-ebc546327afb",
+      "expiresAt": null,
+      "paidAt": "2026-11-27T20:26:06.589",
+      "cancelledAt": null,
+      "createdAt": "2026-11-27T20:26:06.596",
+      "updatedAt": "2026-11-27T20:26:06.596",
+      "attendees": [
+        {
+          "email": "attendee1@example.kz",
+          "fullName": "Aliya Zhaksylykova"
+        },
+        {
+          "email": "attendee1@example.kz",
+          "fullName": "Aliya Zhaksylykova"
+        }
+      ]
+    },
+    {
+      "id": "cmwzfctgo0003v01gl9h727bi",
+      "reference": "BF-8B5A9B7EC90C",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "status": "EXPIRED",
+      "subtotalKzt": 5000,
+      "discountKzt": 0,
+      "feeKzt": 275,
+      "totalKzt": 5000,
+      "currency": "KZT",
+      "campaignId": null,
+      "promoCodeId": null,
+      "clientIdempotencyKey": "afeea392-a9d1-4ca3-981b-81f8012071dc",
+      "expiresAt": "2026-11-27T20:34:13.31",
+      "paidAt": null,
+      "cancelledAt": null,
+      "createdAt": "2026-11-27T20:19:13.319",
+      "updatedAt": "2026-11-27T20:45:45.22",
+      "attendees": [
+        {
+          "email": "attendee1@example.kz",
+          "fullName": "Aliya Zhaksylykova"
+        }
+      ]
+    }
+  ],
+  "OrderItem": [
+    {
+      "id": "cmwzh892y0005v05wadtwysym",
+      "orderId": "cmwzh892y0003v05wa2ffqojf",
+      "ticketTypeId": "cmwzdoqac000bv0uww6y2xmth",
+      "quantity": 1,
+      "unitPriceKzt": 5000,
+      "discountKzt": 0,
+      "totalKzt": 5000,
+      "seatId": "ce8d29bf7f40a8e03c2db6b4e",
+      "sectionName": "Main Hall",
+      "rowLabel": "A",
+      "seatNumber": "3",
+      "createdAt": "2026-11-27T21:11:39.514"
+    },
+    {
+      "id": "cmwzh892y0006v05wm0ygmmtb",
+      "orderId": "cmwzh892y0003v05wa2ffqojf",
+      "ticketTypeId": "cmwzdoqac000bv0uww6y2xmth",
+      "quantity": 1,
+      "unitPriceKzt": 5000,
+      "discountKzt": 0,
+      "totalKzt": 5000,
+      "seatId": "c624a00f3f7d4ef402c0d3dbf",
+      "sectionName": "Main Hall",
+      "rowLabel": "A",
+      "seatNumber": "4",
+      "createdAt": "2026-11-27T21:11:39.514"
+    },
+    {
+      "id": "cmwzh8dur000zv05wy04svgam",
+      "orderId": "cmwzh8dur000xv05whnb4gok4",
+      "ticketTypeId": "cmwzdoqbj000fv0uwt5vto6s0",
+      "quantity": 1,
+      "unitPriceKzt": 10000,
+      "discountKzt": 0,
+      "totalKzt": 10000,
+      "seatId": "c1a7078d72e997a5624971efc",
+      "sectionName": "Standard",
+      "rowLabel": "C",
+      "seatNumber": "1",
+      "createdAt": "2026-11-27T21:11:45.699"
+    },
+    {
+      "id": "cmwzh8dur0010v05wxbcvdley",
+      "orderId": "cmwzh8dur000xv05whnb4gok4",
+      "ticketTypeId": "cmwzdoqbj000fv0uwt5vto6s0",
+      "quantity": 1,
+      "unitPriceKzt": 10000,
+      "discountKzt": 0,
+      "totalKzt": 10000,
+      "seatId": "cf8fa4e06e1b68b10ec6efb01",
+      "sectionName": "Standard",
+      "rowLabel": "C",
+      "seatNumber": "2",
+      "createdAt": "2026-11-27T21:11:45.699"
+    },
+    {
+      "id": "cmwzh8eip001tv05w5vkknju2",
+      "orderId": "cmwzh8eio001rv05wmrcoa90z",
+      "ticketTypeId": "c4d2b42436a549e53f8327719",
+      "quantity": 1,
+      "unitPriceKzt": 15000,
+      "discountKzt": 0,
+      "totalKzt": 15000,
+      "seatId": "c32ebe950945504be0ab8afaa",
+      "sectionName": "VIP",
+      "rowLabel": "A",
+      "seatNumber": "3",
+      "createdAt": "2026-11-27T21:11:46.56"
+    },
+    {
+      "id": "cmwzh8eip001uv05wdm5e70et",
+      "orderId": "cmwzh8eio001rv05wmrcoa90z",
+      "ticketTypeId": "c4d2b42436a549e53f8327719",
+      "quantity": 1,
+      "unitPriceKzt": 15000,
+      "discountKzt": 0,
+      "totalKzt": 15000,
+      "seatId": "c6601c2d6f6b9e3acb7465ec9",
+      "sectionName": "VIP",
+      "rowLabel": "A",
+      "seatNumber": "4",
+      "createdAt": "2026-11-27T21:11:46.56"
+    },
+    {
+      "id": "cmwzh8f3y002nv05w9g7ciyxb",
+      "orderId": "cmwzh8f3y002lv05wrp7i7cmc",
+      "ticketTypeId": "cmwzdoqc4000iv0uw96r4bcvz",
+      "quantity": 2,
+      "unitPriceKzt": 2500,
+      "discountKzt": 1000,
+      "totalKzt": 4000,
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "createdAt": "2026-11-27T21:11:47.326"
+    },
+    {
+      "id": "cmwzhio65003iv05w4u900a2p",
+      "orderId": "cmwzhio64003gv05w10adrce6",
+      "ticketTypeId": "cmwzdoqc4000iv0uw96r4bcvz",
+      "quantity": 1,
+      "unitPriceKzt": 2500,
+      "discountKzt": 500,
+      "totalKzt": 2000,
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "createdAt": "2026-11-27T21:19:45.629"
+    },
+    {
+      "id": "cmwzhj7b0004av05wq35nho50",
+      "orderId": "cmwzhj7b00048v05wg57vvhe7",
+      "ticketTypeId": "cmwzdoqc4000iv0uw96r4bcvz",
+      "quantity": 1,
+      "unitPriceKzt": 2500,
+      "discountKzt": 0,
+      "totalKzt": 2500,
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "createdAt": "2026-11-27T21:20:10.428"
+    },
+    {
+      "id": "cmwzhjn4t004tv05w09j9oirf",
+      "orderId": "cmwzhjn4t004rv05wptygwy3c",
+      "ticketTypeId": "cmwzdoqac000bv0uww6y2xmth",
+      "quantity": 1,
+      "unitPriceKzt": 5000,
+      "discountKzt": 0,
+      "totalKzt": 5000,
+      "seatId": "c260991434a7aa4b76e2b2933",
+      "sectionName": "Main Hall",
+      "rowLabel": "A",
+      "seatNumber": "5",
+      "createdAt": "2026-11-27T21:20:30.941"
+    },
+    {
+      "id": "cmwzhk2vw005cv05wrts68azt",
+      "orderId": "cmwzhk2vw005av05w8lexrget",
+      "ticketTypeId": "cmwzdoq8o0007v0uwy0taaqb4",
+      "quantity": 3,
+      "unitPriceKzt": 0,
+      "discountKzt": 0,
+      "totalKzt": 0,
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "createdAt": "2026-11-27T21:20:51.356"
+    },
+    {
+      "id": "cmwzhkil70061v05wa1bzbvxm",
+      "orderId": "cmwzhkil7005zv05worte79jm",
+      "ticketTypeId": "cmwzdoq650003v0uwdj9ysufk",
+      "quantity": 2,
+      "unitPriceKzt": 0,
+      "discountKzt": 0,
+      "totalKzt": 0,
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "createdAt": "2026-11-27T21:21:11.707"
+    },
+    {
+      "id": "cmwzhkyad006nv05wu8eq0zh3",
+      "orderId": "cmwzhkyad006lv05wrcf44gu0",
+      "ticketTypeId": "cmwzdoqbj000fv0uwt5vto6s0",
+      "quantity": 1,
+      "unitPriceKzt": 10000,
+      "discountKzt": 0,
+      "totalKzt": 10000,
+      "seatId": "c2a398e9e0b63c58806b50b35",
+      "sectionName": "Standard",
+      "rowLabel": "C",
+      "seatNumber": "3",
+      "createdAt": "2026-11-27T21:21:32.053"
+    },
+    {
+      "id": "cmwzhkyad006ov05wyd9r0wpc",
+      "orderId": "cmwzhkyad006lv05wrcf44gu0",
+      "ticketTypeId": "cmwzdoqbj000fv0uwt5vto6s0",
+      "quantity": 1,
+      "unitPriceKzt": 10000,
+      "discountKzt": 0,
+      "totalKzt": 10000,
+      "seatId": "ccf65787b0c0613ac4a2d9847",
+      "sectionName": "Standard",
+      "rowLabel": "C",
+      "seatNumber": "4",
+      "createdAt": "2026-11-27T21:21:32.053"
+    },
+    {
+      "id": "cmwzfctgo0005v01gq6qi1zob",
+      "orderId": "cmwzfctgo0003v01gl9h727bi",
+      "ticketTypeId": "cmwzdoqac000bv0uww6y2xmth",
+      "quantity": 1,
+      "unitPriceKzt": 5000,
+      "discountKzt": 0,
+      "totalKzt": 5000,
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "createdAt": "2026-11-27T20:19:13.319"
+    },
+    {
+      "id": "cmwzflock0005v0e84qeih9xl",
+      "orderId": "cmwzflocj0003v0e8c9hmi8qk",
+      "ticketTypeId": "cmwzdoq650003v0uwdj9ysufk",
+      "quantity": 2,
+      "unitPriceKzt": 0,
+      "discountKzt": 0,
+      "totalKzt": 0,
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "createdAt": "2026-11-27T20:26:06.596"
+    }
+  ],
+  "Attendee": [
+    {
+      "id": "cmwzh8d9m000ev05w8artjp4i",
+      "fullName": "Test Attendee 1-1",
+      "email": "attendee1@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:11:44.938"
+    },
+    {
+      "id": "cmwzh8dar000hv05wwfxyo371",
+      "fullName": "Test Attendee 1-2",
+      "email": "attendee1@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:11:44.98"
+    },
+    {
+      "id": "cmwzh8e3b0018v05w511bl4fi",
+      "fullName": "Test Attendee 2-1",
+      "email": "attendee2@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:11:46.007"
+    },
+    {
+      "id": "cmwzh8e4c001bv05w9cpjc8v4",
+      "fullName": "Test Attendee 2-2",
+      "email": "attendee2@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:11:46.044"
+    },
+    {
+      "id": "cmwzh8erb0022v05wfbu1lnza",
+      "fullName": "Test Attendee 3-1",
+      "email": "attendee3@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:11:46.871"
+    },
+    {
+      "id": "cmwzh8es30025v05wmwymo883",
+      "fullName": "Test Attendee 3-2",
+      "email": "attendee3@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:11:46.899"
+    },
+    {
+      "id": "cmwzh8f8h002xv05wc5m44jsz",
+      "fullName": "Test Attendee 4-1",
+      "email": "attendee4@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:11:47.489"
+    },
+    {
+      "id": "cmwzh8f8y0030v05w6zyazfp2",
+      "fullName": "Test Attendee 4-2",
+      "email": "attendee4@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:11:47.506"
+    },
+    {
+      "id": "cmwzhiriw003sv05woz10gnxf",
+      "fullName": "Test Attendee 5-1",
+      "email": "attendee5@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:19:49.976"
+    },
+    {
+      "id": "cmwzhk2w6005dv05wdhdnl4iw",
+      "fullName": "Test Attendee 8-1",
+      "email": "attendee8@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:20:51.367"
+    },
+    {
+      "id": "cmwzhk2wu005gv05w5m1pl4ex",
+      "fullName": "Test Attendee 8-2",
+      "email": "attendee8@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:20:51.39"
+    },
+    {
+      "id": "cmwzhk2x9005jv05w61ohz382",
+      "fullName": "Test Attendee 8-3",
+      "email": "attendee8@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:20:51.405"
+    },
+    {
+      "id": "cmwzhkili0062v05wan33fayq",
+      "fullName": "Test Attendee 9-1",
+      "email": "attendee9@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:21:11.719"
+    },
+    {
+      "id": "cmwzhkim20065v05wgrwyx8jf",
+      "fullName": "Test Attendee 9-2",
+      "email": "attendee9@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T21:21:11.739"
+    },
+    {
+      "id": "cmwzflode0006v0e8gdohcnt3",
+      "fullName": "Aliya Zhaksylykova",
+      "email": "attendee1@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T20:26:06.627"
+    },
+    {
+      "id": "cmwzfloet0009v0e8eye61uhd",
+      "fullName": "Aliya Zhaksylykova",
+      "email": "attendee1@example.kz",
+      "phone": null,
+      "createdAt": "2026-11-27T20:26:06.677"
+    }
+  ],
+  "Ticket": [
+    {
+      "id": "cmwzh8e4j001dv05w9r6467tg",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "orderId": "cmwzh8dur000xv05whnb4gok4",
+      "orderItemId": "cmwzh8dur0010v05wxbcvdley",
+      "ticketTypeId": "cmwzdoqbj000fv0uwt5vto6s0",
+      "attendeeId": "cmwzh8e4c001bv05w9cpjc8v4",
+      "status": "VALID",
+      "seatId": "cf8fa4e06e1b68b10ec6efb01",
+      "sectionName": "Standard",
+      "rowLabel": "C",
+      "seatNumber": "2",
+      "issuedAt": "2026-11-27T21:11:46.051",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:11:46.051",
+      "updatedAt": "2026-11-27T21:11:46.06"
+    },
+    {
+      "id": "cmwzh8erh0024v05wu5nizx6s",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "orderId": "cmwzh8eio001rv05wmrcoa90z",
+      "orderItemId": "cmwzh8eip001tv05w5vkknju2",
+      "ticketTypeId": "c4d2b42436a549e53f8327719",
+      "attendeeId": "cmwzh8erb0022v05wfbu1lnza",
+      "status": "VALID",
+      "seatId": "c32ebe950945504be0ab8afaa",
+      "sectionName": "VIP",
+      "rowLabel": "A",
+      "seatNumber": "3",
+      "issuedAt": "2026-11-27T21:11:46.877",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:11:46.877",
+      "updatedAt": "2026-11-27T21:11:46.885"
+    },
+    {
+      "id": "cmwzh8es70027v05wcbj8myaz",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "orderId": "cmwzh8eio001rv05wmrcoa90z",
+      "orderItemId": "cmwzh8eip001uv05wdm5e70et",
+      "ticketTypeId": "c4d2b42436a549e53f8327719",
+      "attendeeId": "cmwzh8es30025v05wmwymo883",
+      "status": "VALID",
+      "seatId": "c6601c2d6f6b9e3acb7465ec9",
+      "sectionName": "VIP",
+      "rowLabel": "A",
+      "seatNumber": "4",
+      "issuedAt": "2026-11-27T21:11:46.903",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:11:46.903",
+      "updatedAt": "2026-11-27T21:11:46.908"
+    },
+    {
+      "id": "cmwzh8f910032v05we4tq8gfh",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "orderId": "cmwzh8f3y002lv05wrp7i7cmc",
+      "orderItemId": "cmwzh8f3y002nv05w9g7ciyxb",
+      "ticketTypeId": "cmwzdoqc4000iv0uw96r4bcvz",
+      "attendeeId": "cmwzh8f8y0030v05w6zyazfp2",
+      "status": "VALID",
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "issuedAt": "2026-11-27T21:11:47.509",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:11:47.509",
+      "updatedAt": "2026-11-27T21:11:47.513"
+    },
+    {
+      "id": "cmwzh8d9v000gv05w2at7nccm",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "orderId": "cmwzh892y0003v05wa2ffqojf",
+      "orderItemId": "cmwzh892y0005v05wadtwysym",
+      "ticketTypeId": "cmwzdoqac000bv0uww6y2xmth",
+      "attendeeId": "cmwzh8d9m000ev05w8artjp4i",
+      "status": "REFUNDED",
+      "seatId": "ce8d29bf7f40a8e03c2db6b4e",
+      "sectionName": "Main Hall",
+      "rowLabel": "A",
+      "seatNumber": "3",
+      "issuedAt": "2026-11-27T21:11:44.947",
+      "invalidatedAt": "2026-11-27T21:24:21.966",
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:11:44.947",
+      "updatedAt": "2026-11-27T21:24:21.967"
+    },
+    {
+      "id": "cmwzh8daw000jv05wab4fvc2w",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "orderId": "cmwzh892y0003v05wa2ffqojf",
+      "orderItemId": "cmwzh892y0006v05wm0ygmmtb",
+      "ticketTypeId": "cmwzdoqac000bv0uww6y2xmth",
+      "attendeeId": "cmwzh8dar000hv05wwfxyo371",
+      "status": "REFUNDED",
+      "seatId": "c624a00f3f7d4ef402c0d3dbf",
+      "sectionName": "Main Hall",
+      "rowLabel": "A",
+      "seatNumber": "4",
+      "issuedAt": "2026-11-27T21:11:44.984",
+      "invalidatedAt": "2026-11-27T21:24:21.966",
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:11:44.984",
+      "updatedAt": "2026-11-27T21:24:21.967"
+    },
+    {
+      "id": "cmwzh8f8n002zv05w3qjxvzvm",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "orderId": "cmwzh8f3y002lv05wrp7i7cmc",
+      "orderItemId": "cmwzh8f3y002nv05w9g7ciyxb",
+      "ticketTypeId": "cmwzdoqc4000iv0uw96r4bcvz",
+      "attendeeId": "cmwzh8f8h002xv05wc5m44jsz",
+      "status": "CHECKED_IN",
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "issuedAt": "2026-11-27T21:11:47.495",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:11:47.495",
+      "updatedAt": "2026-11-27T21:44:34.038"
+    },
+    {
+      "id": "cmwzh8e3i001av05wcfmddo6d",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "orderId": "cmwzh8dur000xv05whnb4gok4",
+      "orderItemId": "cmwzh8dur000zv05wy04svgam",
+      "ticketTypeId": "cmwzdoqbj000fv0uwt5vto6s0",
+      "attendeeId": "cmwzh8e3b0018v05w511bl4fi",
+      "status": "VALID",
+      "seatId": "c1a7078d72e997a5624971efc",
+      "sectionName": "Standard",
+      "rowLabel": "C",
+      "seatNumber": "1",
+      "issuedAt": "2026-11-27T21:11:46.015",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:11:46.015",
+      "updatedAt": "2026-11-27T21:44:36.11"
+    },
+    {
+      "id": "cmwzhirj2003uv05w2ofgo525",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "orderId": "cmwzhio64003gv05w10adrce6",
+      "orderItemId": "cmwzhio65003iv05w4u900a2p",
+      "ticketTypeId": "cmwzdoqc4000iv0uw96r4bcvz",
+      "attendeeId": "cmwzhiriw003sv05woz10gnxf",
+      "status": "REFUNDED",
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "issuedAt": "2026-11-27T21:19:49.982",
+      "invalidatedAt": "2026-11-27T21:25:02.499",
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:19:49.982",
+      "updatedAt": "2026-11-27T21:25:02.5"
+    },
+    {
+      "id": "cmwzhk2wb005fv05w63a2kl7d",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "orderId": "cmwzhk2vw005av05w8lexrget",
+      "orderItemId": "cmwzhk2vw005cv05wrts68azt",
+      "ticketTypeId": "cmwzdoq8o0007v0uwy0taaqb4",
+      "attendeeId": "cmwzhk2w6005dv05wdhdnl4iw",
+      "status": "VALID",
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "issuedAt": "2026-11-27T21:20:51.371",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:20:51.371",
+      "updatedAt": "2026-11-27T21:20:51.378"
+    },
+    {
+      "id": "cmwzhk2ww005iv05wxohrujma",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "orderId": "cmwzhk2vw005av05w8lexrget",
+      "orderItemId": "cmwzhk2vw005cv05wrts68azt",
+      "ticketTypeId": "cmwzdoq8o0007v0uwy0taaqb4",
+      "attendeeId": "cmwzhk2wu005gv05w5m1pl4ex",
+      "status": "VALID",
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "issuedAt": "2026-11-27T21:20:51.393",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:20:51.393",
+      "updatedAt": "2026-11-27T21:20:51.396"
+    },
+    {
+      "id": "cmwzhkim40067v05wsfwuqw4t",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "orderId": "cmwzhkil7005zv05worte79jm",
+      "orderItemId": "cmwzhkil70061v05wa1bzbvxm",
+      "ticketTypeId": "cmwzdoq650003v0uwdj9ysufk",
+      "attendeeId": "cmwzhkim20065v05wgrwyx8jf",
+      "status": "VALID",
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "issuedAt": "2026-11-27T21:21:11.741",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:21:11.741",
+      "updatedAt": "2026-11-27T21:21:11.744"
+    },
+    {
+      "id": "cmwzhk2xb005lv05wodqk34ch",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "orderId": "cmwzhk2vw005av05w8lexrget",
+      "orderItemId": "cmwzhk2vw005cv05wrts68azt",
+      "ticketTypeId": "cmwzdoq8o0007v0uwy0taaqb4",
+      "attendeeId": "cmwzhk2x9005jv05w61ohz382",
+      "status": "CHECKED_IN",
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "issuedAt": "2026-11-27T21:20:51.408",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:20:51.408",
+      "updatedAt": "2026-11-27T21:44:33.806"
+    },
+    {
+      "id": "cmwzhkiln0064v05wmhprss5t",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "orderId": "cmwzhkil7005zv05worte79jm",
+      "orderItemId": "cmwzhkil70061v05wa1bzbvxm",
+      "ticketTypeId": "cmwzdoq650003v0uwdj9ysufk",
+      "attendeeId": "cmwzhkili0062v05wan33fayq",
+      "status": "CHECKED_IN",
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "issuedAt": "2026-11-27T21:21:11.723",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T21:21:11.723",
+      "updatedAt": "2026-11-27T21:44:34.249"
+    },
+    {
+      "id": "cmwzflodl0008v0e8167v1y1n",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "orderId": "cmwzflocj0003v0e8c9hmi8qk",
+      "orderItemId": "cmwzflock0005v0e84qeih9xl",
+      "ticketTypeId": "cmwzdoq650003v0uwdj9ysufk",
+      "attendeeId": "cmwzflode0006v0e8gdohcnt3",
+      "status": "VALID",
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "issuedAt": "2026-11-27T20:26:06.634",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T20:26:06.634",
+      "updatedAt": "2026-11-27T20:26:06.642"
+    },
+    {
+      "id": "cmwzflof9000bv0e8cmg1vthe",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "orderId": "cmwzflocj0003v0e8c9hmi8qk",
+      "orderItemId": "cmwzflock0005v0e84qeih9xl",
+      "ticketTypeId": "cmwzdoq650003v0uwdj9ysufk",
+      "attendeeId": "cmwzfloet0009v0e8eye61uhd",
+      "status": "VALID",
+      "seatId": null,
+      "sectionName": null,
+      "rowLabel": null,
+      "seatNumber": null,
+      "issuedAt": "2026-11-27T20:26:06.693",
+      "invalidatedAt": null,
+      "pdfUrl": null,
+      "createdAt": "2026-11-27T20:26:06.693",
+      "updatedAt": "2026-11-27T20:26:06.711"
+    }
+  ],
+  "SeatHold": [
+    {
+      "id": "51b925ad-32be-4a9b-9043-448598907521",
+      "seatId": "ce8d29bf7f40a8e03c2db6b4e",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "orderId": "cmwzh892y0003v05wa2ffqojf",
+      "status": "CONVERTED",
+      "expiresAt": "2026-11-27T21:26:39.339",
+      "createdAt": "2026-11-27T21:11:38.749",
+      "activeKey": "51b925ad-32be-4a9b-9043-448598907521"
+    },
+    {
+      "id": "35611db2-89f0-4f48-8a7d-4f45a76eb53f",
+      "seatId": "c624a00f3f7d4ef402c0d3dbf",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "orderId": "cmwzh892y0003v05wa2ffqojf",
+      "status": "CONVERTED",
+      "expiresAt": "2026-11-27T21:26:39.339",
+      "createdAt": "2026-11-27T21:11:38.749",
+      "activeKey": "35611db2-89f0-4f48-8a7d-4f45a76eb53f"
+    },
+    {
+      "id": "bdcc9ee9-0071-4f9c-838a-9d2664771f31",
+      "seatId": "c1a7078d72e997a5624971efc",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "userId": "cmwz7psti000xv0sscll5fbxh",
+      "orderId": "cmwzh8dur000xv05whnb4gok4",
+      "status": "CONVERTED",
+      "expiresAt": "2026-11-27T21:26:45.671",
+      "createdAt": "2026-11-27T21:11:45.654",
+      "activeKey": "bdcc9ee9-0071-4f9c-838a-9d2664771f31"
+    },
+    {
+      "id": "21d61c47-9a05-4d30-ad96-7f07bbb65697",
+      "seatId": "cf8fa4e06e1b68b10ec6efb01",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "userId": "cmwz7psti000xv0sscll5fbxh",
+      "orderId": "cmwzh8dur000xv05whnb4gok4",
+      "status": "CONVERTED",
+      "expiresAt": "2026-11-27T21:26:45.671",
+      "createdAt": "2026-11-27T21:11:45.654",
+      "activeKey": "21d61c47-9a05-4d30-ad96-7f07bbb65697"
+    },
+    {
+      "id": "77292dfe-db9d-4b04-a385-d95658e696c4",
+      "seatId": "c32ebe950945504be0ab8afaa",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "userId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "orderId": "cmwzh8eio001rv05wmrcoa90z",
+      "status": "CONVERTED",
+      "expiresAt": "2026-11-27T21:26:46.536",
+      "createdAt": "2026-11-27T21:11:46.521",
+      "activeKey": "77292dfe-db9d-4b04-a385-d95658e696c4"
+    },
+    {
+      "id": "b4d39136-c483-45e2-baac-a2fa3507f19c",
+      "seatId": "c6601c2d6f6b9e3acb7465ec9",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "userId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "orderId": "cmwzh8eio001rv05wmrcoa90z",
+      "status": "CONVERTED",
+      "expiresAt": "2026-11-27T21:26:46.536",
+      "createdAt": "2026-11-27T21:11:46.521",
+      "activeKey": "b4d39136-c483-45e2-baac-a2fa3507f19c"
+    },
+    {
+      "id": "71d8ba5a-8bfc-4b13-8419-95937b3a9f6f",
+      "seatId": "c260991434a7aa4b76e2b2933",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "userId": "cmwz7psv6001cv0ss59f2fn89",
+      "orderId": "cmwzhjn4t004rv05wptygwy3c",
+      "status": "RELEASED",
+      "expiresAt": "2026-11-27T21:35:30.917",
+      "createdAt": "2026-11-27T21:20:30.908",
+      "activeKey": "71d8ba5a-8bfc-4b13-8419-95937b3a9f6f"
+    },
+    {
+      "id": "8cf18329-faf7-4452-8ded-043dc11751fc",
+      "seatId": "c2a398e9e0b63c58806b50b35",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "userId": "cmwz7psw1001lv0ssqt7kc503",
+      "orderId": "cmwzhkyad006lv05wrcf44gu0",
+      "status": "ACTIVE",
+      "expiresAt": "2026-11-27T21:36:32.037",
+      "createdAt": "2026-11-27T21:21:32.029",
+      "activeKey": "active"
+    },
+    {
+      "id": "a9acdee3-199b-4275-94a4-d62f0e36281f",
+      "seatId": "ccf65787b0c0613ac4a2d9847",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "userId": "cmwz7psw1001lv0ssqt7kc503",
+      "orderId": "cmwzhkyad006lv05wrcf44gu0",
+      "status": "ACTIVE",
+      "expiresAt": "2026-11-27T21:36:32.037",
+      "createdAt": "2026-11-27T21:21:32.029",
+      "activeKey": "active"
+    }
+  ],
+  "Payment": [
+    {
+      "id": "cmwzh8e0s0014v05wwlnt31cu",
+      "purpose": "TICKET_ORDER",
+      "orderId": "cmwzh8dur000xv05whnb4gok4",
+      "activationId": null,
+      "provider": "simulated",
+      "providerIntentId": "sim_30bed80d98e3526787c145ad",
+      "status": "SUCCEEDED",
+      "amountKzt": 20000,
+      "feeKzt": 800,
+      "currency": "KZT",
+      "failureReason": null,
+      "simulated": true,
+      "succeededAt": "2026-11-27T21:11:46.071",
+      "createdAt": "2026-11-27T21:11:45.916",
+      "updatedAt": "2026-11-27T21:11:46.073"
+    },
+    {
+      "id": "cmwzh8eoy001yv05w5ll7b6uj",
+      "purpose": "TICKET_ORDER",
+      "orderId": "cmwzh8eio001rv05wmrcoa90z",
+      "activationId": null,
+      "provider": "simulated",
+      "providerIntentId": "sim_10a9b0723f6538399e7fdac4",
+      "status": "SUCCEEDED",
+      "amountKzt": 30000,
+      "feeKzt": 1150,
+      "currency": "KZT",
+      "failureReason": null,
+      "simulated": true,
+      "succeededAt": "2026-11-27T21:11:46.915",
+      "createdAt": "2026-11-27T21:11:46.786",
+      "updatedAt": "2026-11-27T21:11:46.918"
+    },
+    {
+      "id": "cmwzh8f7d002tv05wpe4xrymk",
+      "purpose": "TICKET_ORDER",
+      "orderId": "cmwzh8f3y002lv05wrp7i7cmc",
+      "activationId": null,
+      "provider": "simulated",
+      "providerIntentId": "sim_f8d90322706b4252f7536f59",
+      "status": "SUCCEEDED",
+      "amountKzt": 4000,
+      "feeKzt": 240,
+      "currency": "KZT",
+      "failureReason": null,
+      "simulated": true,
+      "succeededAt": "2026-11-27T21:11:47.52",
+      "createdAt": "2026-11-27T21:11:47.449",
+      "updatedAt": "2026-11-27T21:11:47.522"
+    },
+    {
+      "id": "cmwzh8d6y000av05w2thed2si",
+      "purpose": "TICKET_ORDER",
+      "orderId": "cmwzh892y0003v05wa2ffqojf",
+      "activationId": null,
+      "provider": "simulated",
+      "providerIntentId": "sim_9b39bc3c8072f8e2fb9bfb8c",
+      "status": "REFUNDED",
+      "amountKzt": 10000,
+      "feeKzt": 450,
+      "currency": "KZT",
+      "failureReason": null,
+      "simulated": true,
+      "succeededAt": "2026-11-27T21:11:45.001",
+      "createdAt": "2026-11-27T21:11:44.842",
+      "updatedAt": "2026-11-27T21:24:21.996"
+    },
+    {
+      "id": "cmwzih4u300afv05wlec8eo3h",
+      "purpose": "ACTIVATION_FEE",
+      "orderId": null,
+      "activationId": "cmwzih15a00abv05wxvea29bx",
+      "provider": "simulated",
+      "providerIntentId": "sim_f48565a6dfcb302d898027fb",
+      "status": "SUCCEEDED",
+      "amountKzt": 15000,
+      "feeKzt": 0,
+      "currency": "KZT",
+      "failureReason": null,
+      "simulated": true,
+      "succeededAt": "2026-11-27T21:46:35.764",
+      "createdAt": "2026-11-27T21:46:33.531",
+      "updatedAt": "2026-11-27T21:46:35.766"
+    },
+    {
+      "id": "cmwzih8lp00auv05wkapzszpo",
+      "purpose": "ACTIVATION_FEE",
+      "orderId": null,
+      "activationId": "cmwzih8i600aqv05wz9puujtf",
+      "provider": "simulated",
+      "providerIntentId": "sim_66303320e5a6e1443ccdbb26",
+      "status": "SUCCEEDED",
+      "amountKzt": 15000,
+      "feeKzt": 0,
+      "currency": "KZT",
+      "failureReason": null,
+      "simulated": true,
+      "succeededAt": "2026-11-27T21:46:38.526",
+      "createdAt": "2026-11-27T21:46:38.413",
+      "updatedAt": "2026-11-27T21:46:38.527"
+    },
+    {
+      "id": "cmwzih8y100b9v05w1ra1lm94",
+      "purpose": "ACTIVATION_FEE",
+      "orderId": null,
+      "activationId": "cmwzih8uj00b5v05wqadkp2vl",
+      "provider": "simulated",
+      "providerIntentId": "sim_a51359b0cc5cdff1644f1920",
+      "status": "SUCCEEDED",
+      "amountKzt": 15000,
+      "feeKzt": 0,
+      "currency": "KZT",
+      "failureReason": null,
+      "simulated": true,
+      "succeededAt": "2026-11-27T21:46:38.923",
+      "createdAt": "2026-11-27T21:46:38.857",
+      "updatedAt": "2026-11-27T21:46:38.924"
+    },
+    {
+      "id": "cmwzhirh3003ov05w832kpznp",
+      "purpose": "TICKET_ORDER",
+      "orderId": "cmwzhio64003gv05w10adrce6",
+      "activationId": null,
+      "provider": "simulated",
+      "providerIntentId": "sim_17ad95543b6aa5a635a112dc",
+      "status": "REFUNDED",
+      "amountKzt": 2000,
+      "feeKzt": 170,
+      "currency": "KZT",
+      "failureReason": null,
+      "simulated": true,
+      "succeededAt": "2026-11-27T21:19:49.999",
+      "createdAt": "2026-11-27T21:19:49.911",
+      "updatedAt": "2026-11-27T21:25:02.505"
+    },
+    {
+      "id": "cmwzfcyaq0009v01gaqgixhnl",
+      "purpose": "TICKET_ORDER",
+      "orderId": "cmwzfctgo0003v01gl9h727bi",
+      "activationId": null,
+      "provider": "simulated",
+      "providerIntentId": "sim_fb796a0d29663fdf710c4141",
+      "status": "ABANDONED",
+      "amountKzt": 5000,
+      "feeKzt": 275,
+      "currency": "KZT",
+      "failureReason": "expired",
+      "simulated": true,
+      "succeededAt": null,
+      "createdAt": "2026-11-27T20:19:19.586",
+      "updatedAt": "2026-11-27T20:45:45.22"
+    },
+    {
+      "id": "cmwzhj7ex004ev05w9kp0efvh",
+      "purpose": "TICKET_ORDER",
+      "orderId": "cmwzhj7b00048v05wg57vvhe7",
+      "activationId": null,
+      "provider": "simulated",
+      "providerIntentId": "sim_debae7d2f375c462d62151b7",
+      "status": "FAILED",
+      "amountKzt": 2500,
+      "feeKzt": 188,
+      "currency": "KZT",
+      "failureReason": "declined",
+      "simulated": true,
+      "succeededAt": null,
+      "createdAt": "2026-11-27T21:20:10.569",
+      "updatedAt": "2026-11-27T21:20:10.635"
+    },
+    {
+      "id": "cmwzhjn8l004xv05w64psh4sj",
+      "purpose": "TICKET_ORDER",
+      "orderId": "cmwzhjn4t004rv05wptygwy3c",
+      "activationId": null,
+      "provider": "simulated",
+      "providerIntentId": "sim_8543843b89876503025de266",
+      "status": "ABANDONED",
+      "amountKzt": 5000,
+      "feeKzt": 275,
+      "currency": "KZT",
+      "failureReason": "abandoned",
+      "simulated": true,
+      "succeededAt": null,
+      "createdAt": "2026-11-27T21:20:31.077",
+      "updatedAt": "2026-11-27T21:20:31.121"
+    }
+  ],
+  "Refund": [
+    {
+      "id": "cmwzholet006wv05wcvpv9lh6",
+      "orderId": "cmwzh892y0003v05wa2ffqojf",
+      "paymentId": "cmwzh8d6y000av05w2thed2si",
+      "initiatedById": "cmwz7pst4000uv0ssso9hc0tv",
+      "amountKzt": 10000,
+      "reason": "Unable to attend the event",
+      "status": "SUCCEEDED",
+      "simulated": true,
+      "processedAt": "2026-11-27T21:24:21.988",
+      "createdAt": "2026-11-27T21:24:21.99",
+      "updatedAt": "2026-11-27T21:24:21.99"
+    },
+    {
+      "id": "cmwzhpgo60078v05wno3wam28",
+      "orderId": "cmwzhio64003gv05w10adrce6",
+      "paymentId": "cmwzhirh3003ov05w832kpznp",
+      "initiatedById": "cmwz7psuh0016v0ssbgd0zzmu",
+      "amountKzt": 2000,
+      "reason": "Unable to attend the event",
+      "status": "SUCCEEDED",
+      "simulated": true,
+      "processedAt": "2026-11-27T21:25:02.501",
+      "createdAt": "2026-11-27T21:25:02.502",
+      "updatedAt": "2026-11-27T21:25:02.502"
+    }
+  ],
+  "ProcessedWebhookEvent": [
+    {
+      "id": "cmwzh8d82000dv05wu8mkzi0c",
+      "provider": "simulated",
+      "eventKey": "sim_9b39bc3c8072f8e2fb9bfb8c:APPROVED",
+      "processedAt": "2026-11-27T21:11:44.882"
+    },
+    {
+      "id": "cmwzh8e1t0017v05wu58gnuqu",
+      "provider": "simulated",
+      "eventKey": "sim_30bed80d98e3526787c145ad:APPROVED",
+      "processedAt": "2026-11-27T21:11:45.953"
+    },
+    {
+      "id": "cmwzh8epy0021v05w4ctbveig",
+      "provider": "simulated",
+      "eventKey": "sim_10a9b0723f6538399e7fdac4:APPROVED",
+      "processedAt": "2026-11-27T21:11:46.822"
+    },
+    {
+      "id": "cmwzh8f81002wv05w0g7uarwr",
+      "provider": "simulated",
+      "eventKey": "sim_f8d90322706b4252f7536f59:APPROVED",
+      "processedAt": "2026-11-27T21:11:47.473"
+    },
+    {
+      "id": "cmwzhirhz003rv05wpr9nrwts",
+      "provider": "simulated",
+      "eventKey": "sim_17ad95543b6aa5a635a112dc:APPROVED",
+      "processedAt": "2026-11-27T21:19:49.943"
+    },
+    {
+      "id": "cmwzhj7fg004hv05wbu3l3451",
+      "provider": "simulated",
+      "eventKey": "sim_debae7d2f375c462d62151b7:DECLINED",
+      "processedAt": "2026-11-27T21:20:10.589"
+    },
+    {
+      "id": "cmwzhjn900050v05ww2ysyy2w",
+      "provider": "simulated",
+      "eventKey": "sim_8543843b89876503025de266:ABANDONED",
+      "processedAt": "2026-11-27T21:20:31.092"
+    },
+    {
+      "id": "cmwzih6jp00aiv05wpmnhz6zz",
+      "provider": "simulated",
+      "eventKey": "sim_f48565a6dfcb302d898027fb:APPROVED",
+      "processedAt": "2026-11-27T21:46:35.75"
+    },
+    {
+      "id": "cmwzih8oi00axv05wk24ty7ew",
+      "provider": "simulated",
+      "eventKey": "sim_66303320e5a6e1443ccdbb26:APPROVED",
+      "processedAt": "2026-11-27T21:46:38.515"
+    },
+    {
+      "id": "cmwzih8zj00bcv05w4t4y96js",
+      "provider": "simulated",
+      "eventKey": "sim_a51359b0cc5cdff1644f1920:APPROVED",
+      "processedAt": "2026-11-27T21:46:38.912"
+    }
+  ],
+  "PromoRedemption": [
+    {
+      "id": "cmwzh8f4h002pv05wekiebr3f",
+      "campaignId": "nu_student20",
+      "promoCodeId": "promo_nu_student20",
+      "orderId": "cmwzh8f3y002lv05wrp7i7cmc",
+      "userId": "cmwz7psu50013v0ssohai4naf",
+      "discountKzt": 1000,
+      "createdAt": "2026-11-27T21:11:47.346"
+    },
+    {
+      "id": "cmwzhio7z003kv05wh4bnwxk0",
+      "campaignId": "nu_early500",
+      "promoCodeId": "promo_nu_early500",
+      "orderId": "cmwzhio64003gv05w10adrce6",
+      "userId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "discountKzt": 500,
+      "createdAt": "2026-11-27T21:19:45.695"
+    }
+  ],
+  "CheckInRecord": [
+    {
+      "id": "cmwziekgb0087v05wte6jqfac",
+      "ticketId": "cmwzhk2xb005lv05wodqk34ch",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "checkedInById": "cmwz7pssp000rv0ssdgc97gzh",
+      "checkedInAt": "2026-11-27T21:44:33.804",
+      "reversedById": null,
+      "reversedAt": null,
+      "reversalReason": null,
+      "deviceLabel": "Local integration test",
+      "activeKey": "active"
+    },
+    {
+      "id": "cmwziekmr008bv05wcyl0bycm",
+      "ticketId": "cmwzh8f8n002zv05w3qjxvzvm",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "checkedInById": "cmwz7pssp000rv0ssdgc97gzh",
+      "checkedInAt": "2026-11-27T21:44:34.035",
+      "reversedById": null,
+      "reversedAt": null,
+      "reversalReason": null,
+      "deviceLabel": "Local integration test",
+      "activeKey": "active"
+    },
+    {
+      "id": "cmwzieksm008fv05wcx25smov",
+      "ticketId": "cmwzhkiln0064v05wmhprss5t",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "checkedInById": "cmwz7psrr000ov0ssx7b6ffcf",
+      "checkedInAt": "2026-11-27T21:44:34.247",
+      "reversedById": null,
+      "reversedAt": null,
+      "reversalReason": null,
+      "deviceLabel": "Local integration test",
+      "activeKey": "active"
+    },
+    {
+      "id": "cmwzie499007zv05wlfpth543",
+      "ticketId": "cmwzh8e3i001av05wcfmddo6d",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "checkedInById": "cmwz7psrr000ov0ssx7b6ffcf",
+      "checkedInAt": "2026-11-27T21:44:12.813",
+      "reversedById": "cmwz7psrr000ov0ssx7b6ffcf",
+      "reversedAt": "2026-11-27T21:44:36.106",
+      "reversalReason": "Accidental admission during testing",
+      "deviceLabel": "Local integration test",
+      "activeKey": "cmwzie499007zv05wlfpth543"
+    }
+  ],
+  "StaffAssignment": [
+    {
+      "id": "cmwzidn30007hv05ww9d0i3kh",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "userId": "cmwz7psrr000ov0ssx7b6ffcf",
+      "role": "EVENT_ADMIN",
+      "createdAt": "2026-11-27T21:43:50.557"
+    },
+    {
+      "id": "cmwzidn62007kv05w7r9kxcs2",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "userId": "cmwz7psrr000ov0ssx7b6ffcf",
+      "role": "EVENT_ADMIN",
+      "createdAt": "2026-11-27T21:43:50.667"
+    },
+    {
+      "id": "cmwzidn8n007nv05wsi7w184r",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "userId": "cmwz7psrr000ov0ssx7b6ffcf",
+      "role": "EVENT_ADMIN",
+      "createdAt": "2026-11-27T21:43:50.76"
+    },
+    {
+      "id": "cmwzidnc3007qv05wz011bvyy",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "userId": "cmwz7pssp000rv0ssdgc97gzh",
+      "role": "EVENT_ADMIN",
+      "createdAt": "2026-11-27T21:43:50.883"
+    },
+    {
+      "id": "cmwzidneu007tv05wvp1sjuz9",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "userId": "cmwz7pssp000rv0ssdgc97gzh",
+      "role": "EVENT_ADMIN",
+      "createdAt": "2026-11-27T21:43:50.982"
+    }
+  ],
+  "SupportCase": [
+    {
+      "id": "cmwzif2u4008nv05wrou9lbmp",
+      "reference": "CASE-6787FC18",
+      "audience": "ATTENDEE_TO_ORGANIZER",
+      "category": "REFUND",
+      "status": "RESOLVED",
+      "subject": "Refund confirmation",
+      "requesterId": "cmwz7pst4000uv0ssso9hc0tv",
+      "assigneeId": null,
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "orderId": null,
+      "ticketId": null,
+      "lastMessageAt": "2026-11-27T21:45:02.273",
+      "resolvedAt": "2026-11-27T21:45:02.273",
+      "createdAt": "2026-11-27T21:44:57.628",
+      "updatedAt": "2026-11-27T21:45:02.275"
+    },
+    {
+      "id": "cmwzifm2f0091v05we6atdm3s",
+      "reference": "CASE-355E431C",
+      "audience": "ATTENDEE_TO_ORGANIZER",
+      "category": "SEATING",
+      "status": "IN_PROGRESS",
+      "subject": "VIP seating information",
+      "requesterId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "assigneeId": null,
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "orderId": null,
+      "ticketId": null,
+      "lastMessageAt": "2026-11-27T21:45:22.759",
+      "resolvedAt": null,
+      "createdAt": "2026-11-27T21:45:22.551",
+      "updatedAt": "2026-11-27T21:45:22.761"
+    },
+    {
+      "id": "cmwzig3df009fv05w5drm0ffy",
+      "reference": "CASE-0FC0F96C",
+      "audience": "ATTENDEE_TO_ORGANIZER",
+      "category": "EVENT_INFORMATION",
+      "status": "OPEN",
+      "subject": "Markethon registration details",
+      "requesterId": "cmwz7psu50013v0ssohai4naf",
+      "assigneeId": null,
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "orderId": null,
+      "ticketId": null,
+      "lastMessageAt": "2026-11-27T21:45:44.979",
+      "resolvedAt": null,
+      "createdAt": "2026-11-27T21:45:44.979",
+      "updatedAt": "2026-11-27T21:45:44.979"
+    },
+    {
+      "id": "cmwzigiyi009lv05wozovdqwb",
+      "reference": "CASE-0ACCA7C2",
+      "audience": "ATTENDEE_TO_ORGANIZER",
+      "category": "TICKET_DELIVERY",
+      "status": "WAITING_FOR_CUSTOMER",
+      "subject": "Group ticket delivery",
+      "requesterId": "cmwz7psvg001fv0ss3wzihltl",
+      "assigneeId": null,
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "orderId": null,
+      "ticketId": null,
+      "lastMessageAt": "2026-11-27T21:46:05.376",
+      "resolvedAt": null,
+      "createdAt": "2026-11-27T21:46:05.179",
+      "updatedAt": "2026-11-27T21:46:05.377"
+    },
+    {
+      "id": "cmwzigj70009xv05wtouvay2b",
+      "reference": "CASE-768A0ECE",
+      "audience": "ORGANIZER_TO_PLATFORM",
+      "category": "PAYMENT",
+      "status": "IN_PROGRESS",
+      "subject": "Organizer payout information",
+      "requesterId": "cmwz7psol0003v0ss4jvi0kac",
+      "assigneeId": null,
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "orderId": null,
+      "ticketId": null,
+      "lastMessageAt": "2026-11-27T21:59:17.249",
+      "resolvedAt": null,
+      "createdAt": "2026-11-27T21:46:05.485",
+      "updatedAt": "2026-11-27T21:59:17.255"
+    }
+  ],
+  "SupportMessage": [
+    {
+      "id": "cmwzif2u4008pv05w77yc89sa",
+      "caseId": "cmwzif2u4008nv05wrou9lbmp",
+      "authorId": "cmwz7pst4000uv0ssso9hc0tv",
+      "body": "Could you confirm that my ticket refund was processed?",
+      "isSystem": false,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:44:57.628"
+    },
+    {
+      "id": "cmwzif4r8008rv05w6si934ry",
+      "caseId": "cmwzif2u4008nv05wrou9lbmp",
+      "authorId": "cmwz7psol0003v0ss4jvi0kac",
+      "body": "Your simulated refund has been completed successfully.",
+      "isSystem": false,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:45:00.072"
+    },
+    {
+      "id": "cmwzif6f9008xv05w1b6lwwrq",
+      "caseId": "cmwzif2u4008nv05wrou9lbmp",
+      "authorId": "cmwz7psol0003v0ss4jvi0kac",
+      "body": "Status changed to RESOLVED.",
+      "isSystem": true,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:45:02.275"
+    },
+    {
+      "id": "cmwzifm2f0093v05wumsiskbq",
+      "caseId": "cmwzifm2f0091v05we6atdm3s",
+      "authorId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "body": "Where is the entrance to the VIP seating section?",
+      "isSystem": false,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:45:22.551"
+    },
+    {
+      "id": "cmwzifm540095v05whvjja7s9",
+      "caseId": "cmwzifm2f0091v05we6atdm3s",
+      "authorId": "cmwz7psol0003v0ss4jvi0kac",
+      "body": "We are checking the seating arrangements.",
+      "isSystem": false,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:45:22.647"
+    },
+    {
+      "id": "cmwzifm8a009bv05w7drsubyz",
+      "caseId": "cmwzifm2f0091v05we6atdm3s",
+      "authorId": "cmwz7psol0003v0ss4jvi0kac",
+      "body": "Status changed to IN_PROGRESS.",
+      "isSystem": true,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:45:22.761"
+    },
+    {
+      "id": "cmwzig3df009hv05wi5nc5mnt",
+      "caseId": "cmwzig3df009fv05w5drm0ffy",
+      "authorId": "cmwz7psu50013v0ssohai4naf",
+      "body": "Could you provide additional registration information?",
+      "isSystem": false,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:45:44.979"
+    },
+    {
+      "id": "cmwzigiyi009nv05w4qjis416",
+      "caseId": "cmwzigiyi009lv05wozovdqwb",
+      "authorId": "cmwz7psvg001fv0ss3wzihltl",
+      "body": "I registered three participants and need help with the tickets.",
+      "isSystem": false,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:46:05.179"
+    },
+    {
+      "id": "cmwzigj1f009pv05wbq8e6kr5",
+      "caseId": "cmwzigiyi009lv05wozovdqwb",
+      "authorId": "cmwz7psol0003v0ss4jvi0kac",
+      "body": "Please confirm which participant needs assistance.",
+      "isSystem": false,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:46:05.281"
+    },
+    {
+      "id": "cmwzigj42009vv05wz9t0xy18",
+      "caseId": "cmwzigiyi009lv05wozovdqwb",
+      "authorId": "cmwz7psol0003v0ss4jvi0kac",
+      "body": "Status changed to WAITING_FOR_CUSTOMER.",
+      "isSystem": true,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:46:05.377"
+    },
+    {
+      "id": "cmwzigj71009zv05wxa4yq4n9",
+      "caseId": "cmwzigj70009xv05wtouvay2b",
+      "authorId": "cmwz7psol0003v0ss4jvi0kac",
+      "body": "Could you clarify the simulated payout process?",
+      "isSystem": false,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:46:05.485"
+    },
+    {
+      "id": "cmwzigys400a3v05w6t19eg64",
+      "caseId": "cmwzigj70009xv05wtouvay2b",
+      "authorId": "cmwz7psnp0000v0ssey7vcxlx",
+      "body": "The platform team is reviewing your request.",
+      "isSystem": false,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:46:25.684"
+    },
+    {
+      "id": "cmwzigyuj00a9v05w3jcpnxzz",
+      "caseId": "cmwzigj70009xv05wtouvay2b",
+      "authorId": "cmwz7psnp0000v0ssey7vcxlx",
+      "body": "Status changed to IN_PROGRESS.",
+      "isSystem": true,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:46:25.771"
+    },
+    {
+      "id": "cmwzixi4o00bkv05weryrvxk3",
+      "caseId": "cmwzigj70009xv05wtouvay2b",
+      "authorId": "cmwz7psol0003v0ss4jvi0kac",
+      "body": "done",
+      "isSystem": false,
+      "readAt": null,
+      "createdAt": "2026-11-27T21:59:17.255"
+    }
+  ],
+  "Notification": [
+    {
+      "id": "cmwzfloj0000hv0e8kno4nw30",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "IN_APP",
+      "subject": "Заказ BiletFlow BF-25855DBD8E27 подтверждён",
+      "body": "Ваш заказ BF-25855DBD8E27 на «NU School of Medicine Open House» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸0\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzflocj0003v0e8c9hmi8qk",
+        "reference": "BF-25855DBD8E27",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T20:26:06.825",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T20:26:06.828"
+    },
+    {
+      "id": "cmwzfloir000fv0e8c59l7yjf",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "EMAIL",
+      "subject": "Заказ BiletFlow BF-25855DBD8E27 подтверждён",
+      "body": "Ваш заказ BF-25855DBD8E27 на «NU School of Medicine Open House» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸0\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzflocj0003v0e8c9hmi8qk",
+        "reference": "BF-25855DBD8E27",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T20:26:06.82"
+    },
+    {
+      "id": "cmwzflola000lv0e8hpdb6p5f",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "TICKET_DELIVERY",
+      "channel": "IN_APP",
+      "subject": "Билеты BiletFlow по заказу BF-25855DBD8E27",
+      "body": "Ваши билеты на «NU School of Medicine Open House» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzflocj0003v0e8c9hmi8qk",
+        "reference": "BF-25855DBD8E27",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T20:26:06.908",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T20:26:06.91"
+    },
+    {
+      "id": "cmwzflol1000jv0e8qnbdo616",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "TICKET_DELIVERY",
+      "channel": "EMAIL",
+      "subject": "Билеты BiletFlow по заказу BF-25855DBD8E27",
+      "body": "Ваши билеты на «NU School of Medicine Open House» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzflocj0003v0e8c9hmi8qk",
+        "reference": "BF-25855DBD8E27",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T20:26:06.901"
+    },
+    {
+      "id": "cmwzh8ddg000pv05wvgujpr5h",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "IN_APP",
+      "subject": "Заказ BiletFlow BF-94B38AF15C14 подтверждён",
+      "body": "Ваш заказ BF-94B38AF15C14 на «Eurasian Academic Libraries Training 2026» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸10 000\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets\n\nТестовая оплата. Реальные средства не были списаны.",
+      "payload": {
+        "orderId": "cmwzh892y0003v05wa2ffqojf",
+        "reference": "BF-94B38AF15C14",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T21:11:45.074",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:11:45.076"
+    },
+    {
+      "id": "cmwzh8dd4000nv05wb0o7c4cb",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "EMAIL",
+      "subject": "Заказ BiletFlow BF-94B38AF15C14 подтверждён",
+      "body": "Ваш заказ BF-94B38AF15C14 на «Eurasian Academic Libraries Training 2026» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸10 000\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets\n\nТестовая оплата. Реальные средства не были списаны.",
+      "payload": {
+        "orderId": "cmwzh892y0003v05wa2ffqojf",
+        "reference": "BF-94B38AF15C14",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:11:45.064"
+    },
+    {
+      "id": "cmwzh8dh9000tv05wlumk6p4q",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "TICKET_DELIVERY",
+      "channel": "IN_APP",
+      "subject": "Билеты BiletFlow по заказу BF-94B38AF15C14",
+      "body": "Ваши билеты на «Eurasian Academic Libraries Training 2026» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzh892y0003v05wa2ffqojf",
+        "reference": "BF-94B38AF15C14",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T21:11:45.211",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:11:45.213"
+    },
+    {
+      "id": "cmwzh8dh0000rv05wqit8b8jj",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "TICKET_DELIVERY",
+      "channel": "EMAIL",
+      "subject": "Билеты BiletFlow по заказу BF-94B38AF15C14",
+      "body": "Ваши билеты на «Eurasian Academic Libraries Training 2026» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzh892y0003v05wa2ffqojf",
+        "reference": "BF-94B38AF15C14",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:11:45.205"
+    },
+    {
+      "id": "cmwzh8e6i001hv05wfmje1wfl",
+      "userId": "cmwz7psti000xv0sscll5fbxh",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "EMAIL",
+      "subject": "Заказ BiletFlow BF-AD53415E000F подтверждён",
+      "body": "Ваш заказ BF-AD53415E000F на «Impact Central 2026: The ABCD Way» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸20 000\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets\n\nТестовая оплата. Реальные средства не были списаны.",
+      "payload": {
+        "orderId": "cmwzh8dur000xv05whnb4gok4",
+        "reference": "BF-AD53415E000F",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:11:46.122"
+    },
+    {
+      "id": "cmwzh8e6s001jv05wznzj0ah5",
+      "userId": "cmwz7psti000xv0sscll5fbxh",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "IN_APP",
+      "subject": "Заказ BiletFlow BF-AD53415E000F подтверждён",
+      "body": "Ваш заказ BF-AD53415E000F на «Impact Central 2026: The ABCD Way» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸20 000\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets\n\nТестовая оплата. Реальные средства не были списаны.",
+      "payload": {
+        "orderId": "cmwzh8dur000xv05whnb4gok4",
+        "reference": "BF-AD53415E000F",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T21:11:46.129",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:11:46.132"
+    },
+    {
+      "id": "cmwzh8e7x001nv05wq12jwq4a",
+      "userId": "cmwz7psti000xv0sscll5fbxh",
+      "type": "TICKET_DELIVERY",
+      "channel": "IN_APP",
+      "subject": "Билеты BiletFlow по заказу BF-AD53415E000F",
+      "body": "Ваши билеты на «Impact Central 2026: The ABCD Way» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzh8dur000xv05whnb4gok4",
+        "reference": "BF-AD53415E000F",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T21:11:46.171",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:11:46.173"
+    },
+    {
+      "id": "cmwzh8e7q001lv05wqrekcvuz",
+      "userId": "cmwz7psti000xv0sscll5fbxh",
+      "type": "TICKET_DELIVERY",
+      "channel": "EMAIL",
+      "subject": "Билеты BiletFlow по заказу BF-AD53415E000F",
+      "body": "Ваши билеты на «Impact Central 2026: The ABCD Way» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzh8dur000xv05whnb4gok4",
+        "reference": "BF-AD53415E000F",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:11:46.166"
+    },
+    {
+      "id": "cmwzh8etx002dv05w2myp1b6t",
+      "userId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "IN_APP",
+      "subject": "Заказ BiletFlow BF-CCBE2F59731E подтверждён",
+      "body": "Ваш заказ BF-CCBE2F59731E на «Impact Central 2026: The ABCD Way» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸30 000\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets\n\nТестовая оплата. Реальные средства не были списаны.",
+      "payload": {
+        "orderId": "cmwzh8eio001rv05wmrcoa90z",
+        "reference": "BF-CCBE2F59731E",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T21:11:46.963",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:11:46.966"
+    },
+    {
+      "id": "cmwzh8etp002bv05wrpbit6v6",
+      "userId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "EMAIL",
+      "subject": "Заказ BiletFlow BF-CCBE2F59731E подтверждён",
+      "body": "Ваш заказ BF-CCBE2F59731E на «Impact Central 2026: The ABCD Way» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸30 000\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets\n\nТестовая оплата. Реальные средства не были списаны.",
+      "payload": {
+        "orderId": "cmwzh8eio001rv05wmrcoa90z",
+        "reference": "BF-CCBE2F59731E",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:11:46.958"
+    },
+    {
+      "id": "cmwzh8eur002hv05wn10kb1s2",
+      "userId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "type": "TICKET_DELIVERY",
+      "channel": "IN_APP",
+      "subject": "Билеты BiletFlow по заказу BF-CCBE2F59731E",
+      "body": "Ваши билеты на «Impact Central 2026: The ABCD Way» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzh8eio001rv05wmrcoa90z",
+        "reference": "BF-CCBE2F59731E",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T21:11:46.993",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:11:46.995"
+    },
+    {
+      "id": "cmwzh8eul002fv05womte8it5",
+      "userId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "type": "TICKET_DELIVERY",
+      "channel": "EMAIL",
+      "subject": "Билеты BiletFlow по заказу BF-CCBE2F59731E",
+      "body": "Ваши билеты на «Impact Central 2026: The ABCD Way» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzh8eio001rv05wmrcoa90z",
+        "reference": "BF-CCBE2F59731E",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:11:46.989"
+    },
+    {
+      "id": "cmwzh8fa70038v05wq0eeef8i",
+      "userId": "cmwz7psu50013v0ssohai4naf",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "IN_APP",
+      "subject": "Заказ BiletFlow BF-C26B0F665B2E подтверждён",
+      "body": "Ваш заказ BF-C26B0F665B2E на «Markethon 8.0» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸4 000\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets\n\nТестовая оплата. Реальные средства не были списаны.",
+      "payload": {
+        "orderId": "cmwzh8f3y002lv05wrp7i7cmc",
+        "reference": "BF-C26B0F665B2E",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T21:11:47.549",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:11:47.551"
+    },
+    {
+      "id": "cmwzh8fa20036v05wrrurl645",
+      "userId": "cmwz7psu50013v0ssohai4naf",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "EMAIL",
+      "subject": "Заказ BiletFlow BF-C26B0F665B2E подтверждён",
+      "body": "Ваш заказ BF-C26B0F665B2E на «Markethon 8.0» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸4 000\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets\n\nТестовая оплата. Реальные средства не были списаны.",
+      "payload": {
+        "orderId": "cmwzh8f3y002lv05wrp7i7cmc",
+        "reference": "BF-C26B0F665B2E",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:11:47.546"
+    },
+    {
+      "id": "cmwzh8fay003cv05wiwlr3i2h",
+      "userId": "cmwz7psu50013v0ssohai4naf",
+      "type": "TICKET_DELIVERY",
+      "channel": "IN_APP",
+      "subject": "Билеты BiletFlow по заказу BF-C26B0F665B2E",
+      "body": "Ваши билеты на «Markethon 8.0» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzh8f3y002lv05wrp7i7cmc",
+        "reference": "BF-C26B0F665B2E",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T21:11:47.576",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:11:47.578"
+    },
+    {
+      "id": "cmwzh8fat003av05wpw1ekrz2",
+      "userId": "cmwz7psu50013v0ssohai4naf",
+      "type": "TICKET_DELIVERY",
+      "channel": "EMAIL",
+      "subject": "Билеты BiletFlow по заказу BF-C26B0F665B2E",
+      "body": "Ваши билеты на «Markethon 8.0» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzh8f3y002lv05wrp7i7cmc",
+        "reference": "BF-C26B0F665B2E",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:11:47.573"
+    },
+    {
+      "id": "cmwzhirl30040v05w140pem1d",
+      "userId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "IN_APP",
+      "subject": "Заказ BiletFlow BF-F1C08A4DBF3A подтверждён",
+      "body": "Ваш заказ BF-F1C08A4DBF3A на «Markethon 8.0» подтверждён.\n\nВыдано билетов: 1\nИтого: ₸2 000\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets\n\nТестовая оплата. Реальные средства не были списаны.",
+      "payload": {
+        "orderId": "cmwzhio64003gv05w10adrce6",
+        "reference": "BF-F1C08A4DBF3A",
+        "ticketCount": 1
+      },
+      "sentAt": "2026-11-27T21:19:50.05",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:19:50.056"
+    },
+    {
+      "id": "cmwzhirkv003yv05wbu8y2cpc",
+      "userId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "EMAIL",
+      "subject": "Заказ BiletFlow BF-F1C08A4DBF3A подтверждён",
+      "body": "Ваш заказ BF-F1C08A4DBF3A на «Markethon 8.0» подтверждён.\n\nВыдано билетов: 1\nИтого: ₸2 000\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets\n\nТестовая оплата. Реальные средства не были списаны.",
+      "payload": {
+        "orderId": "cmwzhio64003gv05w10adrce6",
+        "reference": "BF-F1C08A4DBF3A",
+        "ticketCount": 1
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:19:50.048"
+    },
+    {
+      "id": "cmwzhirnf0044v05wt0kjzntd",
+      "userId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "type": "TICKET_DELIVERY",
+      "channel": "IN_APP",
+      "subject": "Билеты BiletFlow по заказу BF-F1C08A4DBF3A",
+      "body": "Ваши билеты на «Markethon 8.0» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzhio64003gv05w10adrce6",
+        "reference": "BF-F1C08A4DBF3A",
+        "ticketCount": 1
+      },
+      "sentAt": "2026-11-27T21:19:50.133",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:19:50.139"
+    },
+    {
+      "id": "cmwzhirn90042v05w8mq9xh0f",
+      "userId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "type": "TICKET_DELIVERY",
+      "channel": "EMAIL",
+      "subject": "Билеты BiletFlow по заказу BF-F1C08A4DBF3A",
+      "body": "Ваши билеты на «Markethon 8.0» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzhio64003gv05w10adrce6",
+        "reference": "BF-F1C08A4DBF3A",
+        "ticketCount": 1
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:19:50.134"
+    },
+    {
+      "id": "cmwzhj7i4004nv05ws5prbv8r",
+      "userId": "cmwz7psur0019v0ss37i2ewys",
+      "type": "PAYMENT_FAILED",
+      "channel": "IN_APP",
+      "subject": "Оплата заказа BF-81E24E65E000 не завершена",
+      "body": "Билеты на «Markethon 8.0» не выданы. Начните оформление заново со страницы мероприятия.",
+      "payload": {
+        "reason": "FAILED",
+        "orderId": "cmwzhj7b00048v05wg57vvhe7",
+        "reference": "BF-81E24E65E000"
+      },
+      "sentAt": "2026-11-27T21:20:10.682",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:20:10.684"
+    },
+    {
+      "id": "cmwzhj7hw004lv05wfsgpgxdh",
+      "userId": "cmwz7psur0019v0ss37i2ewys",
+      "type": "PAYMENT_FAILED",
+      "channel": "EMAIL",
+      "subject": "Оплата заказа BF-81E24E65E000 не завершена",
+      "body": "Билеты на «Markethon 8.0» не выданы. Начните оформление заново со страницы мероприятия.",
+      "payload": {
+        "reason": "FAILED",
+        "orderId": "cmwzhj7b00048v05wg57vvhe7",
+        "reference": "BF-81E24E65E000"
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:20:10.677"
+    },
+    {
+      "id": "cmwzhjnae0056v05wag7kjrl5",
+      "userId": "cmwz7psv6001cv0ss59f2fn89",
+      "type": "PAYMENT_FAILED",
+      "channel": "IN_APP",
+      "subject": "Оплата заказа BF-845937B1A406 не завершена",
+      "body": "Билеты на «Eurasian Academic Libraries Training 2026» не выданы. Начните оформление заново со страницы мероприятия.",
+      "payload": {
+        "reason": "ABANDONED",
+        "orderId": "cmwzhjn4t004rv05wptygwy3c",
+        "reference": "BF-845937B1A406"
+      },
+      "sentAt": "2026-11-27T21:20:31.14",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:20:31.142"
+    },
+    {
+      "id": "cmwzhjna90054v05wng82qj4j",
+      "userId": "cmwz7psv6001cv0ss59f2fn89",
+      "type": "PAYMENT_FAILED",
+      "channel": "EMAIL",
+      "subject": "Оплата заказа BF-845937B1A406 не завершена",
+      "body": "Билеты на «Eurasian Academic Libraries Training 2026» не выданы. Начните оформление заново со страницы мероприятия.",
+      "payload": {
+        "reason": "ABANDONED",
+        "orderId": "cmwzhjn4t004rv05wptygwy3c",
+        "reference": "BF-845937B1A406"
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:20:31.138"
+    },
+    {
+      "id": "cmwzhk2yy005rv05w0r9a7l7t",
+      "userId": "cmwz7psvg001fv0ss3wzihltl",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "IN_APP",
+      "subject": "Заказ BiletFlow BF-CCAA52D1DDE5 подтверждён",
+      "body": "Ваш заказ BF-CCAA52D1DDE5 на «NU Day in Almaty» подтверждён.\n\nВыдано билетов: 3\nИтого: ₸0\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzhk2vw005av05w8lexrget",
+        "reference": "BF-CCAA52D1DDE5",
+        "ticketCount": 3
+      },
+      "sentAt": "2026-11-27T21:20:51.463",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:20:51.466"
+    },
+    {
+      "id": "cmwzhk2ys005pv05wqd44if3n",
+      "userId": "cmwz7psvg001fv0ss3wzihltl",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "EMAIL",
+      "subject": "Заказ BiletFlow BF-CCAA52D1DDE5 подтверждён",
+      "body": "Ваш заказ BF-CCAA52D1DDE5 на «NU Day in Almaty» подтверждён.\n\nВыдано билетов: 3\nИтого: ₸0\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzhk2vw005av05w8lexrget",
+        "reference": "BF-CCAA52D1DDE5",
+        "ticketCount": 3
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:20:51.46"
+    },
+    {
+      "id": "cmwzhk2zp005vv05w4bochijd",
+      "userId": "cmwz7psvg001fv0ss3wzihltl",
+      "type": "TICKET_DELIVERY",
+      "channel": "IN_APP",
+      "subject": "Билеты BiletFlow по заказу BF-CCAA52D1DDE5",
+      "body": "Ваши билеты на «NU Day in Almaty» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzhk2vw005av05w8lexrget",
+        "reference": "BF-CCAA52D1DDE5",
+        "ticketCount": 3
+      },
+      "sentAt": "2026-11-27T21:20:51.491",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:20:51.493"
+    },
+    {
+      "id": "cmwzhk2zk005tv05wogl0hw5x",
+      "userId": "cmwz7psvg001fv0ss3wzihltl",
+      "type": "TICKET_DELIVERY",
+      "channel": "EMAIL",
+      "subject": "Билеты BiletFlow по заказу BF-CCAA52D1DDE5",
+      "body": "Ваши билеты на «NU Day in Almaty» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzhk2vw005av05w8lexrget",
+        "reference": "BF-CCAA52D1DDE5",
+        "ticketCount": 3
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:20:51.488"
+    },
+    {
+      "id": "cmwzhkino006dv05w2xqi1br3",
+      "userId": "cmwz7psvq001iv0ssng1k03yn",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "IN_APP",
+      "subject": "Заказ BiletFlow BF-B376274A881A подтверждён",
+      "body": "Ваш заказ BF-B376274A881A на «NU School of Medicine Open House» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸0\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzhkil7005zv05worte79jm",
+        "reference": "BF-B376274A881A",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T21:21:11.795",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:21:11.797"
+    },
+    {
+      "id": "cmwzhkinj006bv05wacz9igqo",
+      "userId": "cmwz7psvq001iv0ssng1k03yn",
+      "type": "ORDER_CONFIRMATION",
+      "channel": "EMAIL",
+      "subject": "Заказ BiletFlow BF-B376274A881A подтверждён",
+      "body": "Ваш заказ BF-B376274A881A на «NU School of Medicine Open House» подтверждён.\n\nВыдано билетов: 2\nИтого: ₸0\n\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzhkil7005zv05worte79jm",
+        "reference": "BF-B376274A881A",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:21:11.791"
+    },
+    {
+      "id": "cmwzhkioc006hv05w18ef3lny",
+      "userId": "cmwz7psvq001iv0ssng1k03yn",
+      "type": "TICKET_DELIVERY",
+      "channel": "IN_APP",
+      "subject": "Билеты BiletFlow по заказу BF-B376274A881A",
+      "body": "Ваши билеты на «NU School of Medicine Open House» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzhkil7005zv05worte79jm",
+        "reference": "BF-B376274A881A",
+        "ticketCount": 2
+      },
+      "sentAt": "2026-11-27T21:21:11.819",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:21:11.82"
+    },
+    {
+      "id": "cmwzhkio7006fv05ws1qlhcdm",
+      "userId": "cmwz7psvq001iv0ssng1k03yn",
+      "type": "TICKET_DELIVERY",
+      "channel": "EMAIL",
+      "subject": "Билеты BiletFlow по заказу BF-B376274A881A",
+      "body": "Ваши билеты на «NU School of Medicine Open House» готовы.\nОткрыть или скачать билеты: http://localhost:3100/ru/tickets",
+      "payload": {
+        "orderId": "cmwzhkil7005zv05worte79jm",
+        "reference": "BF-B376274A881A",
+        "ticketCount": 2
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:21:11.816"
+    },
+    {
+      "id": "cmwzholg60072v05wpqvzg2qk",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "REFUND_COMPLETED",
+      "channel": "IN_APP",
+      "subject": "Тестовый возврат по заказу BF-94B38AF15C14",
+      "body": "По мероприятию «Eurasian Academic Libraries Training 2026» оформлен тестовый возврат на ₸10 000.\nБилеты больше не действуют для входа.",
+      "payload": {
+        "orderId": "cmwzh892y0003v05wa2ffqojf",
+        "amountKzt": 10000,
+        "reference": "BF-94B38AF15C14"
+      },
+      "sentAt": "2026-11-27T21:24:22.036",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:24:22.038"
+    },
+    {
+      "id": "cmwzholfz0070v05w5clow00y",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "REFUND_COMPLETED",
+      "channel": "EMAIL",
+      "subject": "Тестовый возврат по заказу BF-94B38AF15C14",
+      "body": "По мероприятию «Eurasian Academic Libraries Training 2026» оформлен тестовый возврат на ₸10 000.\nБилеты больше не действуют для входа.",
+      "payload": {
+        "orderId": "cmwzh892y0003v05wa2ffqojf",
+        "amountKzt": 10000,
+        "reference": "BF-94B38AF15C14"
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:24:22.031"
+    },
+    {
+      "id": "cmwzhpgp7007ev05wfaj842y5",
+      "userId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "type": "REFUND_COMPLETED",
+      "channel": "IN_APP",
+      "subject": "Тестовый возврат по заказу BF-F1C08A4DBF3A",
+      "body": "По мероприятию «Markethon 8.0» оформлен тестовый возврат на ₸2 000.\nБилеты больше не действуют для входа.",
+      "payload": {
+        "orderId": "cmwzhio64003gv05w10adrce6",
+        "amountKzt": 2000,
+        "reference": "BF-F1C08A4DBF3A"
+      },
+      "sentAt": "2026-11-27T21:25:02.538",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:25:02.539"
+    },
+    {
+      "id": "cmwzhpgp3007cv05wt8vc4lov",
+      "userId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "type": "REFUND_COMPLETED",
+      "channel": "EMAIL",
+      "subject": "Тестовый возврат по заказу BF-F1C08A4DBF3A",
+      "body": "По мероприятию «Markethon 8.0» оформлен тестовый возврат на ₸2 000.\nБилеты больше не действуют для входа.",
+      "payload": {
+        "orderId": "cmwzhio64003gv05w10adrce6",
+        "amountKzt": 2000,
+        "reference": "BF-F1C08A4DBF3A"
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:25:02.536"
+    },
+    {
+      "id": "cmwzif4tv008vv05ws0iz66ku",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "SUPPORT_MESSAGE",
+      "channel": "IN_APP",
+      "subject": "Новый ответ на обращение CASE-6787FC18",
+      "body": "На обращение «Refund confirmation» поступил ответ. Откройте переписку в BiletFlow, чтобы ответить.",
+      "payload": {
+        "caseId": "cmwzif2u4008nv05wrou9lbmp",
+        "messageId": "cmwzif4r8008rv05w6si934ry",
+        "reference": "CASE-6787FC18"
+      },
+      "sentAt": "2026-11-27T21:45:00.209",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:45:00.211"
+    },
+    {
+      "id": "cmwzif4tl008tv05wg9dygkcg",
+      "userId": "cmwz7pst4000uv0ssso9hc0tv",
+      "type": "SUPPORT_MESSAGE",
+      "channel": "EMAIL",
+      "subject": "Новый ответ на обращение CASE-6787FC18",
+      "body": "На обращение «Refund confirmation» поступил ответ. Откройте переписку в BiletFlow, чтобы ответить.",
+      "payload": {
+        "caseId": "cmwzif2u4008nv05wrou9lbmp",
+        "messageId": "cmwzif4r8008rv05w6si934ry",
+        "reference": "CASE-6787FC18"
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:45:00.202"
+    },
+    {
+      "id": "cmwzifm650099v05w79rkgr2c",
+      "userId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "type": "SUPPORT_MESSAGE",
+      "channel": "IN_APP",
+      "subject": "Новый ответ на обращение CASE-355E431C",
+      "body": "На обращение «VIP seating information» поступил ответ. Откройте переписку в BiletFlow, чтобы ответить.",
+      "payload": {
+        "caseId": "cmwzifm2f0091v05we6atdm3s",
+        "messageId": "cmwzifm540095v05whvjja7s9",
+        "reference": "CASE-355E431C"
+      },
+      "sentAt": "2026-11-27T21:45:22.684",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:45:22.686"
+    },
+    {
+      "id": "cmwzifm600097v05wux12og6a",
+      "userId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "type": "SUPPORT_MESSAGE",
+      "channel": "EMAIL",
+      "subject": "Новый ответ на обращение CASE-355E431C",
+      "body": "На обращение «VIP seating information» поступил ответ. Откройте переписку в BiletFlow, чтобы ответить.",
+      "payload": {
+        "caseId": "cmwzifm2f0091v05we6atdm3s",
+        "messageId": "cmwzifm540095v05whvjja7s9",
+        "reference": "CASE-355E431C"
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:45:22.681"
+    },
+    {
+      "id": "cmwzigj2j009tv05w2ifksuoy",
+      "userId": "cmwz7psvg001fv0ss3wzihltl",
+      "type": "SUPPORT_MESSAGE",
+      "channel": "IN_APP",
+      "subject": "Новый ответ на обращение CASE-0ACCA7C2",
+      "body": "На обращение «Group ticket delivery» поступил ответ. Откройте переписку в BiletFlow, чтобы ответить.",
+      "payload": {
+        "caseId": "cmwzigiyi009lv05wozovdqwb",
+        "messageId": "cmwzigj1f009pv05wbq8e6kr5",
+        "reference": "CASE-0ACCA7C2"
+      },
+      "sentAt": "2026-11-27T21:46:05.322",
+      "readAt": null,
+      "error": null,
+      "createdAt": "2026-11-27T21:46:05.323"
+    },
+    {
+      "id": "cmwzigj2f009rv05wj6a332q5",
+      "userId": "cmwz7psvg001fv0ss3wzihltl",
+      "type": "SUPPORT_MESSAGE",
+      "channel": "EMAIL",
+      "subject": "Новый ответ на обращение CASE-0ACCA7C2",
+      "body": "На обращение «Group ticket delivery» поступил ответ. Откройте переписку в BiletFlow, чтобы ответить.",
+      "payload": {
+        "caseId": "cmwzigiyi009lv05wozovdqwb",
+        "messageId": "cmwzigj1f009pv05wbq8e6kr5",
+        "reference": "CASE-0ACCA7C2"
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:46:05.319"
+    },
+    {
+      "id": "cmwzigysx00a5v05wpm5v0a6a",
+      "userId": "cmwz7psol0003v0ss4jvi0kac",
+      "type": "SUPPORT_MESSAGE",
+      "channel": "EMAIL",
+      "subject": "Новый ответ на обращение CASE-768A0ECE",
+      "body": "На обращение «Organizer payout information» поступил ответ. Откройте переписку в BiletFlow, чтобы ответить.",
+      "payload": {
+        "caseId": "cmwzigj70009xv05wtouvay2b",
+        "messageId": "cmwzigys400a3v05w6t19eg64",
+        "reference": "CASE-768A0ECE"
+      },
+      "sentAt": null,
+      "readAt": null,
+      "error": "Historical test delivery error",
+      "createdAt": "2026-11-27T21:46:25.714"
+    },
+    {
+      "id": "cmwzigyt100a7v05wss8tw5av",
+      "userId": "cmwz7psol0003v0ss4jvi0kac",
+      "type": "SUPPORT_MESSAGE",
+      "channel": "IN_APP",
+      "subject": "Новый ответ на обращение CASE-768A0ECE",
+      "body": "На обращение «Organizer payout information» поступил ответ. Откройте переписку в BiletFlow, чтобы ответить.",
+      "payload": {
+        "caseId": "cmwzigj70009xv05wtouvay2b",
+        "messageId": "cmwzigys400a3v05w6t19eg64",
+        "reference": "CASE-768A0ECE"
+      },
+      "sentAt": "2026-11-27T21:46:25.716",
+      "readAt": "2026-11-27T22:26:36.434",
+      "error": null,
+      "createdAt": "2026-11-27T21:46:25.717"
+    }
+  ],
+  "AuditLog": [
+    {
+      "id": "cmwzfcthq0007v01g42vchy0j",
+      "actorUserId": "cmwz7pst4000uv0ssso9hc0tv",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "order.reserved",
+      "entityType": "Order",
+      "entityId": "cmwzfctgo0003v01gl9h727bi",
+      "description": "Paid order reserved pending payment",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T20:19:13.358"
+    },
+    {
+      "id": "cmwzfcyb4000bv01g1v2tg7b7",
+      "actorUserId": "cmwz7pst4000uv0ssso9hc0tv",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "payment.started",
+      "entityType": "Payment",
+      "entityId": "cmwzfcyaq0009v01gaqgixhnl",
+      "description": "Simulated ticket payment started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T20:19:19.601"
+    },
+    {
+      "id": "cmwzflog7000dv0e8ui1i7zf1",
+      "actorUserId": "cmwz7pst4000uv0ssso9hc0tv",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "action": "order.paid",
+      "entityType": "Order",
+      "entityId": "cmwzflocj0003v0e8c9hmi8qk",
+      "description": "Free order paid and tickets issued",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T20:26:06.727"
+    },
+    {
+      "id": "cmwzh89710008v05wp43xlu43",
+      "actorUserId": "cmwz7pst4000uv0ssso9hc0tv",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "order.reserved",
+      "entityType": "Order",
+      "entityId": "cmwzh892y0003v05wa2ffqojf",
+      "description": "Paid order reserved pending payment",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:39.662"
+    },
+    {
+      "id": "cmwzh8d77000cv05wjfqlzaed",
+      "actorUserId": "cmwz7pst4000uv0ssso9hc0tv",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "payment.started",
+      "entityType": "Payment",
+      "entityId": "cmwzh8d6y000av05w2thed2si",
+      "description": "Simulated ticket payment started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:44.851"
+    },
+    {
+      "id": "cmwzh8dbv000lv05wzl8urosd",
+      "actorUserId": "cmwz7pst4000uv0ssso9hc0tv",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "order.paid",
+      "entityType": "Order",
+      "entityId": "cmwzh892y0003v05wa2ffqojf",
+      "description": "Paid order settled and tickets issued",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:45.019"
+    },
+    {
+      "id": "cmwzh8dvw0012v05wfpnfnne8",
+      "actorUserId": "cmwz7psti000xv0sscll5fbxh",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "order.reserved",
+      "entityType": "Order",
+      "entityId": "cmwzh8dur000xv05whnb4gok4",
+      "description": "Paid order reserved pending payment",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:45.74"
+    },
+    {
+      "id": "cmwzh8e0y0016v05wxjudg1bo",
+      "actorUserId": "cmwz7psti000xv0sscll5fbxh",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "payment.started",
+      "entityType": "Payment",
+      "entityId": "cmwzh8e0s0014v05wwlnt31cu",
+      "description": "Simulated ticket payment started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:45.922"
+    },
+    {
+      "id": "cmwzh8e5j001fv05w4qpe9emd",
+      "actorUserId": "cmwz7psti000xv0sscll5fbxh",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "order.paid",
+      "entityType": "Order",
+      "entityId": "cmwzh8dur000xv05whnb4gok4",
+      "description": "Paid order settled and tickets issued",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:46.087"
+    },
+    {
+      "id": "cmwzh8ekf001wv05wlmu9fgu7",
+      "actorUserId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "order.reserved",
+      "entityType": "Order",
+      "entityId": "cmwzh8eio001rv05wmrcoa90z",
+      "description": "Paid order reserved pending payment",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:46.623"
+    },
+    {
+      "id": "cmwzh8ep40020v05w46sl1eb6",
+      "actorUserId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "payment.started",
+      "entityType": "Payment",
+      "entityId": "cmwzh8eoy001yv05w5ll7b6uj",
+      "description": "Simulated ticket payment started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:46.793"
+    },
+    {
+      "id": "cmwzh8esw0029v05wyugupene",
+      "actorUserId": "cmwz7pstu0010v0ssgc0rfgnc",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "order.paid",
+      "entityType": "Order",
+      "entityId": "cmwzh8eio001rv05wmrcoa90z",
+      "description": "Paid order settled and tickets issued",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:46.929"
+    },
+    {
+      "id": "cmwzh8f4n002rv05wo1arbkqy",
+      "actorUserId": "cmwz7psu50013v0ssohai4naf",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "order.reserved",
+      "entityType": "Order",
+      "entityId": "cmwzh8f3y002lv05wrp7i7cmc",
+      "description": "Paid order reserved pending payment",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:47.351"
+    },
+    {
+      "id": "cmwzh8f7h002vv05w8fohynkx",
+      "actorUserId": "cmwz7psu50013v0ssohai4naf",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "payment.started",
+      "entityType": "Payment",
+      "entityId": "cmwzh8f7d002tv05wpe4xrymk",
+      "description": "Simulated ticket payment started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:47.453"
+    },
+    {
+      "id": "cmwzh8f9k0034v05wd692jqj7",
+      "actorUserId": "cmwz7psu50013v0ssohai4naf",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "order.paid",
+      "entityType": "Order",
+      "entityId": "cmwzh8f3y002lv05wrp7i7cmc",
+      "description": "Paid order settled and tickets issued",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:11:47.529"
+    },
+    {
+      "id": "cmwzhio9b003mv05wllayrtgp",
+      "actorUserId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "order.reserved",
+      "entityType": "Order",
+      "entityId": "cmwzhio64003gv05w10adrce6",
+      "description": "Paid order reserved pending payment",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:19:45.744"
+    },
+    {
+      "id": "cmwzhirh8003qv05wrf8e9ylu",
+      "actorUserId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "payment.started",
+      "entityType": "Payment",
+      "entityId": "cmwzhirh3003ov05w832kpznp",
+      "description": "Simulated ticket payment started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:19:49.916"
+    },
+    {
+      "id": "cmwzhirjy003wv05w6tscql23",
+      "actorUserId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "order.paid",
+      "entityType": "Order",
+      "entityId": "cmwzhio64003gv05w10adrce6",
+      "description": "Paid order settled and tickets issued",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:19:50.014"
+    },
+    {
+      "id": "cmwzhj7bj004cv05wh6hwfcnk",
+      "actorUserId": "cmwz7psur0019v0ss37i2ewys",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "order.reserved",
+      "entityType": "Order",
+      "entityId": "cmwzhj7b00048v05wg57vvhe7",
+      "description": "Paid order reserved pending payment",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:20:10.448"
+    },
+    {
+      "id": "cmwzhj7f3004gv05wthqnthnh",
+      "actorUserId": "cmwz7psur0019v0ss37i2ewys",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "payment.started",
+      "entityType": "Payment",
+      "entityId": "cmwzhj7ex004ev05w9kp0efvh",
+      "description": "Simulated ticket payment started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:20:10.575"
+    },
+    {
+      "id": "cmwzhj7gw004jv05wfgcaic18",
+      "actorUserId": "cmwz7psur0019v0ss37i2ewys",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "payment.declined",
+      "entityType": "Payment",
+      "entityId": "cmwzhj7ex004ev05w9kp0efvh",
+      "description": "Simulated payment declined; no ticket issued",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:20:10.64"
+    },
+    {
+      "id": "cmwzhjn5n004vv05w559udx9v",
+      "actorUserId": "cmwz7psv6001cv0ss59f2fn89",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "order.reserved",
+      "entityType": "Order",
+      "entityId": "cmwzhjn4t004rv05wptygwy3c",
+      "description": "Paid order reserved pending payment",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:20:30.972"
+    },
+    {
+      "id": "cmwzhjn8p004zv05w8wofowc6",
+      "actorUserId": "cmwz7psv6001cv0ss59f2fn89",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "payment.started",
+      "entityType": "Payment",
+      "entityId": "cmwzhjn8l004xv05w64psh4sj",
+      "description": "Simulated ticket payment started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:20:31.081"
+    },
+    {
+      "id": "cmwzhjn9w0052v05w4k2sezxd",
+      "actorUserId": "cmwz7psv6001cv0ss59f2fn89",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "payment.abandoned",
+      "entityType": "Payment",
+      "entityId": "cmwzhjn8l004xv05w64psh4sj",
+      "description": "Simulated payment abandoned; no ticket issued",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:20:31.124"
+    },
+    {
+      "id": "cmwzhk2xq005nv05wd71c4vdj",
+      "actorUserId": "cmwz7psvg001fv0ss3wzihltl",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "action": "order.paid",
+      "entityType": "Order",
+      "entityId": "cmwzhk2vw005av05w8lexrget",
+      "description": "Free order paid and tickets issued",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:20:51.422"
+    },
+    {
+      "id": "cmwzhkimg0069v05wurc5o7lv",
+      "actorUserId": "cmwz7psvq001iv0ssng1k03yn",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "action": "order.paid",
+      "entityType": "Order",
+      "entityId": "cmwzhkil7005zv05worte79jm",
+      "description": "Free order paid and tickets issued",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:21:11.752"
+    },
+    {
+      "id": "cmwzhkybb006qv05wg830ws82",
+      "actorUserId": "cmwz7psw1001lv0ssqt7kc503",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "order.reserved",
+      "entityType": "Order",
+      "entityId": "cmwzhkyad006lv05wrcf44gu0",
+      "description": "Paid order reserved pending payment",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:21:32.087"
+    },
+    {
+      "id": "cmwzholfd006yv05wvi5s04g4",
+      "actorUserId": "cmwz7pst4000uv0ssso9hc0tv",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "order.refunded",
+      "entityType": "Order",
+      "entityId": "cmwzh892y0003v05wa2ffqojf",
+      "description": "Simulated refund completed and tickets invalidated",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:24:22.009"
+    },
+    {
+      "id": "cmwzhpgod007av05w3uw81q0c",
+      "actorUserId": "cmwz7psuh0016v0ssbgd0zzmu",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "order.refunded",
+      "entityType": "Order",
+      "entityId": "cmwzhio64003gv05w10adrce6",
+      "description": "Simulated refund completed and tickets invalidated",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:25:02.51"
+    },
+    {
+      "id": "cmwzidn37007jv05wdlnusw66",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "action": "event.admin_assigned",
+      "entityType": "StaffAssignment",
+      "entityId": "cmwz7psrr000ov0ssx7b6ffcf",
+      "description": "Event admin assigned",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:43:50.564"
+    },
+    {
+      "id": "cmwzidn66007mv05wolrb81ri",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "event.admin_assigned",
+      "entityType": "StaffAssignment",
+      "entityId": "cmwz7psrr000ov0ssx7b6ffcf",
+      "description": "Event admin assigned",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:43:50.67"
+    },
+    {
+      "id": "cmwzidn8s007pv05w84dx5bc3",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "event.admin_assigned",
+      "entityType": "StaffAssignment",
+      "entityId": "cmwz7psrr000ov0ssx7b6ffcf",
+      "description": "Event admin assigned",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:43:50.764"
+    },
+    {
+      "id": "cmwzidnc7007sv05w7ktq6ymx",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "action": "event.admin_assigned",
+      "entityType": "StaffAssignment",
+      "entityId": "cmwz7pssp000rv0ssdgc97gzh",
+      "description": "Event admin assigned",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:43:50.888"
+    },
+    {
+      "id": "cmwzidney007vv05wejjkkscu",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "event.admin_assigned",
+      "entityType": "StaffAssignment",
+      "entityId": "cmwz7pssp000rv0ssdgc97gzh",
+      "description": "Event admin assigned",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:43:50.986"
+    },
+    {
+      "id": "cmwzie49l0081v05wq8djft6e",
+      "actorUserId": "cmwz7psrr000ov0ssx7b6ffcf",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "ticket.checked_in",
+      "entityType": "Ticket",
+      "entityId": "cmwzh8e3i001av05wcfmddo6d",
+      "description": "Ticket checked in",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:44:12.825"
+    },
+    {
+      "id": "cmwziekgf0089v05w235ozgp2",
+      "actorUserId": "cmwz7pssp000rv0ssdgc97gzh",
+      "eventId": "cmwzdoq8o0006v0uwy6twsdeu",
+      "action": "ticket.checked_in",
+      "entityType": "Ticket",
+      "entityId": "cmwzhk2xb005lv05wodqk34ch",
+      "description": "Ticket checked in",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:44:33.808"
+    },
+    {
+      "id": "cmwziekmx008dv05wiw9z7p6v",
+      "actorUserId": "cmwz7pssp000rv0ssdgc97gzh",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "ticket.checked_in",
+      "entityType": "Ticket",
+      "entityId": "cmwzh8f8n002zv05w3qjxvzvm",
+      "description": "Ticket checked in",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:44:34.041"
+    },
+    {
+      "id": "cmwzieksr008hv05ws2q2udmd",
+      "actorUserId": "cmwz7psrr000ov0ssx7b6ffcf",
+      "eventId": "cmwzdoq650002v0uw7hxevfr1",
+      "action": "ticket.checked_in",
+      "entityType": "Ticket",
+      "entityId": "cmwzhkiln0064v05wmhprss5t",
+      "description": "Ticket checked in",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:44:34.251"
+    },
+    {
+      "id": "cmwziem8g008jv05wnsig52ur",
+      "actorUserId": "cmwz7psrr000ov0ssx7b6ffcf",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "ticket.check_in_reversed",
+      "entityType": "CheckInRecord",
+      "entityId": "cmwzie499007zv05wlfpth543",
+      "description": "Check-in reversed",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:44:36.113"
+    },
+    {
+      "id": "cmwzih35q00adv05w5imet45h",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "activation.terms_accepted",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih15a00abv05wxvea29bx",
+      "description": "Organizer accepted paid-sales terms",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:31.358"
+    },
+    {
+      "id": "cmwzih4u900ahv05wis31zln4",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "activation.payment_started",
+      "entityType": "Payment",
+      "entityId": "cmwzih4u300afv05wlec8eo3h",
+      "description": "Simulated activation fee started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:33.537"
+    },
+    {
+      "id": "cmwzih6ke00akv05w31iscpi5",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "activation.fee_paid",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih15a00abv05wxvea29bx",
+      "description": "Simulated activation fee paid",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:35.774"
+    },
+    {
+      "id": "cmwzih8ef00amv05wf8ctk2l7",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "activation.completed",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih15a00abv05wxvea29bx",
+      "description": "Paid sales unlocked",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:38.152"
+    },
+    {
+      "id": "cmwzih8ei00aov05wdbhkyc1y",
+      "actorUserId": "cmwz7psnp0000v0ssey7vcxlx",
+      "eventId": "cmwzdoqac000av0uwafy2vlug",
+      "action": "activation.approved",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih15a00abv05wxvea29bx",
+      "description": "Platform admin approved paid sales",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:38.154"
+    },
+    {
+      "id": "cmwzih8k000asv05w1rddw2ly",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "activation.terms_accepted",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih8i600aqv05wz9puujtf",
+      "description": "Organizer accepted paid-sales terms",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:38.353"
+    },
+    {
+      "id": "cmwzih8lr00awv05wxoxtz02w",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "activation.payment_started",
+      "entityType": "Payment",
+      "entityId": "cmwzih8lp00auv05wkapzszpo",
+      "description": "Simulated activation fee started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:38.416"
+    },
+    {
+      "id": "cmwzih8p100azv05wwe7hidmz",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "activation.fee_paid",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih8i600aqv05wz9puujtf",
+      "description": "Simulated activation fee paid",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:38.534"
+    },
+    {
+      "id": "cmwzih8rc00b1v05w7kazn6fr",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "activation.completed",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih8i600aqv05wz9puujtf",
+      "description": "Paid sales unlocked",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:38.617"
+    },
+    {
+      "id": "cmwzih8rf00b3v05wvacsnf4m",
+      "actorUserId": "cmwz7psnp0000v0ssey7vcxlx",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "action": "activation.approved",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih8i600aqv05wz9puujtf",
+      "description": "Platform admin approved paid sales",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:38.619"
+    },
+    {
+      "id": "cmwzih8wh00b7v05wurye0fll",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "activation.terms_accepted",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih8uj00b5v05wqadkp2vl",
+      "description": "Organizer accepted paid-sales terms",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:38.801"
+    },
+    {
+      "id": "cmwzih8y400bbv05wuqp4hqof",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "activation.payment_started",
+      "entityType": "Payment",
+      "entityId": "cmwzih8y100b9v05w1ra1lm94",
+      "description": "Simulated activation fee started",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:38.86"
+    },
+    {
+      "id": "cmwzih90300bev05w76i32a5i",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "activation.fee_paid",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih8uj00b5v05wqadkp2vl",
+      "description": "Simulated activation fee paid",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:38.931"
+    },
+    {
+      "id": "cmwzih92r00bgv05wjltunrv6",
+      "actorUserId": "cmwz7psol0003v0ss4jvi0kac",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "activation.completed",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih8uj00b5v05wqadkp2vl",
+      "description": "Paid sales unlocked",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:39.028"
+    },
+    {
+      "id": "cmwzih92u00biv05w5x8n30a0",
+      "actorUserId": "cmwz7psnp0000v0ssey7vcxlx",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "action": "activation.approved",
+      "entityType": "PaidSalesActivation",
+      "entityId": "cmwzih8uj00b5v05wqadkp2vl",
+      "description": "Platform admin approved paid sales",
+      "metadata": null,
+      "ipAddress": null,
+      "createdAt": "2026-11-27T21:46:39.031"
+    }
+  ],
+  "Payout": [
+    {
+      "id": "cfb647e25a9f23cfb0434234e",
+      "payoutAccountId": "cmwz7pspe0009v0ssh5zd8qjx",
+      "eventId": "cmwzdoqbj000ev0uwmwos1wmx",
+      "grossKzt": 50000,
+      "feeKzt": 1950,
+      "refundedKzt": 0,
+      "netKzt": 48050,
+      "status": "SCHEDULED",
+      "scheduledFor": "2026-12-07T12:00:00",
+      "paidAt": null,
+      "simulated": true,
+      "createdAt": "2026-11-27T21:55:44.638",
+      "updatedAt": "2026-11-27T21:55:44.638"
+    },
+    {
+      "id": "cb305f3ae598b5aac9e700d20",
+      "payoutAccountId": "cmwz7pspe0009v0ssh5zd8qjx",
+      "eventId": "cmwzdoqc4000hv0uwwx7z9ref",
+      "grossKzt": 6000,
+      "feeKzt": 240,
+      "refundedKzt": 2000,
+      "netKzt": 3760,
+      "status": "PENDING",
+      "scheduledFor": "2026-12-08T04:00:00",
+      "paidAt": null,
+      "simulated": true,
+      "createdAt": "2026-11-27T21:55:44.638",
+      "updatedAt": "2026-11-27T21:55:44.638"
+    }
+  ],
+  "PlatformSetting": [
+    {
+      "key": "PLATFORM_ACTIVATION_FEE_KZT",
+      "value": "15000",
+      "updatedAt": "2026-11-27T16:45:21.855"
+    },
+    {
+      "key": "PLATFORM_FEE_PERCENT",
+      "value": "3.5",
+      "updatedAt": "2026-11-27T16:45:21.855"
+    },
+    {
+      "key": "PLATFORM_FEE_FIXED_KZT",
+      "value": "100",
+      "updatedAt": "2026-11-27T16:45:21.855"
+    },
+    {
+      "key": "CHECKOUT_HOLD_MINUTES",
+      "value": "15",
+      "updatedAt": "2026-11-27T16:45:21.855"
+    }
+  ],
+  "EventReport": []
+}

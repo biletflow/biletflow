@@ -2,6 +2,7 @@ import { prisma, type UserRole } from "@biletflow/db";
 
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
+import { lockOrder } from "./checkout";
 import { clientIp } from "./http";
 import { refundInventory } from "./inventory";
 import { notifyRefundCompleted } from "./notifications";
@@ -30,6 +31,7 @@ export async function refundOrder(
   headers: Headers,
 ) {
   const settled = await prisma.$transaction(async (tx) => {
+    if (!(await lockOrder(tx, orderId))) throw new ApiError(404, "NOT_FOUND");
     const order = await tx.order.findUnique({
       where: { id: orderId },
       include: {
@@ -69,15 +71,16 @@ export async function refundOrder(
         eventTitle: order.event.title,
       };
     }
-    if (order.status !== "PAID") throw new ApiError(409, "CONFLICT");
+    if (order.status !== "PAID") throw new ApiError(409, "CONFLICT", "REFUND_UNPAID");
     if (
       user.role !== "PLATFORM_ADMIN" &&
       !refundWindowOpen(order.event.refundPolicy, order.event.startsAt)
     ) {
-      throw new ApiError(409, "CONFLICT");
+      throw new ApiError(409, "CONFLICT",
+        order.event.refundPolicy === "NO_REFUNDS" ? "REFUND_NOT_ALLOWED" : order.event.refundPolicy === "UNTIL_48H_BEFORE" ? "REFUND_WINDOW_48H" : "REFUND_WINDOW_24H");
     }
     if (order.tickets.some((ticket) => ticket.status === "CHECKED_IN")) {
-      throw new ApiError(409, "CONFLICT");
+      throw new ApiError(409, "CONFLICT", "REFUND_CHECKED_IN");
     }
 
     for (const item of order.items) {

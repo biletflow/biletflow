@@ -50,6 +50,7 @@ export default async function SupportCasePage({
           caseId={id}
           initialCase={presented}
           canManage={canManage}
+          currentUserId={user.id}
           locale={locale}
         />
       </div>

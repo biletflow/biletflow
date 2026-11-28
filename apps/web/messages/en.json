@@ -5,6 +5,7 @@
   },
   "nav": {
     "home": "BiletFlow home",
+    "menu": "Menu",
     "browse": "Browse Events",
     "categories": "Categories",
     "signIn": "Sign In",
@@ -13,8 +14,9 @@
     "signingOut": "Signing out…",
     "tickets": "My tickets",
     "support": "Support",
-    "organizer": "Organizer",
-    "admin": "Admin"
+    "notifications": "Notifications",
+    "organizer": "Dashboard",
+    "admin": "Admin Dashboard"
   },
   "home": {
     "eyebrow": "Self-service event ticketing in Kazakhstan",
@@ -104,6 +106,7 @@
     }
   },
   "checkout": {
+    "testPayment": "Test payment. No real funds will be charged.",
     "title": "Checkout",
     "lead": "Confirm the quantity and ticket holder. Totals are whole tenge.",
     "submitFree": "Complete registration",
@@ -118,6 +121,8 @@
     "campaignLinkHint": "A campaign link is attached to this checkout. You can still enter a matching promo code.",
     "errorGeneric": "Could not complete checkout. Try again.",
     "errorConflict": "Those tickets are no longer available.",
+    "errorSalesClosed": "Registration is closed for these tickets.",
+    "errorPaidSalesInactive": "Paid sales are currently unavailable for this event.",
     "errorHoldExpired": "Your checkout hold expired. Start again from the event page.",
     "errorValidation": "Check the name, email, and quantity and try again.",
     "errorPromo": "That promo code or campaign link is not valid for this order."
@@ -157,6 +162,10 @@
     "order": "Order",
     "updateStatus": "Status",
     "saveStatus": "Update status",
+    "assignee": "Assigned to",
+    "assignToMe": "Assign to me",
+    "unassign": "Unassign",
+    "unassigned": "Unassigned",
     "errorGeneric": "Could not complete that request. Try again.",
     "categories": {
       "TICKET_DELIVERY": "Ticket delivery",
@@ -194,6 +203,7 @@
     "signUpLink": "Create one",
     "errorValidation": "Check the name, email, and password and try again.",
     "errorInvalid": "Email or password is incorrect.",
+    "errorRateLimited": "Too many attempts. Wait a moment and try again.",
     "errorForbidden": "This account is suspended.",
     "errorExists": "An account with this email already exists.",
     "errorGeneric": "Could not complete that request. Try again.",
@@ -212,8 +222,7 @@
   },
   "common": {
     "percentSold": "{percent}% sold",
-    "language": "Language",
-    "simulatedPayments": "Demonstration build — all payments are simulated and no real money moves."
+    "language": "Language"
   },
   "cities": {
     "Almaty": "Almaty",
@@ -224,7 +233,9 @@
     "Music": "Music",
     "Community": "Community",
     "Technology": "Technology",
-    "Film": "Film"
+    "Film": "Film",
+    "Business": "Business",
+    "Education": "Education"
   },
   "ticketTypes": {
     "General Admission": "General Admission",
@@ -238,8 +249,13 @@
   "countries": {
     "KZ": "Kazakhstan"
   },
+  "notifications": {
+    "title": "Notifications",
+    "lead": "Recent updates about your orders, tickets, payments, and support cases.",
+    "empty": "No notifications yet."
+  },
   "footer": {
     "tagline": "Kazakhstan-focused self-service event ticketing. Create an event, issue tickets, check people in.",
-    "rights": "© {year} BiletFlow. Almaty, Kazakhstan."
+    "rights": "© {year} BiletFlow. Astana, Kazakhstan."
   }
 }

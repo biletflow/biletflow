@@ -1,3 +1,4 @@
+import OrderHistory from "@/components/order-history";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect as hardRedirect } from "next/navigation";
 
@@ -10,11 +11,14 @@ import { listTicketsForUser } from "@/lib/tickets";
 
 export default async function TicketsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const history = (await searchParams).tab === "orders";
 
   const user = await getSessionUser();
   if (!user) {
@@ -31,7 +35,16 @@ export default async function TicketsPage({
         <h1 className="font-display text-ink-900 text-3xl font-extrabold tracking-tight">
           {t("title")}
         </h1>
-        {tickets.length === 0 ? (
+        <nav className="mt-6 flex gap-3">
+          <Link href="/tickets" className={`rounded-lg px-4 py-2 font-semibold ${!history ? "bg-brand text-white" : "bg-white text-brand"}`}>
+            {locale === "ru" ? "Билеты" : locale === "kk" ? "Билеттер" : "Tickets"}
+          </Link>
+          <Link href="/tickets?tab=orders" className={`rounded-lg px-4 py-2 font-semibold ${history ? "bg-brand text-white" : "bg-white text-brand"}`}>
+            {locale === "ru" ? "История заказов" : locale === "kk" ? "Тапсырыстар тарихы" : "Order history"}
+          </Link>
+        </nav>
+
+        {history ? <OrderHistory locale={locale} /> : tickets.length === 0 ? (
           <div className="border-ink-300 mt-8 rounded-xl border border-dashed bg-white p-12 text-center">
             <p className="text-ink-900 font-bold">{t("empty")}</p>
             <p className="text-ink-600 mt-1 text-sm">{t("emptyBody")}</p>

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { UserRound } from "lucide-react";
 
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -10,10 +11,12 @@ export function SignedInNav({
   name,
   dashboardHref,
   dashboardLabel,
+  compact = false,
 }: {
   name: string;
   dashboardHref?: "/admin" | "/organizer";
   dashboardLabel?: string;
+  compact?: boolean;
 }) {
   const t = useTranslations("nav");
   const router = useRouter();
@@ -27,7 +30,11 @@ export function SignedInNav({
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div
+      className={
+        compact ? "flex flex-col items-start gap-4" : "flex items-center gap-3"
+      }
+    >
       <Link
         href="/tickets"
         className="text-ink-800 hover:text-brand text-sm font-semibold transition-colors"
@@ -40,16 +47,26 @@ export function SignedInNav({
       >
         {t("support")}
       </Link>
+      <Link
+        href="/notifications"
+        className="text-ink-800 hover:text-brand text-sm font-semibold transition-colors"
+      >
+        {t("notifications")}
+      </Link>
       {dashboardHref && dashboardLabel ? (
         <Link
           href={dashboardHref}
-          className="text-ink-800 hover:text-brand hidden text-sm font-semibold transition-colors sm:block"
+          className="text-ink-800 hover:text-brand text-sm font-semibold transition-colors"
         >
           {dashboardLabel}
         </Link>
       ) : null}
-      <span className="text-ink-800 hidden max-w-40 truncate text-sm font-semibold sm:block">
-        {name}
+      <span
+        className="inline-flex max-w-44 cursor-default select-none items-center gap-2 rounded-full border border-ink-300 bg-slate-100 px-3 py-1.5 text-sm font-medium text-ink-700"
+        title={name}
+      >
+        <UserRound className="size-4 shrink-0" aria-hidden />
+        <span className="truncate">{name}</span>
       </span>
       <button
         type="button"

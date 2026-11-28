@@ -59,7 +59,7 @@ export default async function HomePage({
 
           <h1 className="font-display mt-6 max-w-2xl text-4xl leading-[1.05] font-extrabold tracking-tight text-white sm:text-6xl">
             {t("headline")}{" "}
-            <span className="text-brand-tint">{t("headlineAccent")}</span>
+            <span className="text-brand-sky">{t("headlineAccent")}</span>
           </h1>
 
           <p className="mt-5 max-w-lg text-base leading-relaxed text-white/80">
@@ -99,7 +99,7 @@ export default async function HomePage({
       </section>
 
       {categories.length > 0 ? (
-        <section className="bg-ink-100 py-16">
+        <section id="categories" className="bg-ink-100 scroll-mt-16 py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <h2 className="font-display text-ink-900 text-3xl font-extrabold tracking-tight">
               {t("categoriesHeading")}

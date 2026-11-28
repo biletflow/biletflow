@@ -1,6 +1,7 @@
 import { prisma, type NotificationType, type Prisma } from "@biletflow/db";
 
 import { sendMail } from "./mail";
+import { notificationCopy, notificationLocale } from "./notification-copy";
 
 type OrderNotifyInput = {
   orderId: string;
@@ -55,6 +56,17 @@ async function deliver(input: {
       payload: input.payload,
     },
   });
+  await prisma.notification.create({
+    data: {
+      userId: input.userId,
+      type: input.type,
+      channel: "IN_APP",
+      subject: input.subject,
+      body: input.body,
+      payload: input.payload,
+      sentAt: new Date(),
+    },
+  });
 
   try {
     await sendMail({
@@ -65,17 +77,6 @@ async function deliver(input: {
     await prisma.notification.update({
       where: { id: row.id },
       data: { sentAt: new Date() },
-    });
-    await prisma.notification.create({
-      data: {
-        userId: input.userId,
-        type: input.type,
-        channel: "IN_APP",
-        subject: input.subject,
-        body: input.body,
-        payload: input.payload,
-        sentAt: new Date(),
-      },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "send_failed";
@@ -101,17 +102,18 @@ export async function notifyOrderPaid(input: OrderNotifyInput) {
   const user = await userEmail(input.userId);
   if (!user) return { skipped: true };
 
-  const ticketsUrl = `${appBaseUrl()}/${user.locale || "ru"}/tickets`;
-  const subject = `BiletFlow order ${input.reference} confirmed`;
+  const locale = notificationLocale(user.locale);
+  const copy = notificationCopy[locale];
+  const ticketsUrl = `${appBaseUrl()}/${locale}/tickets`;
+  const subject = copy.order(input.reference);
   const body = [
-    `Your order ${input.reference} for "${input.eventTitle}" is confirmed.`,
+    copy.confirmation(input.reference, input.eventTitle),
     "",
-    `Tickets issued: ${input.ticketCount}`,
-    `Total: ₸${input.totalKzt}`,
+    copy.quantity(input.ticketCount),
+    copy.total(input.totalKzt),
     "",
-    `View tickets: ${ticketsUrl}`,
-    "",
-    "This is a simulated academic notification (Mailpit in development).",
+    copy.view(ticketsUrl),
+    ...(input.totalKzt > 0 ? ["", copy.testPayment] : []),
   ].join("\n");
 
   await deliver({
@@ -133,10 +135,10 @@ export async function notifyOrderPaid(input: OrderNotifyInput) {
       userId: input.userId,
       email: user.email,
       type: "TICKET_DELIVERY",
-      subject: `BiletFlow tickets for ${input.reference}`,
+      subject: copy.tickets(input.reference),
       body: [
-        `Your admission tickets for "${input.eventTitle}" are ready.`,
-        `Open My tickets to show the QR or download the PDF: ${ticketsUrl}`,
+        copy.ready(input.eventTitle),
+        copy.view(ticketsUrl),
       ].join("\n"),
       payload: {
         orderId: input.orderId,
@@ -162,11 +164,9 @@ export async function notifyPaymentFailed(input: {
   const user = await userEmail(input.userId);
   if (!user) return { skipped: true };
 
-  const subject = `BiletFlow payment ${input.reason.toLowerCase()} for ${input.reference}`;
-  const body = [
-    `Payment for order ${input.reference} ("${input.eventTitle}") did not complete (${input.reason}).`,
-    "No tickets were issued. You can start checkout again from the event page.",
-  ].join("\n");
+  const copy = notificationCopy[notificationLocale(user.locale)];
+  const subject = copy.failed(input.reference);
+  const body = copy.tryAgain(input.eventTitle);
 
   await deliver({
     userId: input.userId,
@@ -203,11 +203,9 @@ export async function notifyReservationCancelled(input: {
   const user = await userEmail(input.userId);
   if (!user) return { skipped: true };
 
-  const subject = `BiletFlow reservation cancelled (${input.reference})`;
-  const body = [
-    `Your unpaid reservation ${input.reference} for "${input.eventTitle}" was cancelled.`,
-    "Inventory was released. No payment was taken.",
-  ].join("\n");
+  const copy = notificationCopy[notificationLocale(user.locale)];
+  const subject = copy.reservation(input.reference);
+  const body = copy.released(input.eventTitle);
 
   await deliver({
     userId: input.userId,
@@ -236,11 +234,11 @@ export async function notifyRefundCompleted(input: {
   }
   const user = await userEmail(input.userId);
   if (!user) return { skipped: true };
-  const subject = `BiletFlow refund for ${input.reference}`;
+  const copy = notificationCopy[notificationLocale(user.locale)];
+  const subject = copy.refund(input.reference);
   const body = [
-    `Order ${input.reference} for "${input.eventTitle}" was refunded.`,
-    `Amount: ₸${input.amountKzt}. This is a simulated refund. No card was charged or credited.`,
-    "The admission tickets on this order are no longer valid.",
+    copy.refundAmount(input.eventTitle, input.amountKzt),
+    copy.invalid,
   ].join("\n");
   await deliver({
     userId: input.userId,
@@ -270,13 +268,13 @@ export async function notifyEventCancelled(input: {
   }
   const user = await userEmail(input.userId);
   if (!user) return { skipped: true };
-  const subject = `BiletFlow event cancelled: ${input.eventTitle}`;
+  const copy = notificationCopy[notificationLocale(user.locale)];
+  const subject = copy.cancelled(input.eventTitle);
   const body = [
-    `"${input.eventTitle}" was cancelled.`,
-    `Order ${input.reference}. Reason: ${input.reason}`,
+    copy.reason(input.reference, input.reason),
     input.refunded
-      ? "A simulated refund was recorded and the tickets are no longer valid."
-      : "The unpaid reservation was released. No payment was taken.",
+      ? copy.cancelledRefund
+      : copy.released(input.eventTitle),
   ].join("\n");
   await deliver({
     userId: input.userId,
@@ -334,12 +332,9 @@ export async function notifySupportMessage(input: {
   if (existing) return { skipped: true };
   const user = await userEmail(input.recipientId);
   if (!user) return { skipped: true };
-  const subject = `BiletFlow support ${input.reference}`;
-  const body = [
-    `There is a new message on support case ${input.reference}.`,
-    `Subject: ${input.subject}`,
-    "Open the case in BiletFlow to reply.",
-  ].join("\n");
+  const copy = notificationCopy[notificationLocale(user.locale)];
+  const subject = copy.support(input.reference);
+  const body = copy.supportReply(input.subject);
   await deliver({
     userId: input.recipientId,
     email: user.email,

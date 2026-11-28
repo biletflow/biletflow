@@ -22,29 +22,34 @@ Point the app at the same backend the website uses. For an Android emulator with
 
 `--dart-define=BILETFLOW_API_URL=http://10.0.2.2:3000`
 
+For a USB-connected Android device, run `adb reverse tcp:3300 tcp:3300` and point the debug app at `http://127.0.0.1:3300` when the backend listens on port 3300.
+
 iOS Simulator can use `http://127.0.0.1:3000` when the API listens on localhost. Physical devices need a reachable HTTPS (or LAN) URL. Keep credentials out of source control.
 
-Android and iOS projects include camera permissions. Android includes Internet permission, disables backups for the stored session, and allows cleartext to the emulator host alias in debug builds.
+Android and iOS projects include camera permissions. Android includes Internet permission, disables backups for the stored session, and allows cleartext to the emulator host alias and USB loopback in debug builds.
 
 ## Current scope
 
-- Sign-in, secure bearer storage, sign-out, role-aware home, EN/RU/KK locale switcher.
-- Attendee: event catalog/search/filters, event detail + quantity selection, checkout, authenticated simulated payment, My Tickets with server QR PNG and PDF share.
-- Organizer: read-only event list/details.
-- Scanner: authorized event selection, check-in, counts, attendee search, reversal.
-- Shared theme tokens aligned with the web Figma brand; reusable event card, status badge, quantity stepper, empty/error states.
-- Widget and API smoke tests; GitHub Actions runs `flutter analyze` and `flutter test`.
+- Account access, EN/RU/KK and role-based navigation.
+- Attendee: event browsing, checkout, seat selection, promotions, orders, QR/PDF tickets, sharing, calendar, notifications and support.
+- Organizer: event and ticket management, seating, activation, analytics, campaigns, history and settings.
+- Platform admin: activation review, moderation and settings.
+- Event admin: assigned events, QR verification, attendee search, attendance and reversal.
+
+See [mobile scope](../../docs/srs-mobile-addendum.md) for acceptance criteria and #199 for remaining parity checks.
 
 ## Device verification (#134)
 
-CI covers analyze + unit/widget tests on Linux. Native APK/IPA and physical-device runs still need a machine with Android SDK and/or full Xcode. Record results honestly per platform:
+CI runs analysis, tests, Android debug APK and unsigned iOS device builds. Physical-device checks are separate:
 
 ```sh
 flutter doctor -v
 flutter build apk --debug
-flutter build ios --simulator --no-codesign
+flutter build ios --debug --no-codesign
 flutter run -d <android-or-ios-device> --dart-define=BILETFLOW_API_URL=...
 ```
+
+The iOS CI job targets physical-device binaries. The current ML Kit libraries used by `mobile_scanner` lack arm64 support for Apple Silicon iOS 26+ simulators.
 
 Validate permission denial, valid/duplicate scans, wrong event, invalid signatures, campaign codes, canceled/refunded tickets, offline, and backgrounding on each platform you claim.
 

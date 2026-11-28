@@ -16,6 +16,7 @@ void main() {
   ) async {
     var checkedIn = 1;
     var reversalRequests = 0;
+    var offline = false;
     final api = ApiClient(
       'https://example.test',
       client: MockClient((request) async {
@@ -34,6 +35,7 @@ void main() {
             );
           case '/api/mobile/events/event-a/attendees':
             expect(request.url.queryParameters['q'], 'Aliya & friend');
+            if (offline) throw http.ClientException('Connection refused');
             return http.Response(
               '{"attendees":[{"attendeeName":"Aliya","ticketTypeName":"General",'
               '"status":"CHECKED_IN","checkInRecordId":"record-a"}]}',
@@ -89,6 +91,13 @@ void main() {
 
     expect(reversalRequests, 1);
     expect(find.text('Checked in: 0 / 2'), findsOneWidget);
+    expect(find.text('Aliya'), findsNothing);
+
+    offline = true;
+    await tester.tap(find.byTooltip('Search attendees'));
+    await tester.pumpAndSettle();
+    final l10n = AppLocalizations.of(tester.element(find.byType(ScannerScreen)));
+    expect(find.widgetWithText(SnackBar, l10n.scanRequestFailed), findsOneWidget);
     expect(find.text('Aliya'), findsNothing);
   });
 }

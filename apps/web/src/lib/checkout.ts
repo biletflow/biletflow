@@ -10,7 +10,13 @@ import {
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
 import { clientIp, isUniqueViolation } from "./http";
-import { redeemCampaign, releaseInventory, reserveInventory, sellInventory } from "./inventory";
+import {
+  redeemCampaign,
+  releaseInventory,
+  releasePromoRedemption,
+  reserveInventory,
+  sellInventory,
+} from "./inventory";
 import { convertOrderSeats, holdSeat, releaseOrderSeats } from "./seats";
 import {
   notifyOrderPaid,
@@ -18,7 +24,10 @@ import {
 } from "./notifications";
 import { issueTickets, ticketSigningKey, type AttendeeInput } from "./tickets";
 
-const orderInclude = {
+const orderEventSelect = { id: true, title: true, slug: true, startsAt: true, endsAt: true, timezone: true, status: true, updatedAt: true, refundPolicy: true, venue: { select: { name: true, address: true, city: true, country: true } } } as const;
+
+export const orderInclude = {
+  event: { select: orderEventSelect },
   items: true,
   tickets: {
     include: {
@@ -35,6 +44,9 @@ export function presentOrder(order: PresentedOrder) {
     id: order.id,
     reference: order.reference,
     eventId: order.eventId,
+    refundPolicy: order.event.refundPolicy,
+    eventStartsAt: order.event.startsAt,
+    event: order.event,
     status: order.status,
     subtotalKzt: order.subtotalKzt,
     discountKzt: order.discountKzt,
@@ -134,7 +146,7 @@ export async function createOrder(
         (event.registrationOpensAt && event.registrationOpensAt > now) ||
         (event.registrationClosesAt && event.registrationClosesAt < now)
       ) {
-        throw new ApiError(409, "CONFLICT");
+        throw new ApiError(409, "CONFLICT", "REGISTRATION_CLOSED");
       }
 
       const types = new Map(event.ticketTypes.map((ticketType) => [ticketType.id, ticketType]));
@@ -162,7 +174,7 @@ export async function createOrder(
           (ticketType.salesStartAt && ticketType.salesStartAt > now) ||
           (ticketType.salesEndAt && ticketType.salesEndAt < now)
         ) {
-          throw new ApiError(409, "CONFLICT");
+          throw new ApiError(409, "CONFLICT", "TICKET_SALES_CLOSED");
         }
         const seatIds = item.seatIds ?? [];
         if (assigned && seatIds.length !== item.quantity) throw new ApiError(400, "VALIDATION_FAILED");
@@ -185,7 +197,7 @@ export async function createOrder(
 
       const priced = lines.some((line) => line.ticketType.priceKzt > 0);
       if (priced && (!event.paidSalesActive || event.paidSalesSuspended)) {
-        throw new ApiError(409, "CONFLICT");
+        throw new ApiError(409, "CONFLICT", "PAID_SALES_INACTIVE");
       }
 
       // The order item foreign key locks the seat weakly. Take the row lock first.
@@ -323,7 +335,7 @@ export async function createOrder(
         where: { id: created.id },
         include: {
           ...orderInclude,
-          event: { select: { title: true } },
+          event: { select: orderEventSelect },
         },
       });
     });
@@ -390,10 +402,16 @@ async function resolvePromo(
       throw new ApiError(400, "PROMO_INVALID");
     }
   }
-  const prior = await tx.promoRedemption.findUnique({
-    where: { campaignId_userId: { campaignId: campaign.id, userId } },
+  // Hold the campaign row until this checkout commits, so two orders cannot
+  // both pass the per-user count or the shared redemption cap.
+  const locked = await tx.$queryRaw<{ id: string }[]>`
+    SELECT "id" FROM "PromotionalCampaign" WHERE "id" = ${campaign.id} FOR UPDATE
+  `;
+  if (locked.length !== 1) throw new ApiError(400, "PROMO_INVALID");
+  const used = await tx.promoRedemption.count({
+    where: { campaignId: campaign.id, userId },
   });
-  if (prior) throw new ApiError(400, "PROMO_INVALID");
+  if (used >= campaign.perUserLimit) throw new ApiError(400, "PROMO_INVALID");
   return {
     campaignId: campaign.id,
     promoCodeId: promoCode.id,
@@ -420,7 +438,7 @@ export async function cancelReservation(userId: string, orderId: string, headers
       where: { id: orderId },
       include: {
         items: true,
-        event: { select: { title: true } },
+        event: { select: orderEventSelect },
       },
     });
     if (!current || current.userId !== userId) throw new ApiError(404, "NOT_FOUND");
@@ -431,6 +449,7 @@ export async function cancelReservation(userId: string, orderId: string, headers
       await releaseInventory(tx, item.ticketTypeId, item.quantity);
     }
     await releaseOrderSeats(tx, orderId);
+    await releasePromoRedemption(tx, orderId);
     const updated = await tx.order.update({
       where: { id: orderId },
       data: { status: "CANCELLED", cancelledAt: new Date() },

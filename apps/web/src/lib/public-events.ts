@@ -66,6 +66,7 @@ export function presentPublicEventDetail(
   return {
     ...presentPublicEventListItem(event),
     status: event.status,
+    seatingMode: event.seatingMode,
     refundPolicy: event.refundPolicy,
     registrationOpensAt: event.registrationOpensAt?.toISOString() ?? null,
     registrationClosesAt: event.registrationClosesAt?.toISOString() ?? null,
