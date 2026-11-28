@@ -96,3 +96,25 @@ export async function redeemCampaign(
   `;
   if (updated !== 1) throw new ApiError(400, "PROMO_INVALID");
 }
+
+/** Give back a redemption that belonged to an unpaid order. A second call is a no-op. */
+export async function releasePromoRedemption(
+  tx: Prisma.TransactionClient,
+  orderId: string,
+) {
+  const redemption = await tx.promoRedemption.findUnique({ where: { orderId } });
+  if (!redemption) return;
+  const locked = await tx.$queryRaw<{ id: string }[]>`
+    SELECT "id" FROM "PromotionalCampaign" WHERE "id" = ${redemption.campaignId} FOR UPDATE
+  `;
+  if (locked.length !== 1) throw new ApiError(409, "CONFLICT");
+  const removed = await tx.promoRedemption.deleteMany({ where: { id: redemption.id } });
+  if (removed.count !== 1) return;
+  const updated = await tx.$executeRaw`
+    UPDATE "PromotionalCampaign"
+    SET "redeemed" = "redeemed" - 1
+    WHERE "id" = ${redemption.campaignId}
+      AND "redeemed" > 0
+  `;
+  if (updated !== 1) throw new ApiError(409, "CONFLICT");
+}

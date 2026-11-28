@@ -94,7 +94,7 @@ Public `GET /api/events/:slug/seats` returns only `AVAILABLE` seats for a publis
 
 Assigned checkout item: `{ "ticketTypeId", "quantity", "seatIds" }`. `seatIds.length` must equal `quantity`, ids must be unique, and each seat must belong to the event venue and have physical status `AVAILABLE`. A mismatch is `400`. A missing, foreign, or physically unavailable seat is `404`. A seat already held or sold for this event is `409` with code `SOLD_OUT`. The insert locks the seat row. The order item, the order response, and `GET /api/tickets` include `seatId`, `sectionName`, `rowLabel`, and `seatNumber`. General admission leaves those fields `null`.
 
-Declined, abandoned, expired, and cancelled checkouts release the hold and the reserved inventory together. Payment approval, expiry, and cancellation lock the order row, so two approvals of the same order issue one ticket. A successful refund or event cancellation marks the ticket `REFUNDED` (`invalidatedAt` is set). Check-in then returns `REFUNDED`, and the seat can be sold again. A checked-in ticket cannot be refunded by the organizer (`409`).
+Declined, abandoned, expired, and cancelled checkouts release the hold, the reserved inventory, and the promo redemption of that unpaid order. A repeated cancel or webhook does not move those counters again, and the buyer can use the code once more. Payment approval, expiry, and cancellation lock the order row, so two approvals of the same order issue one ticket. A successful refund or event cancellation marks the ticket `REFUNDED` (`invalidatedAt` is set). Check-in then returns `REFUNDED`, and the seat can be sold again. A checked-in ticket cannot be refunded by the organizer (`409`).
 
 Check-in success and `ALREADY_CHECKED_IN` both include `ticket.seatLabel` (`"Stalls A 1"`, or `null` for general admission).
 
@@ -160,7 +160,7 @@ by construction.
 | `GET` `POST` | `/api/organizer/events/:id/campaigns` | `campaignInputSchema`. Generates the promo code and the opaque QR token |
 | `PUT` | `/api/organizer/campaigns/:id` | Disable, edit dates and limits |
 
-Checkout accepts the code while the campaign is `ACTIVE`, inside its dates, and `redeemed` is still below `maxRedemptions` (or the cap is unset). The counter moves in that same transaction. The next order is `400` `PROMO_INVALID`, and `redeemed` stays at the cap. `perUserLimit` is how many of one user's orders may use the code. The default is 1. A further order by that user is the same `400`.
+Checkout accepts the code while the campaign is `ACTIVE`, inside its dates, and `redeemed` is still below `maxRedemptions` (or the cap is unset). The counter moves in that same transaction. The next order is `400` `PROMO_INVALID`, and `redeemed` stays at the cap. `perUserLimit` is how many of one user's orders may use the code. The default is 1. A further order by that user is the same `400`. Cancelling, declining, abandoning, or expiring the unpaid order removes that redemption and lowers `redeemed`. A paid refund keeps the redemption.
 | `GET` | `/api/organizer/campaigns/:id/qr.png` | Visually distinct from a ticket QR: different frame, campaign label, no ticket styling |
 | `GET` | `/api/organizer/campaigns/:id/report` | Redemptions, orders, tickets, gross, discount, net |
 

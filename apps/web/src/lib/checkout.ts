@@ -10,7 +10,13 @@ import {
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
 import { clientIp, isUniqueViolation } from "./http";
-import { redeemCampaign, releaseInventory, reserveInventory, sellInventory } from "./inventory";
+import {
+  redeemCampaign,
+  releaseInventory,
+  releasePromoRedemption,
+  reserveInventory,
+  sellInventory,
+} from "./inventory";
 import { convertOrderSeats, holdSeat, releaseOrderSeats } from "./seats";
 import {
   notifyOrderPaid,
@@ -443,6 +449,7 @@ export async function cancelReservation(userId: string, orderId: string, headers
       await releaseInventory(tx, item.ticketTypeId, item.quantity);
     }
     await releaseOrderSeats(tx, orderId);
+    await releasePromoRedemption(tx, orderId);
     const updated = await tx.order.update({
       where: { id: orderId },
       data: { status: "CANCELLED", cancelledAt: new Date() },
