@@ -116,11 +116,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         if (event != null)
           IconButton(
             icon: const Icon(Icons.share_outlined),
-            tooltip: seatLabel(context, 'Share event', 'Поделиться', 'Бөлісу'),
+            tooltip: l10n.shareEvent,
             onPressed: () async {
               final box = context.findRenderObject() as RenderBox?;
+              final link = publicEventUrl(
+                widget.api.base,
+                l10n.locale.languageCode,
+                widget.slug,
+              );
               await Share.share(
-                '$title\n${widget.api.base.resolve('/events/${Uri.encodeComponent(widget.slug)}')}',
+                '$title\n$link',
                 sharePositionOrigin: box == null || !box.hasSize ? null : box.localToGlobal(Offset.zero) & box.size,
               );
             },

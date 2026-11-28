@@ -1,5 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:biletflow_mobile/core/format.dart';
 import 'package:biletflow_mobile/screens/my_tickets.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('groups tickets by event identity, not title', () {
@@ -15,5 +16,16 @@ void main() {
   test('formats assigned seats and omits general admission seat labels', () {
     expect(ticketSeat({'sectionName': 'Stalls', 'rowLabel': 'A', 'seatNumber': '3'}), 'Stalls A 3');
     expect(ticketSeat({}), '');
+  });
+
+  test('shares the localized public event page', () {
+    expect(
+      publicEventUrl(Uri.parse('https://biletflow.kz'), 'en', 'jazz night'),
+      'https://biletflow.kz/en/events/jazz%20night',
+    );
+    expect(
+      publicEventUrl(Uri.parse('http://10.0.2.2:3000'), 'fr', 'jazz'),
+      'http://10.0.2.2:3000/ru/events/jazz',
+    );
   });
 }

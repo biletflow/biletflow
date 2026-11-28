@@ -14,7 +14,12 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       include: { event: { include: { venue: true } } },
     });
     if (!order) throw new ApiError(404, "NOT_FOUND");
-    return new Response(eventCalendar(order.event), {
+    const origin = (process.env.NEXT_PUBLIC_APP_URL ?? new URL(request.url).origin).replace(/\/$/, "");
+    return new Response(eventCalendar({
+      ...order.event,
+      description: order.event.description,
+      url: `${origin}/ru/events/${order.event.slug}`,
+    }), {
       headers: {
         "Content-Type": "text/calendar; charset=utf-8",
         "Content-Disposition": 'attachment; filename="biletflow-event.ics"',

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/api.dart';
 import '../l10n/app_localizations.dart';
@@ -63,19 +64,13 @@ class _EventUtilitiesState extends State<EventUtilities> {
       if (location.isNotEmpty)
         OutlinedButton.icon(
           onPressed: () async {
-            await showDialog<void>(context: context, builder: (context) => AlertDialog(
-              title: Text(label('Map link', 'Ссылка на карту', 'Карта сілтемесі')),
-              content: SelectableText(url.toString()),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: Text(MaterialLocalizations.of(context).closeButtonLabel)),
-                FilledButton(onPressed: () async {
-                  Navigator.pop(context);
-                  await Share.share(url.toString(), sharePositionOrigin: shareOrigin);
-                }, child: Text(label('Share / open link', 'Поделиться / открыть ссылку', 'Сілтемені бөлісу / ашу'))),
-              ],
-            ));
+            final opened = await launchUrl(url, mode: LaunchMode.externalApplication);
+            if (!opened && context.mounted) {
+              await Share.share(url.toString(), sharePositionOrigin: shareOrigin);
+            }
           },
-          icon: const Icon(Icons.map_outlined), label: Text(label('Maps', 'Карта', 'Карта')),
+          icon: const Icon(Icons.map_outlined),
+          label: Text(label('Open in Maps', 'Открыть на карте', 'Картадан ашу')),
         ),
     ]);
   }

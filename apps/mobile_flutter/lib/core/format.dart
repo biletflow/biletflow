@@ -1,5 +1,15 @@
 import 'package:material_ui/material_ui.dart';
 
+/// Public event page. The site always prefixes a locale; Russian is the default.
+String publicEventUrl(Uri apiBase, String locale, String slug) {
+  final language = locale == 'en' || locale == 'kk' || locale == 'ru'
+      ? locale
+      : 'ru';
+  return apiBase
+      .resolve('/$language/events/${Uri.encodeComponent(slug)}')
+      .toString();
+}
+
 String formatWholeNumber(int amount, String languageCode) {
   final digits = amount.abs().toString();
   final separator = languageCode == 'en' ? ',' : '\u00a0';
