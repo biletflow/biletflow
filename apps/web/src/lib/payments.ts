@@ -6,7 +6,7 @@ import { paymentWebhookSchema } from "@biletflow/shared";
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
 import { clientIp, isUniqueViolation } from "./http";
-import { convertReservation, releaseInventory } from "./inventory";
+import { convertReservation, releaseInventory, releasePromoRedemption } from "./inventory";
 import { convertOrderSeats, releaseOrderSeats } from "./seats";
 import { maybeActivate, presentActivation } from "./activation";
 import { notifyOrderPaid, notifyPaymentFailed } from "./notifications";
@@ -97,6 +97,7 @@ async function expireOrder(orderId: string, userId: string, headers: Headers) {
       await releaseInventory(tx, item.ticketTypeId, item.quantity);
     }
     await releaseOrderSeats(tx, orderId);
+    await releasePromoRedemption(tx, orderId);
     await tx.order.update({ where: { id: orderId }, data: { status: "EXPIRED" } });
     await audit(tx, {
       actorUserId: userId,
@@ -351,6 +352,7 @@ async function releasePaidHold(
       await releaseInventory(tx, item.ticketTypeId, item.quantity);
     }
     await releaseOrderSeats(tx, order.id);
+    await releasePromoRedemption(tx, order.id);
     await tx.order.update({
       where: { id: order.id },
       data: {

@@ -10,7 +10,13 @@ import {
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
 import { clientIp, isUniqueViolation } from "./http";
-import { redeemCampaign, releaseInventory, reserveInventory, sellInventory } from "./inventory";
+import {
+  redeemCampaign,
+  releaseInventory,
+  releasePromoRedemption,
+  reserveInventory,
+  sellInventory,
+} from "./inventory";
 import { convertOrderSeats, holdSeat, releaseOrderSeats } from "./seats";
 import {
   notifyOrderPaid,
@@ -396,10 +402,16 @@ async function resolvePromo(
       throw new ApiError(400, "PROMO_INVALID");
     }
   }
-  const prior = await tx.promoRedemption.findUnique({
-    where: { campaignId_userId: { campaignId: campaign.id, userId } },
+  // Hold the campaign row until this checkout commits, so two orders cannot
+  // both pass the per-user count or the shared redemption cap.
+  const locked = await tx.$queryRaw<{ id: string }[]>`
+    SELECT "id" FROM "PromotionalCampaign" WHERE "id" = ${campaign.id} FOR UPDATE
+  `;
+  if (locked.length !== 1) throw new ApiError(400, "PROMO_INVALID");
+  const used = await tx.promoRedemption.count({
+    where: { campaignId: campaign.id, userId },
   });
-  if (prior) throw new ApiError(400, "PROMO_INVALID");
+  if (used >= campaign.perUserLimit) throw new ApiError(400, "PROMO_INVALID");
   return {
     campaignId: campaign.id,
     promoCodeId: promoCode.id,
@@ -437,6 +449,7 @@ export async function cancelReservation(userId: string, orderId: string, headers
       await releaseInventory(tx, item.ticketTypeId, item.quantity);
     }
     await releaseOrderSeats(tx, orderId);
+    await releasePromoRedemption(tx, orderId);
     const updated = await tx.order.update({
       where: { id: orderId },
       data: { status: "CANCELLED", cancelledAt: new Date() },

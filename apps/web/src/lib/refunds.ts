@@ -2,6 +2,7 @@ import { prisma, type UserRole } from "@biletflow/db";
 
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
+import { lockOrder } from "./checkout";
 import { clientIp } from "./http";
 import { refundInventory } from "./inventory";
 import { notifyRefundCompleted } from "./notifications";
@@ -30,6 +31,7 @@ export async function refundOrder(
   headers: Headers,
 ) {
   const settled = await prisma.$transaction(async (tx) => {
+    if (!(await lockOrder(tx, orderId))) throw new ApiError(404, "NOT_FOUND");
     const order = await tx.order.findUnique({
       where: { id: orderId },
       include: {

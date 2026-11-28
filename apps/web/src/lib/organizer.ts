@@ -3,7 +3,8 @@ import { prisma, type Prisma, type TicketType, type UserRole } from "@biletflow/
 import { ApiError } from "./api-error";
 import { audit } from "./audit";
 import { clientIp } from "./http";
-import { refundInventory, releaseInventory } from "./inventory";
+import { lockOrder } from "./checkout";
+import { refundInventory, releaseInventory, releasePromoRedemption } from "./inventory";
 import { releaseOrderSeats } from "./seats";
 
 type SessionUser = {
@@ -148,23 +149,29 @@ export async function cancelEvent(
     });
 
     for (const order of orders) {
-      if (order.status === "PAID") {
-        for (const item of order.items) {
+      if (!(await lockOrder(tx, order.id))) continue;
+      const current = await tx.order.findUnique({
+        where: { id: order.id },
+        include: { items: true, payments: true },
+      });
+      if (!current) continue;
+      if (current.status === "PAID") {
+        for (const item of current.items) {
           await refundInventory(tx, item.ticketTypeId, item.quantity);
         }
         await tx.ticket.updateMany({
-          where: { orderId: order.id, status: { in: ["VALID", "CHECKED_IN"] } },
+          where: { orderId: current.id, status: { in: ["VALID", "CHECKED_IN"] } },
           data: { status: "REFUNDED", invalidatedAt: new Date() },
         });
         await tx.order.update({
-          where: { id: order.id },
+          where: { id: current.id },
           data: { status: "REFUNDED" },
         });
-        for (const payment of order.payments) {
+        for (const payment of current.payments) {
           if (payment.status !== "SUCCEEDED") continue;
           await tx.refund.create({
             data: {
-              orderId: order.id,
+              orderId: current.id,
               paymentId: payment.id,
               initiatedById: user.id,
               amountKzt: payment.amountKzt,
@@ -179,13 +186,14 @@ export async function cancelEvent(
             data: { status: "REFUNDED" },
           });
         }
-      } else {
-        for (const item of order.items) {
+      } else if (current.status === "PENDING" || current.status === "AWAITING_PAYMENT") {
+        for (const item of current.items) {
           await releaseInventory(tx, item.ticketTypeId, item.quantity);
         }
-        await releaseOrderSeats(tx, order.id);
+        await releaseOrderSeats(tx, current.id);
+        await releasePromoRedemption(tx, current.id);
         await tx.order.update({
-          where: { id: order.id },
+          where: { id: current.id },
           data: { status: "CANCELLED", cancelledAt: new Date() },
         });
       }

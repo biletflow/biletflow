@@ -75,6 +75,7 @@ class _OrganizerSettingsState extends State<OrganizerSettings> {
         ],const {},(body)=>widget.api.post('/api/organizer/payout-accounts',body)),child:Text(tr('Add demo account','Добавить тестовый счёт','Сынақ шотын қосу'))),
         const Divider(),
         Text(tr('Payout history','История выплат','Төлем тарихы')),
+        Text(tr('Saved simulated payout. Not recalculated from current sales, refunds, or fees.','Сохранённая тестовая выплата. Не пересчитывается из текущих продаж, возвратов и комиссий.','Сақталған сынақ төлем. Ағымдағы сатылым, қайтарым және комиссиядан қайта есептелмейді.')),
         for(final row in payouts.whereType<Map>()) ListTile(title:Text('${row['status']}'),subtitle:Text('${row['createdAt']}'),trailing:Text('${row['netKzt']} KZT')),
       ]);
     }),

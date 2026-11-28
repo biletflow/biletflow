@@ -434,9 +434,9 @@ async function main() {
       }
 
       if (useCampaign) {
-        // perUserLimit is 1, so skip if this buyer already redeemed this campaign.
-        const existing = await prisma.promoRedemption.findUnique({
-          where: { campaignId_userId: { campaignId: campaign!.id, userId: buyer.id } },
+        // The demo campaigns allow one redemption per buyer.
+        const existing = await prisma.promoRedemption.findFirst({
+          where: { campaignId: campaign!.id, userId: buyer.id },
         });
         if (!existing) {
           await prisma.promoRedemption.create({

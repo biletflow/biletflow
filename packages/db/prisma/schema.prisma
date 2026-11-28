@@ -811,8 +811,7 @@ model PromoRedemption {
   order     Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
   user      User                @relation(fields: [userId], references: [id])
 
-  @@unique([campaignId, userId])
-  @@index([campaignId])
+  @@index([campaignId, userId])
 }
 
 // ---------------------------------------------------------------------------
