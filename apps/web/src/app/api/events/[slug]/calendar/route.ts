@@ -9,7 +9,12 @@ export async function GET(_request: Request, context: { params: Promise<{ slug: 
     const { slug } = await context.params;
     const event = await getPublicEventBySlug(slug);
     if (!event) throw new ApiError(404, "NOT_FOUND");
-    return new Response(eventCalendar(event), {
+    const origin = (process.env.NEXT_PUBLIC_APP_URL ?? new URL(_request.url).origin).replace(/\/$/, "");
+    return new Response(eventCalendar({
+      ...event,
+      description: event.description,
+      url: `${origin}/ru/events/${event.slug}`,
+    }), {
       headers: {
         "Content-Type": "text/calendar; charset=utf-8",
         "Content-Disposition": 'attachment; filename="biletflow-event.ics"',

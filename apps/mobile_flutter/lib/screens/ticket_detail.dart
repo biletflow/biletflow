@@ -78,13 +78,33 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     if (!mounted || _qrError != null || _qr == null) return;
     final bytes = _qr!;
     final l10n = AppLocalizations.of(context);
+    final summary = widget.summary;
+    final event = summary['event'];
+    final title = event is Map ? '${event['title'] ?? ''}' : '';
+    final seat = [
+      summary['sectionName'],
+      summary['rowLabel'],
+      summary['seatNumber'],
+    ].whereType<String>().where((part) => part.isNotEmpty).join(' ');
     await Navigator.push<void>(context, MaterialPageRoute(builder: (_) => Scaffold(
-      appBar: AppBar(title: Text(l10n.admissionQr)),
-      backgroundColor: Colors.white,
-      body: SafeArea(child: Center(child: Padding(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        title: Text(l10n.showAtDoor),
+      ),
+      body: SafeArea(child: ListView(
         padding: const EdgeInsets.all(24),
-        child: Image.memory(bytes, fit: BoxFit.contain, width: double.infinity),
-      ))),
+        children: [
+          if (title.isNotEmpty)
+            Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
+          Text('${summary['attendeeName'] ?? ''}', style: const TextStyle(color: Colors.white)),
+          Text(l10n.ticketTypeName('${summary['ticketTypeName'] ?? ''}'), style: const TextStyle(color: Colors.white70)),
+          if (seat.isNotEmpty) Text(seat, style: const TextStyle(color: Colors.white70)),
+          const SizedBox(height: 24),
+          Image.memory(bytes, fit: BoxFit.contain),
+        ],
+      )),
     )));
   }
 
@@ -186,7 +206,11 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
               )),
             ),
           if (_canShowQr && _qr != null && !_qrLoading && _qrError == null)
-            OutlinedButton.icon(onPressed: _showFullQr, icon: const Icon(Icons.fullscreen), label: Text(switch (l10n.locale.languageCode) { 'ru' => 'На весь экран', 'kk' => 'Толық экран', _ => 'Full screen' })),
+            OutlinedButton.icon(
+              onPressed: _showFullQr,
+              icon: const Icon(Icons.fullscreen),
+              label: Text(l10n.showAtDoor),
+            ),
           const SizedBox(height: 20),
           FilledButton.icon(
             onPressed: _pdfBusy ? null : _sharePdf,

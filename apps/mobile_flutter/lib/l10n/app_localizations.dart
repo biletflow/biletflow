@@ -325,6 +325,8 @@ class AppLocalizations {
       'upcoming': 'Upcoming events',
       'workspace': 'Workspace',
       'orderHistory': 'Order history',
+      'showAtDoor': 'Show at the door',
+      'shareEvent': 'Share event',
       'noOrders': 'No orders yet',
       'registrationUnavailable': 'Registration is closed.',
       'paidSalesUnavailable':
@@ -584,6 +586,8 @@ class AppLocalizations {
       'upcoming': 'Ближайшие события',
       'workspace': 'Управление',
       'orderHistory': 'История заказов',
+      'showAtDoor': 'Показать на входе',
+      'shareEvent': 'Поделиться событием',
       'noOrders': 'Заказов пока нет',
       'registrationUnavailable': 'Регистрация закрыта.',
       'paidSalesUnavailable':
@@ -840,6 +844,8 @@ class AppLocalizations {
       'upcoming': 'Алдағы іс-шаралар',
       'workspace': 'Басқару',
       'orderHistory': 'Тапсырыстар тарихы',
+      'showAtDoor': 'Кіреберісте көрсету',
+      'shareEvent': 'Іс-шарамен бөлісу',
       'noOrders': 'Әзірге тапсырыс жоқ',
       'registrationUnavailable': 'Тіркелу жабық.',
       'paidSalesUnavailable': 'Бұл іс-шараға ақылы билеттер қазір сатылмайды.',
@@ -1001,6 +1007,8 @@ class AppLocalizations {
   String get upcoming => _t('upcoming');
   String get workspace => _t('workspace');
   String get orderHistory => _t('orderHistory');
+  String get showAtDoor => _t('showAtDoor');
+  String get shareEvent => _t('shareEvent');
   String get noOrders => _t('noOrders');
   String get registrationUnavailable => _t('registrationUnavailable');
   String get paidSalesUnavailable => _t('paidSalesUnavailable');

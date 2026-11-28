@@ -5,6 +5,8 @@ export type CalendarEvent = {
   endsAt: Date;
   updatedAt: Date;
   status: string;
+  description?: string | null;
+  url?: string | null;
   venue: { name: string; address: string; city: string; country: string } | null;
 };
 
@@ -46,12 +48,15 @@ export function eventCalendar(event: CalendarEvent) {
     "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//BiletFlow//Events//EN", "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
     "UID:" + escapeText(event.id) + "@biletflow",
+    "SEQUENCE:" + (event.status === "CANCELLED" ? "1" : "0"),
     "DTSTAMP:" + stamp(event.updatedAt),
     "LAST-MODIFIED:" + stamp(event.updatedAt),
     "DTSTART:" + stamp(event.startsAt),
     "DTEND:" + stamp(event.endsAt),
     "SUMMARY:" + escapeText(event.title),
+    "DESCRIPTION:" + escapeText(event.description ?? ""),
     "LOCATION:" + escapeText(eventLocation(event)),
+    ...(event.url ? ["URL:" + escapeText(event.url)] : []),
     "STATUS:" + (event.status === "CANCELLED" ? "CANCELLED" : "CONFIRMED"),
     "END:VEVENT", "END:VCALENDAR", "",
   ].map(foldLine).join("\r\n");

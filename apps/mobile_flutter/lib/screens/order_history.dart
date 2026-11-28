@@ -60,25 +60,30 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             itemCount: orders.length,
             itemBuilder: (context, index) {
               final order = orders[index];
-              final id = order['id'] as String;
-              final status = order['status'] as String;
-              final total = (order['totalKzt'] as num).round();
+              final id = '${order['id'] ?? ''}';
+              final status = '${order['status'] ?? ''}';
+              final total = order['totalKzt'] is num ? (order['totalKzt'] as num).round() : 0;
+              final event = order['event'];
+              final eventTitle = event is Map ? '${event['title'] ?? ''}' : '';
               return Card(
                 child: ListTile(
-                  title: Text('${order['reference']}'),
+                  title: Text(eventTitle.isEmpty ? '${order['reference']}' : eventTitle),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        total > 0
-                            ? '${l10n.money(total)} · ${l10n.testTransaction}'
-                            : l10n.free,
+                        [
+                          '${order['reference']}',
+                          total > 0 ? l10n.money(total) : l10n.free,
+                        ].join(' · '),
                       ),
                       StatusBadge.order(status, l10n.orderStatus(status)),
                     ],
                   ),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () async {
+                  onTap: id.isEmpty
+                      ? null
+                      : () async {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(

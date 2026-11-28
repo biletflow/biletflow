@@ -6,9 +6,19 @@ describe("calendar export", () => {
   it("keeps stable identity, UTC times and escaped text", () => {
     const result = eventCalendar(event);
     expect(result).toContain("UID:event1@biletflow\r\n");
+    expect(result).toContain("SEQUENCE:0\r\n");
     expect(result).toContain("DTSTART:20261128T050000Z");
     expect(result).toContain("SUMMARY:A\\, B\\; C\\nD");
-    expect(eventCalendar({ ...event, status: "CANCELLED" })).toContain("STATUS:CANCELLED");
+    const cancelled = eventCalendar({
+      ...event,
+      status: "CANCELLED",
+      description: "Venue closed",
+      url: "https://biletflow.kz/ru/events/jazz",
+    });
+    expect(cancelled).toContain("STATUS:CANCELLED");
+    expect(cancelled).toContain("SEQUENCE:1\r\n");
+    expect(cancelled).toContain("DESCRIPTION:Venue closed");
+    expect(cancelled).toContain("URL:https://biletflow.kz/ru/events/jazz");
   });
   it("encodes map query", () => {
     expect(new URL(mapsUrl("Astana, Kazakhstan")).searchParams.get("query")).toBe("Astana, Kazakhstan");
