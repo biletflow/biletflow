@@ -74,7 +74,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       Text(
                         [
                           '${order['reference']}',
-                          total > 0 ? l10n.money(total) : l10n.free,
+                          total > 0
+                              ? '${l10n.money(total)} · ${l10n.testTransaction}'
+                              : l10n.free,
                         ].join(' · '),
                       ),
                       StatusBadge.order(status, l10n.orderStatus(status)),

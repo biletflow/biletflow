@@ -165,6 +165,7 @@ export async function getPublicEventBySlug(slug: string) {
       registrationClosesAt: true,
       cancellationReason: true,
       updatedAt: true,
+      calendarSequence: true,
       seatingMode: true,
       venue: { select: { name: true, address: true, city: true, country: true } },
       organizer: {
